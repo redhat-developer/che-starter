@@ -12,25 +12,39 @@
  */
 package io.fabric8.planner.che.starter.client;
 
-import java.util.Arrays;
+import java.util.List;
 
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-@Component
+import io.fabric8.planner.che.starter.model.Workspace;
+
+@Service
 public class CheRestClient {
-    
-    public void getWorspaces() {
+
+    public List<Workspace> listWorkspaces() {
         RestTemplate template = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-        HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
-        ResponseEntity<String> result = template.exchange(CheEndpoints.LIST_WORKSPACES.toString(), HttpMethod.GET, entity, String.class);
+        ResponseEntity<List<Workspace>> response =
+                template.exchange(CheRestEndpoints.LIST_WORKSPACES.toString(),
+                                  HttpMethod.GET,
+                                  null,
+                                  new ParameterizedTypeReference<List<Workspace>>() {});
+        return response.getBody();
+    }
+
+    public void startWorkspace() {
+        throw new UnsupportedOperationException("'startWorkspace' is currently not supported");
+    }
+
+    public void stopWorkspace() {
+        throw new UnsupportedOperationException("'stopWorkspace' is currently not supported");
+    }
+
+    public void stopAllWorkspaces() {
+        throw new UnsupportedOperationException("'stopAllWorkspaces' is currently not supported");
     }
 
 }

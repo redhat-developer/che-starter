@@ -12,7 +12,6 @@
  */
 package io.fabric8.planner.che.starter.controller;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -45,17 +44,22 @@ public class WorkspaceConroller {
 
     @PostMapping
     public Workspace create() {
-        return new Workspace(generator.generateId());
+        return new Workspace();
     }
 
     @GetMapping
     public List<Workspace> list() {
-        return Collections.emptyList();
+        return cheRestClient.listWorkspaces();
     }
 
     @DeleteMapping("/{id}/runtime")
     public Workspace stop(@PathVariable String id) {
-        return new Workspace(id);
+        return new Workspace();
+    }
+    
+    @DeleteMapping("/all")
+    public void stopAll() {
+        cheRestClient.stopAllWorkspaces();
     }
 
 }

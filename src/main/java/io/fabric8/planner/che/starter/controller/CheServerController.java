@@ -37,7 +37,8 @@ public class CheServerController {
     }
 
     @DeleteMapping("/{id}")
-    public CheServer stopCheServer() {
+    public CheServer stopCheServer(@PathVariable String id) {
+        LOG.info("Stopping Che Server {}", id);
         return new CheServer("id");
     }
 

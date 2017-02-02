@@ -12,18 +12,19 @@
  */
 package io.fabric8.planner.che.starter.client;
 
-public enum CheEndpoints {
-    LIST_WORKSPACES("http://che.openshift.mini/api/workspace");
+public enum CheRestEndpoints {
+    CREATE_WORKSPACE("http://demo.che.ci.centos.org/api/workspace"),
+    LIST_WORKSPACES ("http://demo.che.ci.centos.org/api/workspace");
 
-    private final String uri;
+    private final String endpoint;
 
-    private CheEndpoints(final String uri) {
-        this.uri = uri;
+    private CheRestEndpoints(final String endpoint) {
+        this.endpoint = endpoint;
     }
 
     @Override
     public String toString() {
-        return uri;
+        return endpoint;
     }
 
 }
