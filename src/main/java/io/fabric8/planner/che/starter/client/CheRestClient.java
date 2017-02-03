@@ -14,6 +14,8 @@ package io.fabric8.planner.che.starter.client;
 
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +26,7 @@ import io.fabric8.planner.che.starter.model.Workspace;
 
 @Service
 public class CheRestClient {
+    private static final Logger LOG = LogManager.getLogger(CheRestClient.class);
 
     public List<Workspace> listWorkspaces() {
         RestTemplate template = new RestTemplate();
@@ -35,12 +38,15 @@ public class CheRestClient {
         return response.getBody();
     }
 
-    public void startWorkspace() {
-        throw new UnsupportedOperationException("'startWorkspace' is currently not supported");
+    public void createAndStartWorkspace() {
+        RestTemplate template = new RestTemplate();
+        Workspace workspace = template.postForObject(CheRestEndpoints.CREATE_WORKSPACE.toString(), new Workspace(), Workspace.class);
+        LOG.info("New Workspace has been created (id: {}),", workspace.getId());
     }
 
-    public void stopWorkspace() {
-        throw new UnsupportedOperationException("'stopWorkspace' is currently not supported");
+    public void stopWorkspace(String id) {
+        RestTemplate template = new RestTemplate();
+        template.delete(CheRestEndpoints.STOP_WORKSPACE.toString().replace("{id}", id));
     }
 
     public void stopAllWorkspaces() {

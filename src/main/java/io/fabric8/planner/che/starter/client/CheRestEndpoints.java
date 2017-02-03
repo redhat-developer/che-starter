@@ -14,7 +14,8 @@ package io.fabric8.planner.che.starter.client;
 
 public enum CheRestEndpoints {
     CREATE_WORKSPACE("http://demo.che.ci.centos.org/api/workspace"),
-    LIST_WORKSPACES ("http://demo.che.ci.centos.org/api/workspace");
+    LIST_WORKSPACES ("http://demo.che.ci.centos.org/api/workspace"),
+    STOP_WORKSPACE  ("http://demo.che.ci.centos.org/api/workspace/{id}/runtime");
 
     private final String endpoint;
 
