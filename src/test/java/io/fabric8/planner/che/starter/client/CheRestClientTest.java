@@ -13,12 +13,10 @@
 package io.fabric8.planner.che.starter.client;
 
 import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;
@@ -45,10 +43,7 @@ public class CheRestClientTest {
         List<Workspace> workspaces = this.client.listWorkspaces();
         LOG.info("Number of workspaces: {}", workspaces.size());
         workspaces.forEach(w -> LOG.info("workspace ID: {}", w.getId()));
-        List<Workspace> runningWorkspaces = workspaces.stream().filter(w -> w.getStatus().equals("RUNNING"))
-                .collect(Collectors.toList());
         assertFalse(workspaces.isEmpty());
-        assertTrue(CollectionUtils.isEqualCollection(workspaces, runningWorkspaces));
     }
 
     @Test(expected = HttpClientErrorException.class)
@@ -65,7 +60,11 @@ public class CheRestClientTest {
     public void stopWorskpace() {
         List<Workspace> workspaces = client.listWorkspaces();
         if (!workspaces.isEmpty()) {
-            client.stopWorkspace(workspaces.get(0).getId());
+            List<Workspace> runningWorkspaces = workspaces.stream().filter(w -> w.getStatus().equals("RUNNING"))
+                    .collect(Collectors.toList());
+            if (!runningWorkspaces.isEmpty()) {
+                client.stopWorkspace(runningWorkspaces.get(0).getId());
+            }
         }
     }
 

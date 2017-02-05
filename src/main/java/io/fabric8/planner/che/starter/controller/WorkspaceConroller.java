@@ -53,8 +53,8 @@ public class WorkspaceConroller {
     }
 
     @DeleteMapping("/{id}/runtime")
-    public Workspace stop(@PathVariable String id) {
-        return new Workspace();
+    public void stop(@PathVariable String id) {
+        cheRestClient.stopWorkspace(id);
     }
     
     @DeleteMapping("/all")
