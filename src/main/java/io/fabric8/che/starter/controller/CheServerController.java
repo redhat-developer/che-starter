@@ -35,7 +35,7 @@ import io.fabric8.che.starter.model.CheServer;
 public class CheServerController {
 
     private static final Logger LOG = LogManager.getLogger(CheServerController.class);
-    
+
     @ApiOperation(value = "initializeUser")
     @RequestMapping(method = RequestMethod.GET, path="/initializeUser/{userToken}", produces="application/json")
     @ApiImplicitParams({
@@ -43,7 +43,7 @@ public class CheServerController {
     })
     @ApiResponses(value = {
     		@ApiResponse(code = 200, message = "Success")
-    })    
+    })
     public void initializeUser(@PathVariable String userToken) {
     	LOG.info("Initializing user {}",  userToken);
     }

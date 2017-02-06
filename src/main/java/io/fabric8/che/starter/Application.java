@@ -27,10 +27,10 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 public class Application {
 
-    public static void main(String[] args) {    	
-        SpringApplication.run(Application.class, args);        
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
     }
-    
+
     @Bean
     public Docket newsApi() {
         return new Docket(DocumentationType.SWAGGER_2)
@@ -40,12 +40,12 @@ public class Application {
                 .paths(regex("/greeting.*"))
                 .build();
     }
-     
+
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
                 .title("Che Starter API")
                 .description("API for managing Che instances per user")
                 .version("1.0")
                 .build();
-    }    
+    }
 }
