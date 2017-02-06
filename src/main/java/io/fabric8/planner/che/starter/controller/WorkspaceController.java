@@ -32,9 +32,9 @@ import io.fabric8.planner.che.starter.model.Workspace;
 @CrossOrigin
 @RestController
 @RequestMapping("/workspace")
-public class WorkspaceConroller {
+public class WorkspaceController {
 
-    private static final Logger LOG = LogManager.getLogger(WorkspaceConroller.class);
+    private static final Logger LOG = LogManager.getLogger(WorkspaceController.class);
 
     @Autowired
     CheRestClient cheRestClient;
