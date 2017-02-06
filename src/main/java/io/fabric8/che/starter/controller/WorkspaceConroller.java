@@ -10,7 +10,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package io.fabric8.planner.che.starter.controller;
+package io.fabric8.che.starter.controller;
 
 import java.util.List;
 
@@ -25,9 +25,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.fabric8.planner.che.starter.client.CheRestClient;
-import io.fabric8.planner.che.starter.client.IdGenerator;
-import io.fabric8.planner.che.starter.model.Workspace;
+import io.fabric8.che.starter.client.CheRestClient;
+import io.fabric8.che.starter.client.IdGenerator;
+import io.fabric8.che.starter.model.Workspace;
 
 @CrossOrigin
 @RestController
