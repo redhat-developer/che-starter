@@ -10,7 +10,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package io.fabric8.planner.che.starter.client;
+package io.fabric8.che.starter.client;
 
 import static org.testng.Assert.assertFalse;
 
@@ -27,7 +27,8 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.HttpClientErrorException;
 
-import io.fabric8.planner.che.starter.model.Workspace;
+import io.fabric8.che.starter.client.CheRestClient;
+import io.fabric8.che.starter.model.Workspace;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)

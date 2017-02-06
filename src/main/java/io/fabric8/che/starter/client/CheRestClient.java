@@ -10,7 +10,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package io.fabric8.planner.che.starter.client;
+package io.fabric8.che.starter.client;
 
 import java.util.List;
 
@@ -22,7 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import io.fabric8.planner.che.starter.model.Workspace;
+import io.fabric8.che.starter.model.Workspace;
 
 @Service
 public class CheRestClient {

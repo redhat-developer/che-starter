@@ -10,7 +10,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package io.fabric8.planner.che.starter.model;
+package io.fabric8.che.starter.model;
 
 public class CheServer {
     
