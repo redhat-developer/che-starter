@@ -39,10 +39,10 @@ public class CheServerController {
     @ApiOperation(value = "initializeUser")
     @RequestMapping(method = RequestMethod.GET, path="/initializeUser/{userToken}", produces="application/json")
     @ApiImplicitParams({
-    	@ApiImplicitParam(name = "userToken", value = "User Token", required = true, dataType = "string", paramType="path")
+        @ApiImplicitParam(name = "userToken", value = "User Token", required = true, dataType = "string", paramType="path")
     })
     @ApiResponses(value = {
-    		@ApiResponse(code = 200, message = "Success")
+        @ApiResponse(code = 200, message = "Success")
     })
     public void initializeUser(@PathVariable String userToken) {
     	LOG.info("Initializing user {}",  userToken);

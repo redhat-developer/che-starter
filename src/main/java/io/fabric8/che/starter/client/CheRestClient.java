@@ -28,29 +28,40 @@ import io.fabric8.che.starter.model.Workspace;
 public class CheRestClient {
     private static final Logger LOG = LogManager.getLogger(CheRestClient.class);
 
-    public List<Workspace> listWorkspaces() {
+    public List<Workspace> listWorkspaces(String cheServerURL) {
+        String url = generateURL(cheServerURL, CheRestEndpoints.LIST_WORKSPACES);
         RestTemplate template = new RestTemplate();
         ResponseEntity<List<Workspace>> response =
-                template.exchange(CheRestEndpoints.LIST_WORKSPACES.toString(),
+                template.exchange(url,
                                   HttpMethod.GET,
                                   null,
                                   new ParameterizedTypeReference<List<Workspace>>() {});
         return response.getBody();
     }
 
-    public void createAndStartWorkspace() {
+    public void createAndStartWorkspace(String cheServerURL) {
+        String url = generateURL(cheServerURL, CheRestEndpoints.CREATE_WORKSPACE);
         RestTemplate template = new RestTemplate();
-        Workspace workspace = template.postForObject(CheRestEndpoints.CREATE_WORKSPACE.toString(), new Workspace(), Workspace.class);
+        Workspace workspace = template.postForObject(url, new Workspace(), Workspace.class);
         LOG.info("New Workspace has been created (id: {}),", workspace.getId());
     }
 
-    public void stopWorkspace(String id) {
+    public void stopWorkspace(String cheServerURL, String id) {
+        String url = generateURL(cheServerURL, CheRestEndpoints.STOP_WORKSPACE, id);
         RestTemplate template = new RestTemplate();
-        template.delete(CheRestEndpoints.STOP_WORKSPACE.toString().replace("{id}", id));
+        template.delete(url);
     }
 
     public void stopAllWorkspaces() {
         throw new UnsupportedOperationException("'stopAllWorkspaces' is currently not supported");
+    }
+
+    private String generateURL(String cheServerURL, CheRestEndpoints endpoint) {
+        return cheServerURL + endpoint.toString();
+    }
+
+    private String generateURL(String cheServerURL, CheRestEndpoints endpoint, String id) {
+        return cheServerURL + endpoint.toString().replace("{id}", id);
     }
 
 }

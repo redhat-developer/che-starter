@@ -1,8 +1,3 @@
-package io.fabric8.che.starter.controller;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 /*-
  * #%L
  * che-starter
@@ -15,7 +10,10 @@ import org.apache.logging.log4j.Logger;
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
+package io.fabric8.che.starter.controller;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -39,21 +37,14 @@ public class ConfigController {
     private static final Logger LOG = LogManager.getLogger(CheServerController.class);
 
     @ApiOperation(value = "initializeService")
-    @RequestMapping(method = RequestMethod.GET, path="/initializeService", produces="application/json")
+    @RequestMapping(method = RequestMethod.GET, path = "/initializeService", produces = "application/json")
     @ApiImplicitParams({
-    	@ApiImplicitParam(name = "masterUrl", value = "Master URL", required = true, dataType = "string", paramType="request")
-    })
-    @ApiResponses(value = {
-    		@ApiResponse(code = 200, message = "Success")
-    })
+            @ApiImplicitParam(name = "masterUrl", value = "Master URL", required = true, dataType = "string", paramType = "request") })
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "Success") })
     public void initializeService(@RequestParam String masterUrl) {
-    	LOG.info("Initializing service {}", masterUrl);
-    	
-    	Config config = new ConfigBuilder()
-    			.withMasterUrl(masterUrl)
-    			.build();
-    	KubernetesClient client = new DefaultKubernetesClient(config);
+        LOG.info("Initializing service {}", masterUrl);
+        Config config = new ConfigBuilder().withMasterUrl(masterUrl).build();
+        KubernetesClient client = new DefaultKubernetesClient(config);
     }
-
 
 }

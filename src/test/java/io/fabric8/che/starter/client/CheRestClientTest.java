@@ -22,6 +22,7 @@ import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -36,12 +37,15 @@ public class CheRestClientTest {
 
     private static final Logger LOG = LogManager.getLogger(CheRestClientTest.class);
 
+    @Value("${che.server.url}")
+    String cheServerURL;
+
     @Autowired
     private CheRestClient client;
 
     @Test
     public void listWorkspaces() {
-        List<Workspace> workspaces = this.client.listWorkspaces();
+        List<Workspace> workspaces = this.client.listWorkspaces(cheServerURL);
         LOG.info("Number of workspaces: {}", workspaces.size());
         workspaces.forEach(w -> LOG.info("workspace ID: {}", w.getId()));
         assertFalse(workspaces.isEmpty());
@@ -49,7 +53,7 @@ public class CheRestClientTest {
 
     @Test(expected = HttpClientErrorException.class)
     public void createAndStartWorkspace() {
-        client.createAndStartWorkspace();
+        client.createAndStartWorkspace(cheServerURL);
     }
 
     @Test(expected = UnsupportedOperationException.class)
@@ -59,12 +63,12 @@ public class CheRestClientTest {
 
     @Test
     public void stopWorskpace() {
-        List<Workspace> workspaces = client.listWorkspaces();
+        List<Workspace> workspaces = client.listWorkspaces(cheServerURL);
         if (!workspaces.isEmpty()) {
             List<Workspace> runningWorkspaces = workspaces.stream().filter(w -> w.getStatus().equals("RUNNING"))
                     .collect(Collectors.toList());
             if (!runningWorkspaces.isEmpty()) {
-                client.stopWorkspace(runningWorkspaces.get(0).getId());
+                client.stopWorkspace(cheServerURL, runningWorkspaces.get(0).getId());
             }
         }
     }
