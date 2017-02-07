@@ -22,12 +22,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.fabric8.che.starter.model.CheServer;
+import io.fabric8.kubernetes.client.Config;
+import io.fabric8.kubernetes.client.ConfigBuilder;
+import io.fabric8.openshift.client.DefaultOpenShiftClient;
+import io.fabric8.openshift.client.OpenShiftClient;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import io.fabric8.che.starter.model.CheServer;
 
 @CrossOrigin
 @RestController
@@ -48,10 +52,11 @@ public class CheServerController {
     	LOG.info("Initializing user {}",  userToken);
     }
 
-    @GetMapping("/{id}")
-    public CheServer startCheServer(@PathVariable String id) {
-        LOG.info("Starting new Che Server {}", id);
-        return new CheServer(id);
+    @GetMapping("/{masterURL}/{userToken}")
+    public void startCheServer(@PathVariable String masterUrl, @PathVariable String userToken) {
+        Config config = new ConfigBuilder().withMasterUrl(masterUrl).
+                withOauthToken(userToken).build();
+        OpenShiftClient client = new DefaultOpenShiftClient(config);
     }
 
     @DeleteMapping("/{id}")

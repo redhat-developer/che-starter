@@ -14,6 +14,7 @@ package io.fabric8.che.starter.client;
 
 import static org.testng.Assert.assertFalse;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,9 +27,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.web.client.HttpClientErrorException;
 
-import io.fabric8.che.starter.client.CheRestClient;
 import io.fabric8.che.starter.model.Workspace;
 
 @RunWith(SpringRunner.class)
@@ -51,8 +50,8 @@ public class CheRestClientTest {
         assertFalse(workspaces.isEmpty());
     }
 
-    @Test(expected = HttpClientErrorException.class)
-    public void createAndStartWorkspace() {
+    @Test
+    public void createAndStartWorkspace() throws IOException {
         client.createAndStartWorkspace(cheServerURL);
     }
 

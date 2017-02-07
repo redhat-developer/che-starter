@@ -87,6 +87,12 @@
             <artifactId>kubernetes-client</artifactId>
             <version>${io.fabric8.version}</version>
         </dependency>
+        
+        <dependency>
+            <groupId>io.fabric8</groupId>
+            <artifactId>openshift-client</artifactId>
+            <version>${io.fabric8.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>commons-collections</groupId>
@@ -139,6 +145,7 @@
                     <excludes>
                         <exclude>test-output/**</exclude>
                         <exclude>target/**</exclude>
+                        <exclude>src/main/resources/workspace_template.json</exclude>
                     </excludes>
                 </configuration>
                 <executions>

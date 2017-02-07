@@ -12,21 +12,30 @@
  */
 package io.fabric8.che.starter.client;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import io.fabric8.che.starter.model.Workspace;
+import io.fabric8.che.starter.model.WorkspaceTemplate;
 
 @Service
 public class CheRestClient {
     private static final Logger LOG = LogManager.getLogger(CheRestClient.class);
+    
+    @Autowired
+    WorkspaceTemplate workspcaceTemplate;
 
     public List<Workspace> listWorkspaces(String cheServerURL) {
         String url = generateURL(cheServerURL, CheRestEndpoints.LIST_WORKSPACES);
@@ -39,11 +48,17 @@ public class CheRestClient {
         return response.getBody();
     }
 
-    public void createAndStartWorkspace(String cheServerURL) {
+    public String createAndStartWorkspace(String cheServerURL) throws IOException {
         String url = generateURL(cheServerURL, CheRestEndpoints.CREATE_WORKSPACE);
+        String jsonTemplate = workspcaceTemplate.getJSON();
         RestTemplate template = new RestTemplate();
-        Workspace workspace = template.postForObject(url, new Workspace(), Workspace.class);
-        LOG.info("New Workspace has been created (id: {}),", workspace.getId());
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> entity = new HttpEntity<String>(jsonTemplate, headers);
+        ResponseEntity<String> response = template
+                .exchange(url, HttpMethod.POST, entity, String.class);
+        LOG.info("Workspace has been created: {}", response);
+        return response.getBody();
     }
 
     public void stopWorkspace(String cheServerURL, String id) {

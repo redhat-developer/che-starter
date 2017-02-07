@@ -16,7 +16,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Component;
 
 @Component
-public final class IdGenerator {
+public final class Generator {
 
     /**
      * Che workspace id is used as OpenShift service / deployment config name
@@ -27,6 +27,10 @@ public final class IdGenerator {
      */
     public String generateId() {
         return RandomStringUtils.random(16, true, true).toLowerCase();
+    }
+
+    public String generateName() {
+        return RandomStringUtils.random(8, true, true).toLowerCase();
     }
 
 }

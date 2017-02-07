@@ -18,10 +18,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class Workspace {
 
     private String id;
+    private String name;
     private String login;
     private String status;
     private String repository;
     private String branch;
+    private String location;
 
     public String getId() {
         return id;
@@ -61,6 +63,22 @@ public class Workspace {
 
     public void setLogin(String login) {
         this.login = login;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 
 }
