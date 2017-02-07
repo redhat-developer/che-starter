@@ -13,6 +13,8 @@
 package io.fabric8.che.starter;
 
 import static springfox.documentation.builders.PathSelectors.regex;
+import static com.google.common.base.Predicates.or;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -31,13 +33,14 @@ public class Application {
         SpringApplication.run(Application.class, args);
     }
 
-    @Bean
+    @SuppressWarnings("unchecked")
+	@Bean
     public Docket newsApi() {
         return new Docket(DocumentationType.SWAGGER_2)
-                .groupName("greetings")
+                .groupName("che-starter")
                 .apiInfo(apiInfo())
                 .select()
-                .paths(regex("/greeting.*"))
+                .paths(or(regex("/config.*"), regex("/server.*"), regex("/workspace.*")))
                 .build();
     }
 
