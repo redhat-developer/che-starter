@@ -145,7 +145,7 @@
                     <excludes>
                         <exclude>test-output/**</exclude>
                         <exclude>target/**</exclude>
-                        <exclude>src/main/resources/workspace_template.json</exclude>
+                        <exclude>src/main/resources/*.json</exclude>
                     </excludes>
                 </configuration>
                 <executions>

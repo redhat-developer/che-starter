@@ -33,21 +33,20 @@ public class Application {
         SpringApplication.run(Application.class, args);
     }
 
-    @SuppressWarnings("unchecked")
     @Bean
     public Docket newsApi() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .groupName("che-starter")
                 .apiInfo(apiInfo())
                 .select()
-                .paths(or(regex("/config.*"), regex("/server.*"), regex("/workspace.*")))
+                .paths(or(regex("/server.*"), regex("/workspace.*")))
                 .build();
     }
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
                 .title("Che Starter API")
-                .description("API for managing Che instances per user")
+                .description("API for managing Che servers and workspaces")
                 .version("1.0")
                 .build();
     }
