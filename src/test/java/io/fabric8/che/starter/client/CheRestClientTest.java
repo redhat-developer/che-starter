@@ -12,8 +12,6 @@
  */
 package io.fabric8.che.starter.client;
 
-import static org.testng.Assert.assertFalse;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,18 +19,13 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.test.context.junit4.SpringRunner;
 
+import io.fabric8.che.starter.TestConfig;
 import io.fabric8.che.starter.model.Workspace;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class CheRestClientTest {
+public class CheRestClientTest extends TestConfig{
 
     private static final Logger LOG = LogManager.getLogger(CheRestClientTest.class);
 
@@ -47,17 +40,11 @@ public class CheRestClientTest {
         List<Workspace> workspaces = this.client.listWorkspaces(cheServerURL);
         LOG.info("Number of workspaces: {}", workspaces.size());
         workspaces.forEach(w -> LOG.info("workspace ID: {}", w.getId()));
-        assertFalse(workspaces.isEmpty());
     }
 
     @Test
-    public void createAndStartWorkspace() throws IOException {
-        client.createAndStartWorkspace(cheServerURL);
-    }
-
-    @Test(expected = UnsupportedOperationException.class)
-    public void stopAllWorskpaces() {
-        client.stopAllWorkspaces();
+    public void createWorkspace() throws IOException {
+        client.createWorkspace(cheServerURL);
     }
 
     @Test
@@ -70,6 +57,11 @@ public class CheRestClientTest {
                 client.stopWorkspace(cheServerURL, runningWorkspaces.get(0).getId());
             }
         }
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void stopAllWorskpaces() {
+        client.stopAllWorkspaces();
     }
 
 }

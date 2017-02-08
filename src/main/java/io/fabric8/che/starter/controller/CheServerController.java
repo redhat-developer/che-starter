@@ -37,28 +37,27 @@ import io.swagger.annotations.ApiImplicitParams;
 public class CheServerController {
 
     private static final Logger LOG = LogManager.getLogger(CheServerController.class);
-    
+
     @Value(value = "classpath:che_server_template.json")
     private Resource resource;
 
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "masterUrl", value = "Master URL", required = true, dataType = "string", paramType = "path"), 
-        @ApiImplicitParam(name = "userToken", value = "User Token", required = true, dataType = "string", paramType = "path")
+            @ApiImplicitParam(name = "masterUrl", value = "Master URL", required = true, dataType = "string", paramType = "path"),
+            @ApiImplicitParam(name = "userToken", value = "User Token", required = true, dataType = "string", paramType = "path")
     })
     @GetMapping("/{masterURL}/{userToken}")
     public void startCheServer(@PathVariable String masterUrl, @PathVariable String userToken) {
         LOG.info("OpenShift url: {}", masterUrl);
         LOG.info("OAth token: {}", userToken);
-        
-        Config config = new ConfigBuilder().withMasterUrl(masterUrl).
-                withOauthToken(userToken).build();
+
+        Config config = new ConfigBuilder().withMasterUrl(masterUrl).withOauthToken(userToken).build();
         OpenShiftClient client = new DefaultOpenShiftClient(config);
     }
 
     @DeleteMapping("/{id}")
     public CheServer stopCheServer(@PathVariable String id) {
         LOG.info("Stopping Che Server {}", id);
-        return new CheServer("id");
+        throw new UnsupportedOperationException("'stopCheServer' functionality is currently not supported");
     }
 
 }
