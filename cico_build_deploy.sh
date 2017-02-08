@@ -28,9 +28,7 @@ if [ $? -eq 0 ]; then
 
   export PROJECT_VERSION=`mvn -o help:evaluate -Dexpression=project.version | grep -e '^[[:digit:]]'`
 
-  echo 'che-starter version: ${PROJECT_VERSION}'
-
-  docker build --build-arg VERSION=${PROJECT_VERSION} -t rhche/che-starter .
+  docker build -t rhche/che-starter .
 
   if [ $? -ne 0 ]; then
     echo 'Docker Build Failed'
