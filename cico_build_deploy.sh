@@ -26,9 +26,9 @@ scl enable rh-maven33 'mvn clean verify'
 
 if [ $? -eq 0 ]; then
 
-  export PROJECT_VERSION = `mvn org.apache.maven.plugins:maven-help-plugin:2.1.1:evaluate -Dexpression=project.version | grep -v '\['`
+  export PROJECT_VERSION = `mvn -o help:evaluate -Dexpression=project.version | grep -e '^[[:digit:]]'`
 
-  docker build --build-arg VERSION=${PROJECT_VERSION} -t rhche/che-starter:nightly .
+  docker build -t rhche/che-starter:nightly .
 
   if [ $? -ne 0 ]; then
     echo 'Docker Build Failed'
