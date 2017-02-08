@@ -35,7 +35,7 @@ public class WorkspaceControllerTest extends TestConfig {
     @Autowired
     WorkspaceController controller;
 
-    @Test/*(expected = UnsupportedOperationException.class)*/
+    @Test(expected = UnsupportedOperationException.class)
     public void stopAllWorskpaces() {
         controller.stopAll();
     }
