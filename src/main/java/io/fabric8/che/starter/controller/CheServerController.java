@@ -57,7 +57,6 @@ public class CheServerController {
         OpenShiftClient client = new DefaultOpenShiftClient(config);
         
         Template template = client.templates().load(cheServerTemplate.getInputStream()).get();
-        
     }
 
     @DeleteMapping("/{id}")

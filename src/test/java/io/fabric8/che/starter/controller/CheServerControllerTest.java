@@ -30,11 +30,11 @@ import io.fabric8.che.starter.client.Generator;
 public class CheServerControllerTest extends TestConfig {
     private static final Logger LOG = LogManager.getLogger(CheServerControllerTest.class);
 
+    @Value(value = "classpath:che_server_template.json")
+    private Resource cheServerTemplate;
+
     @Autowired
     CheServerController controller;
-
-    @Value(value = "classpath:che_server_template.json")
-    private Resource resource;
 
     @Autowired
     Generator generator;
@@ -43,12 +43,12 @@ public class CheServerControllerTest extends TestConfig {
     public void stopCheServer() {
         controller.stopCheServer(generator.generateId());
     }
-    
+
     @Test
     public void readTemplate() throws IOException {
-        try (BufferedReader buffer = new BufferedReader(new InputStreamReader(resource.getInputStream()))) {
-             String template = buffer.lines().collect(Collectors.joining("\n"));
-             LOG.info("Che server template: {}", template);
+        try (BufferedReader buffer = new BufferedReader(new InputStreamReader(cheServerTemplate.getInputStream()))) {
+            String template = buffer.lines().collect(Collectors.joining("\n"));
+            LOG.info("Che server template: {}", template);
         }
     }
 

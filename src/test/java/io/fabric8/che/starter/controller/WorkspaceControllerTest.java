@@ -30,7 +30,7 @@ public class WorkspaceControllerTest extends TestConfig {
     private static final Logger LOG = LogManager.getLogger(WorkspaceControllerTest.class);
 
     @Value(value = "classpath:workspace_template.json")
-    private Resource resource;
+    private Resource workspaceTemplate;
 
     @Autowired
     WorkspaceController controller;
@@ -42,7 +42,7 @@ public class WorkspaceControllerTest extends TestConfig {
 
     @Test
     public void readTemplate() throws IOException {
-        try (BufferedReader buffer = new BufferedReader(new InputStreamReader(resource.getInputStream()))) {
+        try (BufferedReader buffer = new BufferedReader(new InputStreamReader(workspaceTemplate.getInputStream()))) {
             String template = buffer.lines().collect(Collectors.joining("\n"));
             LOG.info("Workspace template: {}", template);
         }
