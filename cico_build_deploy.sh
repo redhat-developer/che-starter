@@ -28,7 +28,7 @@ if [ $? -eq 0 ]; then
 
   export PROJECT_VERSION=`mvn -o help:evaluate -Dexpression=project.version | grep -e '^[[:digit:]]'`
 
-  docker build -t rhche/che-starter .
+  docker build -t rhche/che-starter:nightly .
 
   if [ $? -ne 0 ]; then
     echo 'Docker Build Failed'
