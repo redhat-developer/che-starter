@@ -12,7 +12,7 @@
 # http://www.eclipse.org/legal/epl-v10.html
 # #L%
 ###
-cat jenkins-env | grep RHCHEBOT_DOCKER_HUB_PASSWORD > inherit-env
+cat jenkins-env | grep PASS > inherit-env
 . inherit-env
 
 yum -y update
