@@ -22,11 +22,13 @@ yum -y install rh-maven33
 sed -i '/OPTIONS=.*/c\OPTIONS="--selinux-enabled --log-driver=journald --insecure-registry registry.ci.centos.org:5000"' /etc/sysconfig/docker
 systemctl start docker
 
-rh-maven33 'mvn clean verify'
+scl enable rh-maven33 'mvn clean verify'
 
 if [ $? -eq 0 ]; then
 
-  export PROJECT_VERSION = rh-maven33 `mvn -o help:evaluate -Dexpression=project.version | grep -e '^[[:digit:]]'`
+  export PROJECT_VERSION=`mvn -o help:evaluate -Dexpression=project.version | grep -e '^[[:digit:]]'`
+
+  echo 'che-starter version: ${PROJECT_VERSION}'
 
   docker build --build-arg VERSION=${PROJECT_VERSION} -t rhche/che-starter .
 
