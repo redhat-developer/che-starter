@@ -55,7 +55,7 @@ public class CheServerController {
 
         Config config = new ConfigBuilder().withMasterUrl(masterUrl).withOauthToken(userToken).build();
         OpenShiftClient client = new DefaultOpenShiftClient(config);
-        
+
         Template template = client.templates().load(cheServerTemplate.getInputStream()).get();
     }
 
