@@ -12,16 +12,29 @@
  */
 package io.fabric8.che.starter.controller;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.stream.Collectors;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 
 import io.fabric8.che.starter.TestConfig;
 import io.fabric8.che.starter.client.Generator;
 
 public class CheServerControllerTest extends TestConfig {
+    private static final Logger LOG = LogManager.getLogger(CheServerControllerTest.class);
 
     @Autowired
     CheServerController controller;
+
+    @Value(value = "classpath:che_server_template.json")
+    private Resource resource;
 
     @Autowired
     Generator generator;
@@ -29,6 +42,14 @@ public class CheServerControllerTest extends TestConfig {
     @Test(expected = UnsupportedOperationException.class)
     public void stopCheServer() {
         controller.stopCheServer(generator.generateId());
+    }
+    
+    @Test
+    public void readTemplate() throws IOException {
+        try (BufferedReader buffer = new BufferedReader(new InputStreamReader(resource.getInputStream()))) {
+             String template = buffer.lines().collect(Collectors.joining("\n"));
+             LOG.info("Che server template: {}", template);
+        }
     }
 
 }

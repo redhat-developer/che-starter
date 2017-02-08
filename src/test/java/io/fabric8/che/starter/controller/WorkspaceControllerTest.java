@@ -12,12 +12,25 @@
  */
 package io.fabric8.che.starter.controller;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.stream.Collectors;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 
 import io.fabric8.che.starter.TestConfig;
 
 public class WorkspaceControllerTest extends TestConfig {
+    private static final Logger LOG = LogManager.getLogger(WorkspaceControllerTest.class);
+
+    @Value(value = "classpath:workspace_template.json")
+    private Resource resource;
 
     @Autowired
     WorkspaceController controller;
@@ -25,6 +38,14 @@ public class WorkspaceControllerTest extends TestConfig {
     @Test(expected = UnsupportedOperationException.class)
     public void stopAllWorskpaces() {
         controller.stopAll();
+    }
+
+    @Test
+    public void readTemplate() throws IOException {
+        try (BufferedReader buffer = new BufferedReader(new InputStreamReader(resource.getInputStream()))) {
+            String template = buffer.lines().collect(Collectors.joining("\n"));
+            LOG.info("Workspace template: {}", template);
+        }
     }
 
 }
