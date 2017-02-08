@@ -16,7 +16,8 @@ cat jenkins-env | grep RHCHEBOT_DOCKER_HUB_PASSWORD > inherit-env
 . inherit-env
 
 yum -y update
-yum -y install centos-release-scl java-1.8.0-openjdk-devel rh-maven33 git patch bzip2 docker
+yum -y install centos-release-scl java-1.8.0-openjdk-devel git patch bzip2 docker
+yum -y install rh-maven33
 
 sed -i '/OPTIONS=.*/c\OPTIONS="--selinux-enabled --log-driver=journald --insecure-registry registry.ci.centos.org:5000"' /etc/sysconfig/docker
 systemctl start docker
