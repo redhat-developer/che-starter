@@ -22,10 +22,7 @@ yum -y install rh-maven33
 sed -i '/OPTIONS=.*/c\OPTIONS="--selinux-enabled --log-driver=journald --insecure-registry registry.ci.centos.org:5000"' /etc/sysconfig/docker
 systemctl start docker
 
-useradd chebuilder
-chown chebuilder:chebuilder *
-
-runuser -u chebuilder ./build_che_starter.sh
+scl enable rh-maven33 'mvn clean verify'
 
 if [ $? -eq 0 ]; then
 
