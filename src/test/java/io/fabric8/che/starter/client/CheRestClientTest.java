@@ -23,9 +23,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import io.fabric8.che.starter.TestConfig;
+import io.fabric8.che.starter.model.Stack;
 import io.fabric8.che.starter.model.Workspace;
+import static org.junit.Assert.*;
 
-public class CheRestClientTest extends TestConfig{
+public class CheRestClientTest extends TestConfig {
 
     private static final Logger LOG = LogManager.getLogger(CheRestClientTest.class);
 
@@ -57,6 +59,12 @@ public class CheRestClientTest extends TestConfig{
                 client.stopWorkspace(cheServerURL, runningWorkspaces.get(0).getId());
             }
         }
+    }
+
+    @Test
+    public void listStacks() {
+        List<Stack> stacks = client.listStacks(cheServerURL);
+        assertFalse(stacks.isEmpty());
     }
 
     @Test(expected = UnsupportedOperationException.class)

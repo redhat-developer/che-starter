@@ -26,17 +26,14 @@ import org.springframework.web.bind.annotation.RestController;
 import io.fabric8.che.starter.client.CheRestClient;
 import io.fabric8.che.starter.client.Generator;
 import io.fabric8.che.starter.model.Stack;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 
 @CrossOrigin
 @RestController
 @RequestMapping("/stack")
 public class StackController {
 
-    private static final Logger LOG = LogManager.getLogger(WorkspaceController.class);
+    private static final Logger LOG = LogManager.getLogger(StackController.class);
 
     @Value("${che.server.url}")
     String cheServerURL;
@@ -48,12 +45,6 @@ public class StackController {
     Generator generator;
 
     @ApiOperation(value = "List the available stacks")
-    @ApiImplicitParams({
-        
-    })
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Success")
-    })
     @GetMapping
     public List<Stack> list() {
     	return cheRestClient.listStacks(cheServerURL);

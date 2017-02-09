@@ -34,7 +34,7 @@ import io.fabric8.che.starter.model.WorkspaceTemplate;
 @Service
 public class CheRestClient {
     private static final Logger LOG = LogManager.getLogger(CheRestClient.class);
-    
+
     @Autowired
     WorkspaceTemplate workspcaceTemplate;
 

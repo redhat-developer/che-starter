@@ -13,7 +13,7 @@
 package io.fabric8.che.starter.model;
 
 public class CheServer {
-    
+
     private final String id;
     
     public CheServer(String id) {
