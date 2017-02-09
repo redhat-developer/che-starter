@@ -33,13 +33,14 @@ public class Application {
         SpringApplication.run(Application.class, args);
     }
 
-    @Bean
+    @SuppressWarnings("unchecked")
+	@Bean
     public Docket newsApi() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .groupName("che-starter")
                 .apiInfo(apiInfo())
                 .select()
-                .paths(or(regex("/server.*"), regex("/workspace.*")))
+                .paths(or(regex("/server.*"), regex("/workspace.*"), regex("/stack.*")))
                 .build();
     }
 

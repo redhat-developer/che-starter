@@ -19,19 +19,13 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.fabric8.che.starter.client.CheRestClient;
 import io.fabric8.che.starter.client.Generator;
 import io.fabric8.che.starter.model.Stack;
-import io.fabric8.che.starter.model.Workspace;
-import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -39,8 +33,8 @@ import io.swagger.annotations.ApiResponses;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/workspace")
-public class WorkspaceController {
+@RequestMapping("/stack")
+public class StackController {
 
     private static final Logger LOG = LogManager.getLogger(WorkspaceController.class);
 
@@ -53,11 +47,6 @@ public class WorkspaceController {
     @Autowired
     Generator generator;
 
-    @PostMapping
-    public Workspace create() {
-        return new Workspace();
-    }
-
     @ApiOperation(value = "List the user's workspaces")
     @ApiImplicitParams({
         
@@ -66,18 +55,8 @@ public class WorkspaceController {
         @ApiResponse(code = 200, message = "Success")
     })
     @GetMapping
-    public List<Workspace> list() {
-        return cheRestClient.listWorkspaces(cheServerURL);
-    }
-
-    @DeleteMapping("/{id}/runtime")
-    public void stop(@PathVariable String id) {
-        cheRestClient.stopWorkspace(cheServerURL, id);
-    }
-    
-    @DeleteMapping("/all")
-    public void stopAll() {
-        cheRestClient.stopAllWorkspaces();
+    public List<Stack> list() {
+    	return cheRestClient.listStacks(cheServerURL);
     }
 
 }

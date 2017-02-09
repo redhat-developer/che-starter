@@ -27,6 +27,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import io.fabric8.che.starter.model.Stack;
 import io.fabric8.che.starter.model.Workspace;
 import io.fabric8.che.starter.model.WorkspaceTemplate;
 
@@ -69,6 +70,17 @@ public class CheRestClient {
 
     public void stopAllWorkspaces() {
         throw new UnsupportedOperationException("'stopAllWorkspaces' is currently not supported");
+    }
+    
+    public List<Stack> listStacks(String cheServerURL) {
+        String url = generateURL(cheServerURL, CheRestEndpoints.LIST_STACKS);
+        RestTemplate template = new RestTemplate();
+        ResponseEntity<List<Stack>> response =
+                template.exchange(url,
+                                  HttpMethod.GET,
+                                  null,
+                                  new ParameterizedTypeReference<List<Stack>>() {});
+        return response.getBody();    	
     }
 
     private String generateURL(String cheServerURL, CheRestEndpoints endpoint) {
