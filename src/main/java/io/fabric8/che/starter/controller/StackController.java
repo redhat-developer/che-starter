@@ -47,7 +47,7 @@ public class StackController {
     @ApiOperation(value = "List the available stacks")
     @GetMapping
     public List<Stack> list() {
-    	return cheRestClient.listStacks(cheServerURL);
+        return cheRestClient.listStacks(cheServerURL);
     }
 
 }
