@@ -24,11 +24,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.fabric8.che.starter.client.CheRestClient;
 import io.fabric8.che.starter.client.Generator;
 import io.fabric8.che.starter.model.Workspace;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 @CrossOrigin
 @RestController
@@ -51,6 +57,13 @@ public class WorkspaceController {
         return new Workspace();
     }
 
+    @ApiOperation(value = "List the user's workspaces")
+    @ApiImplicitParams({
+        
+    })
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Success")
+    })
     @GetMapping
     public List<Workspace> list() {
         return cheRestClient.listWorkspaces(cheServerURL);
