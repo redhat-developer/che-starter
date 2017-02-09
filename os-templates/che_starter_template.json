@@ -1,0 +1,195 @@
+{
+    "kind": "Template",
+    "apiVersion": "v1",
+    "metadata": {
+        "annotations": {
+            "description": "che-starter template",
+            "iconClass" : "icon-openjdk",
+            "tags" : "eclipse,che,java",
+            "version" : "1.0.0"
+        },
+        "name": "eclipse-che-starter"
+    },
+    "labels": {
+        "template": "eclipse-che",
+        "xpaas" : "1.0.0"
+    },
+    "parameters": [
+        {
+            "description": "The name for the application.",
+            "name": "APPLICATION_NAME",
+            "value": "che-starter",
+            "required": true
+        },
+        {
+            "description": "Custom hostname for http service route.  Leave blank for default hostname, e.g.: <application-name>.<project>.<default-domain-suffix>",
+            "name": "HOSTNAME_HTTP",
+            "value": "",
+            "required": false
+        },
+        {
+            "description": "Name of the che-starter Docker image.",
+            "name": "CHE_STARTER_DOCKER_IMAGE",
+            "value": "rhche/che-starter:nightly",
+            "required": true
+        },
+        {
+            "description": "OpenShift username",
+            "name": "CHE_OPENSHIFT_USERNAME",
+            "value": "openshift-dev",
+            "required": true
+        },
+        {
+            "description": "OpenShift userpassword.",
+            "name": "CHE_OPENSHIFT_PASSWORD",
+            "value": "devel",
+            "required": true
+        },
+        {
+            "description": "OpenShift project.",
+            "name": "CHE_OPENSHIFT_PROJECT",
+            "value": "eclipse-che",
+            "required": true
+        },
+        {
+            "description": "OpenShift service account name.",
+            "name": "CHE_OPENSHIFT_SERVICEACCOUNTNAME",
+            "value": "cheserviceaccount",
+            "required": true
+        },
+        {
+            "description": "Che log level (INFO or DEBUG)",
+            "name": "CHE_LOG_LEVEL",
+            "value": "INFO",
+            "required": false
+        },
+        {
+            "description": "IP of the host docker0 bridge. This IP is used by che-server to communicate with che workspaces",
+            "name": "DOCKER0_BRIDGE_IP",
+            "value": "172.17.0.1",
+            "required": true
+        }
+    ],
+    "objects": [
+        {
+            "kind": "Service",
+            "apiVersion": "v1",
+            "spec": {
+                "ports": [
+                    {
+                        "port": 10000,
+                        "targetPort": 10000,
+                        "protocol": "TCP",
+                        "name": "tomcat"
+                    }
+                ],
+                "selector": {
+                    "deploymentConfig": "${APPLICATION_NAME}"
+                }
+            },
+            "metadata": {
+                "name": "${APPLICATION_NAME}",
+                "labels": {
+                    "application": "${APPLICATION_NAME}"
+                },
+                "annotations": {
+                    "description": "Che starter http port."
+                }
+            }
+        },
+        {
+            "kind": "Route",
+            "apiVersion": "v1",
+            "id": "${APPLICATION_NAME}-http",
+            "metadata": {
+                "name": "${APPLICATION_NAME}",
+                "labels": {
+                    "application": "${APPLICATION_NAME}"
+                },
+                "annotations": {
+                    "description": "Route for application's http service."
+                }
+            },
+            "spec": {
+                "host": "${HOSTNAME_HTTP}",
+                "to": {
+                    "name": "${APPLICATION_NAME}"
+                },
+                "port": {
+                    "targetPort": "tomcat"
+                }
+            }
+        },
+        {
+            "kind": "DeploymentConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "${APPLICATION_NAME}",
+                "labels": {
+                    "application": "${APPLICATION_NAME}"
+                }
+            },
+            "spec": {
+                "strategy": {
+                    "type": "Recreate"
+                },
+                "triggers": [
+                    {
+                        "type": "ConfigChange"
+                    }
+                ],
+                "replicas": 1,
+                "selector": {
+                    "deploymentConfig": "${APPLICATION_NAME}"
+                },
+                "template": {
+                    "metadata": {
+                        "name": "${APPLICATION_NAME}",
+                        "labels": {
+                            "deploymentConfig": "${APPLICATION_NAME}",
+                            "application": "${APPLICATION_NAME}"
+                        }
+                    },
+                    "spec": {
+                        "terminationGracePeriodSeconds": 75,
+                        "containers": [
+                            {
+                                "name": "${APPLICATION_NAME}",
+                                "image": "${CHE_STARTER_DOCKER_IMAGE}",
+                                "imagePullPolicy": "IfNotPresent",
+                                "privileged": false,
+                                "livenessProbe": {
+                                    "tcpSocket": {
+                                        "port": 10000
+                                    },
+                                    "initialDelaySeconds": 5,
+                                    "timeoutSeconds": 1
+                                },
+                                "readinessProbe": {
+                                    "tcpSocket": {
+                                        "port": 10000
+                                    },
+                                    "initialDelaySeconds": 5,
+                                    "timeoutSeconds": 1
+                                },
+                                "ports": [
+                                    {
+                                        "name": "http",
+                                        "containerPort": 10000,
+                                        "protocol": "TCP"
+                                    }
+                                ],
+                                "args": [],
+                                "securityContext": {
+                                        "privileged": false,
+                                        "runAsUser": 1000
+                                }
+                            }
+                        ],
+                        "serviceAccountName": "${CHE_OPENSHIFT_SERVICEACCOUNTNAME}"
+                    }
+                }
+            }
+        }
+    ]
+}
