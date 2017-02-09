@@ -38,8 +38,8 @@ if [ $? -eq 0 ]; then
   docker login -u rhchebot -p $RHCHEBOT_DOCKER_HUB_PASSWORD -e noreply@redhat.com
   docker push rhche/che-starter:nightly
 
-  docker tag rhche/che-starter:nightly registry.ci.centos.org:5000/almighty/che-starter:nightly
-  docker push registry.ci.centos.org:5000/almighty/che-starter:nightly
+  docker tag rhche/che-starter:nightly registry.ci.centos.org:5000/almighty/che-starter:latest
+  docker push registry.ci.centos.org:5000/almighty/che-starter:latest
 
 else
   echo 'Build Failed!'
