@@ -47,7 +47,7 @@ public class StackController {
     @Autowired
     Generator generator;
 
-    @ApiOperation(value = "List the user's workspaces")
+    @ApiOperation(value = "List the available stacks")
     @ApiImplicitParams({
         
     })
