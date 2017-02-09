@@ -3,20 +3,20 @@
     "apiVersion": "v1",
     "metadata": {
         "annotations": {
-            "description": "che-starter template",
-            "iconClass" : "icon-openjdk",
+            "description": "eclipse-che-starter template",
+            "iconClass" : "icon-che",
             "tags" : "eclipse,che,java",
             "version" : "1.0.0"
         },
         "name": "eclipse-che-starter"
     },
     "labels": {
-        "template": "eclipse-che",
+        "template": "eclipse-che-starter",
         "xpaas" : "1.0.0"
     },
     "parameters": [
         {
-            "description": "The name for the application.",
+            "description": "The name for the application",
             "name": "APPLICATION_NAME",
             "value": "che-starter",
             "required": true
@@ -28,32 +28,14 @@
             "required": false
         },
         {
-            "description": "Name of the che-starter Docker image.",
+            "description": "Name of the che-starter Docker image",
             "name": "CHE_STARTER_DOCKER_IMAGE",
             "value": "rhche/che-starter:nightly",
             "required": true
         },
         {
-            "description": "OpenShift username",
-            "name": "CHE_OPENSHIFT_USERNAME",
-            "value": "openshift-dev",
-            "required": true
-        },
-        {
-            "description": "OpenShift userpassword.",
-            "name": "CHE_OPENSHIFT_PASSWORD",
-            "value": "devel",
-            "required": true
-        },
-        {
-            "description": "OpenShift project.",
-            "name": "CHE_OPENSHIFT_PROJECT",
-            "value": "eclipse-che",
-            "required": true
-        },
-        {
-            "description": "OpenShift service account name.",
-            "name": "CHE_OPENSHIFT_SERVICEACCOUNTNAME",
+            "description": "OpenShift service account name",
+            "name": "SERVICE_ACCOUNT_NAME",
             "value": "cheserviceaccount",
             "required": true
         },
@@ -62,12 +44,6 @@
             "name": "CHE_LOG_LEVEL",
             "value": "INFO",
             "required": false
-        },
-        {
-            "description": "IP of the host docker0 bridge. This IP is used by che-server to communicate with che workspaces",
-            "name": "DOCKER0_BRIDGE_IP",
-            "value": "172.17.0.1",
-            "required": true
         }
     ],
     "objects": [
@@ -93,7 +69,7 @@
                     "application": "${APPLICATION_NAME}"
                 },
                 "annotations": {
-                    "description": "Che starter http port."
+                    "description": "Che starter http port"
                 }
             }
         },
@@ -107,7 +83,7 @@
                     "application": "${APPLICATION_NAME}"
                 },
                 "annotations": {
-                    "description": "Route for application's http service."
+                    "description": "Route for application's http service"
                 }
             },
             "spec": {
@@ -186,7 +162,7 @@
                                 }
                             }
                         ],
-                        "serviceAccountName": "${CHE_OPENSHIFT_SERVICEACCOUNTNAME}"
+                        "serviceAccountName": "${SERVICE_ACCOUNT_NAME}"
                     }
                 }
             }
