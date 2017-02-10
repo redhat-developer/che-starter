@@ -47,7 +47,7 @@ public class CheRestClientTest extends TestConfig {
 
     @Test
     public void createWorkspace() throws IOException {
-        client.createWorkspace(cheServerURL);
+        client.createWorkspace(cheServerURL, null, null, null);
     }
 
     @Test

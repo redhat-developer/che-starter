@@ -39,7 +39,7 @@
       "attributes": {},
       "description": "A hello world Java application.",
       "source": {
-        "location": "https://github.com/che-samples/console-java-simple.git",
+        "location": "${workspace.git.repo}",
         "type": "git",
         "parameters": {
         }

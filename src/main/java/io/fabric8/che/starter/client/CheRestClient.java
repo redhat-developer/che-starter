@@ -54,9 +54,15 @@ public class CheRestClient {
         return response.getBody();
     }
 
-    public WorkspaceInfo createWorkspace(String cheServerURL) throws IOException {
+    public WorkspaceInfo createWorkspace(String cheServerURL, String name, String repo, String branch) throws IOException {
         String url = generateURL(cheServerURL, CheRestEndpoints.CREATE_WORKSPACE);
-        String jsonTemplate = workspaceTemplate.getJSON();
+
+        String jsonTemplate = workspaceTemplate.createRequest()
+        		.setName(name)
+        		.setRepo(repo)
+        		.setBranch(branch)
+        		.getJSON();
+
         RestTemplate template = new RestTemplate();
         
         HttpHeaders headers = new HttpHeaders();
