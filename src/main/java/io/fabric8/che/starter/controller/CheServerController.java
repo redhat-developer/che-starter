@@ -33,6 +33,7 @@ import io.fabric8.openshift.client.DefaultOpenShiftClient;
 import io.fabric8.openshift.client.OpenShiftClient;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
+import springfox.documentation.annotations.ApiIgnore;
 
 @CrossOrigin
 @RestController
@@ -59,6 +60,7 @@ public class CheServerController {
         Template template = client.templates().load(cheServerTemplate.getInputStream()).get();
     }
 
+    @ApiIgnore
     @DeleteMapping("/{id}")
     public CheServer stopCheServer(@PathVariable String id) {
         LOG.info("Stopping Che Server {}", id);

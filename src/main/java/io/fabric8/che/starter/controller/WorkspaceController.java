@@ -36,6 +36,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import springfox.documentation.annotations.ApiIgnore;
 
 @CrossOrigin
 @RestController
@@ -60,24 +61,24 @@ public class WorkspaceController {
     }
 
     @ApiOperation(value = "List the user's workspaces")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Success")
-    })
     @GetMapping
     public List<WorkspaceInfo> list() {
         return cheRestClient.listWorkspaces(cheServerURL);
     }
-    
+
+    @ApiIgnore
     @DeleteMapping("{id}")
     public void delete(@PathVariable String id) {
         cheRestClient.deleteWorkspace(cheServerURL, id);
     }
 
+    @ApiIgnore
     @DeleteMapping("/{id}/runtime")
     public void stop(@PathVariable String id) {
         cheRestClient.stopWorkspace(cheServerURL, id);
     }
-    
+
+    @ApiIgnore
     @DeleteMapping("/all")
     public void stopAll() {
         cheRestClient.stopAllWorkspaces();
