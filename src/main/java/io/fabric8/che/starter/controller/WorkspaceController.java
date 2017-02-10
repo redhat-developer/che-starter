@@ -60,15 +60,17 @@ public class WorkspaceController {
     }
 
     @ApiOperation(value = "List the user's workspaces")
-    @ApiImplicitParams({
-        
-    })
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Success")
     })
     @GetMapping
     public List<WorkspaceInfo> list() {
         return cheRestClient.listWorkspaces(cheServerURL);
+    }
+    
+    @DeleteMapping("{id}")
+    public void delete(@PathVariable String id) {
+        cheRestClient.deleteWorkspace(cheServerURL, id);
     }
 
     @DeleteMapping("/{id}/runtime")

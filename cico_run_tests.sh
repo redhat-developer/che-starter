@@ -18,10 +18,7 @@ yum -y install rh-maven33
 
 scl enable rh-maven33 'mvn surefire:test -B'
 
-if [ $? -eq 0 ]; then  
-  echo 'Build Success!'
-  exit 0
-else
-  echo 'Build Failed!'
-  exit 1
+if [ $? -ne 0 ]; then
+    echo 'Build Failed!'
+    exit 1
 fi

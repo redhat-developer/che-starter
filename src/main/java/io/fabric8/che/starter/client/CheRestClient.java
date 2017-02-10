@@ -68,21 +68,29 @@ public class CheRestClient {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<String>(jsonTemplate, headers);
 
-        ResponseEntity<Workspace> workspace = template.exchange(url, HttpMethod.POST, entity, Workspace.class);
+        ResponseEntity<Workspace> response = template.exchange(url, HttpMethod.POST, entity, Workspace.class);
+        Workspace workspace = response.getBody();
+
         LOG.info("Workspace has been created: {}", workspace);
 
-        WorkspaceInfo response = new WorkspaceInfo();
-        response.setId(workspace.getBody().getId());
-        response.setName(workspace.getBody().getConfig().getName());
+        WorkspaceInfo workspaceInfo = new WorkspaceInfo();
+        workspaceInfo.setId(workspace.getId());
+        workspaceInfo.setName(workspace.getConfig().getName());
 
-        for (WorkspaceLink link : workspace.getBody().getLinks()) {
+        for (WorkspaceLink link : workspace.getLinks()) {
             if (WORKSPACE_LINK_IDE_URL.equals(link.getRel())) {
-                response.setWorkspaceIdeUrl(link.getHref());
+                workspaceInfo.setWorkspaceIdeUrl(link.getHref());
                 break;
             }
         }
 
-        return response;
+        return workspaceInfo;
+    }
+
+    public void deleteWorkspace(String cheServerURL, String id) {
+        String url = generateURL(cheServerURL, CheRestEndpoints.DELETE_WORKSPACE, id);
+        RestTemplate template = new RestTemplate();
+        template.delete(url);
     }
 
     public void stopWorkspace(String cheServerURL, String id) {
