@@ -30,12 +30,16 @@ import org.springframework.web.client.RestTemplate;
 import io.fabric8.che.starter.model.WorkspaceTemplate;
 import io.fabric8.che.starter.model.che.Stack;
 import io.fabric8.che.starter.model.che.Workspace;
+import io.fabric8.che.starter.model.che.WorkspaceLink;
 import io.fabric8.che.starter.model.response.WorkspaceInfo;
 
 @Service
 public class CheRestClient {
     private static final Logger LOG = LogManager.getLogger(CheRestClient.class);
 
+    public static final String WORKSPACE_LINK_IDE_URL = "ide url";
+    public static final String WORKSPACE_LINK_START_WORKSPACE = "start workspace";
+    
     @Autowired
     WorkspaceTemplate workspaceTemplate;
 
@@ -66,6 +70,14 @@ public class CheRestClient {
         WorkspaceInfo response = new WorkspaceInfo();
         response.setId(workspace.getBody().getId());
         response.setName(workspace.getBody().getConfig().getName());
+        
+        for (WorkspaceLink link : workspace.getBody().getLinks()) {
+        	if (WORKSPACE_LINK_IDE_URL.equals(link.getRel())) {
+        		response.setWorkspaceIdeUrl(link.getHref());
+        		break;
+        	}
+        }
+        
         
         return response;
     }

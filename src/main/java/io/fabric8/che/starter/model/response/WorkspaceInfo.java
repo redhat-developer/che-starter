@@ -24,8 +24,18 @@ public class WorkspaceInfo {
     private String repository;
     private String branch;
     private String location;
+    
+    private String workspaceIdeUrl;
 
-    public String getId() {
+	public String getWorkspaceIdeUrl() {
+		return workspaceIdeUrl;
+	}
+
+	public void setWorkspaceIdeUrl(String workspaceIdeUrl) {
+		this.workspaceIdeUrl = workspaceIdeUrl;
+	}
+
+	public String getId() {
         return id;
     }
 
