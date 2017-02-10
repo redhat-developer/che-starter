@@ -15,7 +15,7 @@ package io.fabric8.che.starter.model.response;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class WorkspaceResponse {
+public class WorkspaceInfo {
 
     private String id;
     private String name;

@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.fabric8.che.starter.client.CheRestClient;
 import io.fabric8.che.starter.client.Generator;
-import io.fabric8.che.starter.model.response.WorkspaceResponse;
+import io.fabric8.che.starter.model.response.WorkspaceInfo;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -52,7 +52,7 @@ public class WorkspaceController {
     Generator generator;
 
     @PostMapping
-    public WorkspaceResponse create() throws IOException {
+    public WorkspaceInfo create() throws IOException {
     	return cheRestClient.createWorkspace(cheServerURL);
     }
 
@@ -64,7 +64,7 @@ public class WorkspaceController {
         @ApiResponse(code = 200, message = "Success")
     })
     @GetMapping
-    public List<WorkspaceResponse> list() {
+    public List<WorkspaceInfo> list() {
         return cheRestClient.listWorkspaces(cheServerURL);
     }
 

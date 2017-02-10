@@ -30,7 +30,7 @@ import org.springframework.web.client.RestTemplate;
 import io.fabric8.che.starter.model.WorkspaceTemplate;
 import io.fabric8.che.starter.model.che.Stack;
 import io.fabric8.che.starter.model.che.Workspace;
-import io.fabric8.che.starter.model.response.WorkspaceResponse;
+import io.fabric8.che.starter.model.response.WorkspaceInfo;
 
 @Service
 public class CheRestClient {
@@ -39,18 +39,18 @@ public class CheRestClient {
     @Autowired
     WorkspaceTemplate workspaceTemplate;
 
-    public List<WorkspaceResponse> listWorkspaces(String cheServerURL) {
+    public List<WorkspaceInfo> listWorkspaces(String cheServerURL) {
         String url = generateURL(cheServerURL, CheRestEndpoints.LIST_WORKSPACES);
         RestTemplate template = new RestTemplate();
-        ResponseEntity<List<WorkspaceResponse>> response =
+        ResponseEntity<List<WorkspaceInfo>> response =
                 template.exchange(url,
                                   HttpMethod.GET,
                                   null,
-                                  new ParameterizedTypeReference<List<WorkspaceResponse>>() {});
+                                  new ParameterizedTypeReference<List<WorkspaceInfo>>() {});
         return response.getBody();
     }
 
-    public WorkspaceResponse createWorkspace(String cheServerURL) throws IOException {
+    public WorkspaceInfo createWorkspace(String cheServerURL) throws IOException {
         String url = generateURL(cheServerURL, CheRestEndpoints.CREATE_WORKSPACE);
         String jsonTemplate = workspaceTemplate.getJSON();
         RestTemplate template = new RestTemplate();
@@ -63,7 +63,7 @@ public class CheRestClient {
                 .exchange(url, HttpMethod.POST, entity, Workspace.class);
         LOG.info("Workspace has been created: {}", workspace);
         
-        WorkspaceResponse response = new WorkspaceResponse();
+        WorkspaceInfo response = new WorkspaceInfo();
         response.setId(workspace.getBody().getId());
         response.setName(workspace.getBody().getConfig().getName());
         

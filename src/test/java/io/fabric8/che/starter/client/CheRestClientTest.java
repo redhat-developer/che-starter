@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 import io.fabric8.che.starter.TestConfig;
 import io.fabric8.che.starter.model.che.Stack;
-import io.fabric8.che.starter.model.response.WorkspaceResponse;
+import io.fabric8.che.starter.model.response.WorkspaceInfo;
 
 import static org.junit.Assert.*;
 
@@ -40,7 +40,7 @@ public class CheRestClientTest extends TestConfig {
 
     @Test
     public void listWorkspaces() {
-        List<WorkspaceResponse> workspaces = this.client.listWorkspaces(cheServerURL);
+        List<WorkspaceInfo> workspaces = this.client.listWorkspaces(cheServerURL);
         LOG.info("Number of workspaces: {}", workspaces.size());
         workspaces.forEach(w -> LOG.info("workspace ID: {}", w.getId()));
     }
@@ -52,9 +52,9 @@ public class CheRestClientTest extends TestConfig {
 
     @Test
     public void stopWorskpace() {
-        List<WorkspaceResponse> workspaces = client.listWorkspaces(cheServerURL);
+        List<WorkspaceInfo> workspaces = client.listWorkspaces(cheServerURL);
         if (!workspaces.isEmpty()) {
-            List<WorkspaceResponse> runningWorkspaces = workspaces.stream().filter(w -> w.getStatus().equals("RUNNING"))
+            List<WorkspaceInfo> runningWorkspaces = workspaces.stream().filter(w -> w.getStatus().equals("RUNNING"))
                     .collect(Collectors.toList());
             if (!runningWorkspaces.isEmpty()) {
                 client.stopWorkspace(cheServerURL, runningWorkspaces.get(0).getId());
