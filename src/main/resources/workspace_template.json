@@ -43,10 +43,10 @@
         "type": "git",
         "parameters": {
           "branch": "${workspace.git.branch}",
-          "keepVcs": "true",
+          "keepVcs": "true"
         }
       },
-      "mixins": [ "git" ],
+      "mixins": [ "git" ]
     }
   ],
   "links": []
