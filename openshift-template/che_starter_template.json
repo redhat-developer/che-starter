@@ -4,7 +4,7 @@
     "metadata": {
         "annotations": {
             "description": "eclipse-che-starter template",
-            "iconClass" : "icon-che",
+            "iconClass" : "icon-openjdk",
             "tags" : "eclipse,che,java",
             "version" : "1.0.0"
         },
