@@ -39,7 +39,7 @@ public class CheRestClient {
 
     public static final String WORKSPACE_LINK_IDE_URL = "ide url";
     public static final String WORKSPACE_LINK_START_WORKSPACE = "start workspace";
-    
+
     @Autowired
     WorkspaceTemplate workspaceTemplate;
 
