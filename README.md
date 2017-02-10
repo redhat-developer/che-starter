@@ -1,7 +1,7 @@
 che-starter
 ===========
 
-REST endpoints for managing Che servers and workspaces
+REST endpoints for managing [Eclipse Che](http://www.eclipse.org/che/) servers and workspaces.
 
 Building from command line
 --------------------------
@@ -21,7 +21,7 @@ There are several ways for running the project:
     $ mvn spring-boot:run
 ````
 
-* From Eclipse IDE you can simply right-click on `Application.java` - **Run As..** -> **Java Application**
+* From Eclipse IDE you can simply right-click on `Application.java` -> **Run As..** -> **Java Application**
 
 * From command line:
 
@@ -29,17 +29,15 @@ There are several ways for running the project:
     $ java -jar target/che-starter-1.0-SNAPSHOT.jar
 ````
 
-Once the service is running, it would be available with [Swagger](http://swagger.io/) documentation on the following URL:
-
-[http://localhost:10000/](http://localhost:10000/)
+Once the service is running, it would be available with [Swagger](http://swagger.io/) documentation on [http://localhost:10000/](http://localhost:10000/)
 
 Debugging
 ---------
 There are several ways for debugging the project:
 
-1. From Eclipse IDE you can simply right-click on `Application.java` -> **Debug As..** -> **Java Application**
+* From Eclipse IDE you can simply right-click on `Application.java` -> **Debug As..** -> **Java Application**
 
-2. Running the project in the debug mode from the command line: 
+* Running the project in the debug mode from the command line: 
 
 ```bash
     $ java -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=8000,suspend=n -jar target/che-starter-1.0-SNAPSHOT.jar 

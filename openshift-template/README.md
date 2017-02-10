@@ -3,8 +3,9 @@
 ```sh
 cd che-starter
 
-# build the image
 docker build -t rhche/che-starter:nightly .
+
+cd openshift-template
 
 oc create -f che_starter_template.json
 
