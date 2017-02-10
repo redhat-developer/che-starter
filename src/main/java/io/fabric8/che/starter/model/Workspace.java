@@ -22,36 +22,36 @@ public class Workspace {
     private String status;
     private WorkspaceConfig config;
     private List<WorkspaceLink> links;
-    
-	public String getId() {
-		return id;
-	}
-	
-	public void setId(String id) {
-		this.id = id;
-	}
-	
-	public String getStatus() {
-		return status;
-	}
-	
-	public void setStatus(String status) {
-		this.status = status;
-	}
-	
-	public WorkspaceConfig getConfig() {
-		return config;
-	}
-	
-	public void setConfig(WorkspaceConfig config) {
-		this.config = config;
-	}
-	
-	public List<WorkspaceLink> getLinks() {
-		return links;
-	}
-	
-	public void setLinks(List<WorkspaceLink> links) {
-		this.links = links;
-	}
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public WorkspaceConfig getConfig() {
+        return config;
+    }
+
+    public void setConfig(WorkspaceConfig config) {
+        this.config = config;
+    }
+
+    public List<WorkspaceLink> getLinks() {
+        return links;
+    }
+
+    public void setLinks(List<WorkspaceLink> links) {
+        this.links = links;
+    }
 }
