@@ -27,39 +27,47 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import io.fabric8.che.starter.model.Stack;
-import io.fabric8.che.starter.model.Workspace;
 import io.fabric8.che.starter.model.WorkspaceTemplate;
+import io.fabric8.che.starter.model.che.Stack;
+import io.fabric8.che.starter.model.che.Workspace;
+import io.fabric8.che.starter.model.response.WorkspaceResponse;
 
 @Service
 public class CheRestClient {
     private static final Logger LOG = LogManager.getLogger(CheRestClient.class);
 
     @Autowired
-    WorkspaceTemplate workspcaceTemplate;
+    WorkspaceTemplate workspaceTemplate;
 
-    public List<Workspace> listWorkspaces(String cheServerURL) {
+    public List<WorkspaceResponse> listWorkspaces(String cheServerURL) {
         String url = generateURL(cheServerURL, CheRestEndpoints.LIST_WORKSPACES);
         RestTemplate template = new RestTemplate();
-        ResponseEntity<List<Workspace>> response =
+        ResponseEntity<List<WorkspaceResponse>> response =
                 template.exchange(url,
                                   HttpMethod.GET,
                                   null,
-                                  new ParameterizedTypeReference<List<Workspace>>() {});
+                                  new ParameterizedTypeReference<List<WorkspaceResponse>>() {});
         return response.getBody();
     }
 
-    public String createWorkspace(String cheServerURL) throws IOException {
+    public WorkspaceResponse createWorkspace(String cheServerURL) throws IOException {
         String url = generateURL(cheServerURL, CheRestEndpoints.CREATE_WORKSPACE);
-        String jsonTemplate = workspcaceTemplate.getJSON();
+        String jsonTemplate = workspaceTemplate.getJSON();
         RestTemplate template = new RestTemplate();
+        
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<String>(jsonTemplate, headers);
-        ResponseEntity<String> response = template
-                .exchange(url, HttpMethod.POST, entity, String.class);
-        LOG.info("Workspace has been created: {}", response);
-        return response.getBody();
+        
+        ResponseEntity<Workspace> workspace = template
+                .exchange(url, HttpMethod.POST, entity, Workspace.class);
+        LOG.info("Workspace has been created: {}", workspace);
+        
+        WorkspaceResponse response = new WorkspaceResponse();
+        response.setId(workspace.getBody().getId());
+        response.setName(workspace.getBody().getConfig().getName());
+        
+        return response;
     }
 
     public void stopWorkspace(String cheServerURL, String id) {

@@ -12,6 +12,7 @@
  */
 package io.fabric8.che.starter.controller;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -28,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.fabric8.che.starter.client.CheRestClient;
 import io.fabric8.che.starter.client.Generator;
-import io.fabric8.che.starter.model.Workspace;
+import io.fabric8.che.starter.model.response.WorkspaceResponse;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -51,8 +52,8 @@ public class WorkspaceController {
     Generator generator;
 
     @PostMapping
-    public Workspace create() {
-        return new Workspace();
+    public WorkspaceResponse create() throws IOException {
+    	return cheRestClient.createWorkspace(cheServerURL);
     }
 
     @ApiOperation(value = "List the user's workspaces")
@@ -63,7 +64,7 @@ public class WorkspaceController {
         @ApiResponse(code = 200, message = "Success")
     })
     @GetMapping
-    public List<Workspace> list() {
+    public List<WorkspaceResponse> list() {
         return cheRestClient.listWorkspaces(cheServerURL);
     }
 
