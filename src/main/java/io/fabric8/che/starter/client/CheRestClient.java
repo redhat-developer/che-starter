@@ -27,10 +27,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import io.fabric8.che.starter.model.Stack;
+import io.fabric8.che.starter.model.Workspace;
+import io.fabric8.che.starter.model.WorkspaceLink;
 import io.fabric8.che.starter.model.WorkspaceTemplate;
-import io.fabric8.che.starter.model.che.Stack;
-import io.fabric8.che.starter.model.che.Workspace;
-import io.fabric8.che.starter.model.che.WorkspaceLink;
 import io.fabric8.che.starter.model.response.WorkspaceInfo;
 
 @Service
@@ -54,37 +54,34 @@ public class CheRestClient {
         return response.getBody();
     }
 
-    public WorkspaceInfo createWorkspace(String cheServerURL, String name, String repo, String branch) throws IOException {
+    public WorkspaceInfo createWorkspace(String cheServerURL, String name, String repo, String branch)
+            throws IOException {
         String url = generateURL(cheServerURL, CheRestEndpoints.CREATE_WORKSPACE);
-
         String jsonTemplate = workspaceTemplate.createRequest()
-        		.setName(name)
-        		.setRepo(repo)
-        		.setBranch(branch)
-        		.getJSON();
+                                                .setName(name)
+                                                .setRepo(repo)
+                                                .setBranch(branch)
+                                                .getJSON();
 
         RestTemplate template = new RestTemplate();
-        
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<String>(jsonTemplate, headers);
-        
-        ResponseEntity<Workspace> workspace = template
-                .exchange(url, HttpMethod.POST, entity, Workspace.class);
+
+        ResponseEntity<Workspace> workspace = template.exchange(url, HttpMethod.POST, entity, Workspace.class);
         LOG.info("Workspace has been created: {}", workspace);
-        
+
         WorkspaceInfo response = new WorkspaceInfo();
         response.setId(workspace.getBody().getId());
         response.setName(workspace.getBody().getConfig().getName());
-        
+
         for (WorkspaceLink link : workspace.getBody().getLinks()) {
-        	if (WORKSPACE_LINK_IDE_URL.equals(link.getRel())) {
-        		response.setWorkspaceIdeUrl(link.getHref());
-        		break;
-        	}
+            if (WORKSPACE_LINK_IDE_URL.equals(link.getRel())) {
+                response.setWorkspaceIdeUrl(link.getHref());
+                break;
+            }
         }
-        
-        
+
         return response;
     }
 
@@ -97,7 +94,7 @@ public class CheRestClient {
     public void stopAllWorkspaces() {
         throw new UnsupportedOperationException("'stopAllWorkspaces' is currently not supported");
     }
-    
+
     public List<Stack> listStacks(String cheServerURL) {
         String url = generateURL(cheServerURL, CheRestEndpoints.LIST_STACKS);
         RestTemplate template = new RestTemplate();
@@ -106,7 +103,7 @@ public class CheRestClient {
                                   HttpMethod.GET,
                                   null,
                                   new ParameterizedTypeReference<List<Stack>>() {});
-        return response.getBody();    	
+        return response.getBody();
     }
 
     private String generateURL(String cheServerURL, CheRestEndpoints endpoint) {

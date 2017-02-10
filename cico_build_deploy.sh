@@ -22,7 +22,7 @@ yum -y install rh-maven33
 sed -i '/OPTIONS=.*/c\OPTIONS="--selinux-enabled --log-driver=journald --insecure-registry registry.ci.centos.org:5000"' /etc/sysconfig/docker
 systemctl start docker
 
-scl enable rh-maven33 'mvn clean verify'
+scl enable rh-maven33 'mvn clean verify -B'
 
 if [ $? -eq 0 ]; then
 

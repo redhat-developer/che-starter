@@ -30,9 +30,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.fabric8.che.starter.client.CheRestClient;
 import io.fabric8.che.starter.client.Generator;
-import io.fabric8.che.starter.model.che.request.WorkspaceCreateParams;
+import io.fabric8.che.starter.model.request.WorkspaceCreateParams;
 import io.fabric8.che.starter.model.response.WorkspaceInfo;
-import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -53,7 +52,7 @@ public class WorkspaceController {
 
     @Autowired
     Generator generator; 
-    
+
     @ApiOperation(value = "Create a new workspace")
     @PostMapping
     public WorkspaceInfo create(@RequestBody WorkspaceCreateParams params) throws IOException {

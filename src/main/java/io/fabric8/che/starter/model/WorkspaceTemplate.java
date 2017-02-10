@@ -34,56 +34,64 @@ public class WorkspaceTemplate {
 
     @Value(value = "classpath:workspace_template.json")
     private Resource resource;
-    
+
     @Autowired
     Generator generator;
-    
-    public class WorkspaceCreateRequest {   
-    	private String name;
-    	private String repo;
-    	private String branch;
-    	private String stack;
-    	
-    	protected WorkspaceCreateRequest(WorkspaceTemplate template) {
-    		this.name = generator.generateName();
-    	}
-    	
-    	public WorkspaceCreateRequest setName(String name) {
-    		this.name = name;
-    		return this;
-    	}
-    	
-    	public WorkspaceCreateRequest setRepo(String repo) {
-    		this.repo = repo;
-    		return this;
-    	}
-    	
-    	public WorkspaceCreateRequest setBranch(String branch) {
-    		this.branch = branch;
-    		return this;
-    	}
-    	
-    	public WorkspaceCreateRequest setStack(String stack) {
-    		this.stack = stack;
-    		return this;
-    	}    	
-    	
-    	public String getJSON() throws IOException {
-    		String json = read(resource.getInputStream());    		
-  			json = StringUtils.replace(json, WORKSPACE_NAME, name);    	
-    		json = StringUtils.replace(json, WORKSPACE_GIT_REPO, repo);   		
-    		return json;
-    	}
 
+    public class WorkspaceCreateRequest {
+        private String name;
+        private String repo;
+        private String branch;
+        private String stack;
+
+        protected WorkspaceCreateRequest(WorkspaceTemplate template) {
+            this.name = generator.generateName();
+        }
+
+        public WorkspaceCreateRequest setName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public WorkspaceCreateRequest setRepo(String repo) {
+            this.repo = repo;
+            return this;
+        }
+
+        public WorkspaceCreateRequest setBranch(String branch) {
+            this.branch = branch;
+            return this;
+        }
+
+        public WorkspaceCreateRequest setStack(String stack) {
+            this.stack = stack;
+            return this;
+        }
+
+        public String getJSON() throws IOException {
+            String json = read(resource.getInputStream());
+            json = StringUtils.replace(json, WORKSPACE_NAME, name);
+            json = StringUtils.replace(json, WORKSPACE_GIT_REPO, repo);
+            return json;
+        }
+
+        public String getBranch() {
+            return branch;
+        }
+
+        public String getStack() {
+            return stack;
+        }
     }
 
-/*    public String getJSON() throws IOException {
-        String template = read(resource.getInputStream());
-        return StringUtils.replace(template, WORKSPACE_NAME, generator.generateName());
-    }*/
-    
+    /*
+     * public String getJSON() throws IOException { String template =
+     * read(resource.getInputStream()); return StringUtils.replace(template,
+     * WORKSPACE_NAME, generator.generateName()); }
+     */
+
     public WorkspaceCreateRequest createRequest() {
-    	return new WorkspaceCreateRequest(this);
+        return new WorkspaceCreateRequest(this);
     }
 
     public static String read(InputStream input) throws IOException {

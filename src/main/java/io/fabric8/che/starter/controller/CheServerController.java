@@ -65,5 +65,4 @@ public class CheServerController {
         throw new UnsupportedOperationException("'stopCheServer' functionality is currently not supported");
     }
 
-
 }

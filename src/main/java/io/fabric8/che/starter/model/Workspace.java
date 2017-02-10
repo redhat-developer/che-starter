@@ -10,7 +10,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package io.fabric8.che.starter.model.che;
+package io.fabric8.che.starter.model;
 
 import java.util.List;
 

@@ -23,17 +23,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import io.fabric8.che.starter.TestConfig;
-import io.fabric8.che.starter.model.che.Stack;
+import io.fabric8.che.starter.model.Stack;
 import io.fabric8.che.starter.model.response.WorkspaceInfo;
 
 import static org.junit.Assert.*;
 
 public class CheRestClientTest extends TestConfig {
+    private static final String GITHUB_REPO = "https://github.com/che-samples/console-java-simple";
+    private static final String BRANCH = "master";
 
     private static final Logger LOG = LogManager.getLogger(CheRestClientTest.class);
 
     @Value("${che.server.url}")
     String cheServerURL;
+
+    @Autowired
+    Generator generator; 
 
     @Autowired
     private CheRestClient client;
@@ -47,7 +52,7 @@ public class CheRestClientTest extends TestConfig {
 
     @Test
     public void createWorkspace() throws IOException {
-        client.createWorkspace(cheServerURL, null, null, null);
+        client.createWorkspace(cheServerURL, generator.generateName(), GITHUB_REPO, BRANCH);
     }
 
     @Test
