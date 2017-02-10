@@ -31,6 +31,7 @@ public class WorkspaceTemplate {
     private final static String WORKSPACE_NAME = "${workspace.name}";
     private final static String WORKSPACE_GIT_REPO = "${workspace.git.repo}";
     private final static String WORKSPACE_GIT_BRANCH = "${workspace.git.branch}";
+    private final static String DEFAULT_WORKSPACE_GIT_BRANCH = "master";
 
     @Value(value = "classpath:workspace_template.json")
     private Resource resource;
