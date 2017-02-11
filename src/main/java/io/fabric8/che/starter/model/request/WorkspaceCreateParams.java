@@ -14,8 +14,6 @@ package io.fabric8.che.starter.model.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import io.swagger.annotations.ApiImplicitParam;
-
 /**
  * This DTO is used to manage the workspace creation parameters coming from a
  * client calling the workspace create method.
@@ -29,8 +27,6 @@ public class WorkspaceCreateParams {
     private String repo;
     private String branch;
 
-    // @ApiImplicitParam(name = "name", value = "Workspace Name", required =
-    // false, dataType = "string", paramType = "path")
     public String getName() {
         return name;
     }
@@ -47,8 +43,6 @@ public class WorkspaceCreateParams {
     	this.stack = stack;
     }
 
-    // @ApiImplicitParam(name = "repo", value = "Git repository URL", required =
-    // true, dataType = "string", paramType = "path")
     public String getRepo() {
         return repo;
     }
@@ -57,8 +51,6 @@ public class WorkspaceCreateParams {
         this.repo = repo;
     }
 
-    // @ApiImplicitParam(name = "branch", value = "Git branch", required = true,
-    // dataType = "string", paramType = "path")
     public String getBranch() {
         return branch;
     }

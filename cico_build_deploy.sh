@@ -31,7 +31,7 @@ if [ $? -eq 0 ]; then
   docker build -t rhche/che-starter:nightly .
 
   if [ $? -ne 0 ]; then
-    echo 'Docker Build Failed'
+    echo 'Docker Build Failed!'
     exit 2
   fi
 
