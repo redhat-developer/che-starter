@@ -51,10 +51,11 @@ public class WorkspaceController {
     @Autowired
     Generator generator; 
 
-    @ApiOperation(value = "Creates and starts a new workspace. Also stops all other workspaces (only one workspace can be running at a time). If a workspace with the project already exists just starts it.")
+    @ApiOperation(value = "Create and start a new workspace. Stop all other workspaces (only one workspace can be running at a time). If a workspace with the imported project already exists, just start it")
     @PostMapping
-    public WorkspaceInfo create(@RequestBody String masterUrl, @RequestBody String userToken, @RequestBody WorkspaceCreateParams params) throws IOException {
-        return cheRestClient.createWorkspace(cheServerURL, params.getName(), params.getStack(), params.getRepo(), params.getBranch());
+    public WorkspaceInfo create(@RequestBody String masterUrl, @RequestBody String userToken, @RequestBody WorkspaceCreateParams parameters) throws IOException {
+        LOG.info("OpenShift MasterURL: {}", masterUrl);
+        return cheRestClient.createWorkspace(cheServerURL, parameters.getName(), parameters.getStack(), parameters.getRepo(), parameters.getBranch());
     }
 
     @ApiIgnore

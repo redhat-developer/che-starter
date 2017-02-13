@@ -44,7 +44,7 @@ public class CheRestClient {
 
     @Autowired
     WorkspaceTemplate workspaceTemplate;
-    
+
     @Autowired
     ProjectTemplate projectTemplate;
 
@@ -89,10 +89,10 @@ public class CheRestClient {
                 break;
             }
         }
-        
+
         // Before we can create a project, we must start the new workspace
         //startWorkspace(cheServerURL, workspaceInfo.getId());
-        
+
         // Next we create a new project within the workspace
         url = generateURL(cheServerURL, CheRestEndpoints.CREATE_PROJECT, workspaceInfo.getId());
         jsonTemplate = projectTemplate.createRequest()
@@ -100,7 +100,7 @@ public class CheRestClient {
                                 .setRepo(repo)
                                 .setBranch(branch)
                                 .getJSON();
-        
+
         template = new RestTemplate();
         headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -113,10 +113,9 @@ public class CheRestClient {
 
         return workspaceInfo;
     }
-    
-    public void createProject(String cheServerURL, String name, String repo, String branch)
-    		throws IOException {
-    	
+
+    public void createProject(String cheServerURL, String name, String repo, String branch) throws IOException {
+
     }
 
     public void deleteWorkspace(String cheServerURL, String id) {
@@ -124,11 +123,11 @@ public class CheRestClient {
         RestTemplate template = new RestTemplate();
         template.delete(url);
     }
-    
+
     public void startWorkspace(String cheServerURL, String id) {
-    	String url = generateURL(cheServerURL, CheRestEndpoints.START_WORKSPACE, id);
-    	RestTemplate template = new RestTemplate();
-    	template.postForLocation(url,  null);
+        String url = generateURL(cheServerURL, CheRestEndpoints.START_WORKSPACE, id);
+        RestTemplate template = new RestTemplate();
+        template.postForLocation(url, null);
     }
 
     public void stopWorkspace(String cheServerURL, String id) {
