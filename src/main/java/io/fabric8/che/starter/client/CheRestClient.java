@@ -61,7 +61,7 @@ public class CheRestClient {
 
     public WorkspaceInfo createWorkspace(String cheServerURL, String name, String stack, String repo, String branch)
             throws IOException {
-    	// The first step is to create the workspace
+        // The first step is to create the workspace
         String url = generateURL(cheServerURL, CheRestEndpoints.CREATE_WORKSPACE);
         String jsonTemplate = workspaceTemplate.createRequest()
                                                 .setName(name)
@@ -96,10 +96,10 @@ public class CheRestClient {
         // Next we create a new project within the workspace
         url = generateURL(cheServerURL, CheRestEndpoints.CREATE_PROJECT, workspaceInfo.getId());
         jsonTemplate = projectTemplate.createRequest()
-        						.setName(name)
-        						.setRepo(repo)
-        						.setBranch(branch)
-        						.getJSON();
+                                .setName(name)
+                                .setRepo(repo)
+                                .setBranch(branch)
+                                .getJSON();
         
         template = new RestTemplate();
         headers = new HttpHeaders();
@@ -110,7 +110,7 @@ public class CheRestClient {
         Project project = projectResponse.getBody();
 
         //workspaceInfo.setRepository(project.getRepository());
-        
+
         return workspaceInfo;
     }
     

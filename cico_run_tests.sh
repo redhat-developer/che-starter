@@ -12,6 +12,8 @@
 # http://www.eclipse.org/legal/epl-v10.html
 # #L%
 ###
+. inherit-env
+
 yum -y update
 yum -y install centos-release-scl java-1.8.0-openjdk-devel
 yum -y install rh-maven33

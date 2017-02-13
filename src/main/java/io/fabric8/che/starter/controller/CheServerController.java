@@ -13,6 +13,7 @@
 package io.fabric8.che.starter.controller;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,7 +23,10 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.fabric8.che.starter.model.CheServer;
@@ -45,18 +49,15 @@ public class CheServerController {
     @Value(value = "classpath:che_server_template.json")
     private Resource cheServerTemplate;
 
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "masterUrl", value = "Master URL", required = true, dataType = "string", paramType = "path"),
-            @ApiImplicitParam(name = "userToken", value = "User Token", required = true, dataType = "string", paramType = "path")
-    })
-    @GetMapping("/{masterURL}/{userToken}")
-    public void startCheServer(@PathVariable String masterUrl, @PathVariable String userToken) throws IOException {
-        LOG.info("OpenShift url: {}", masterUrl);
+    @PostMapping
+    public void startCheServer(@RequestParam Map<String, String> config, @RequestBody String masterUrl, @RequestBody String userToken) throws IOException {
+        LOG.info("OpenShift config: {}", config);
+        LOG.info("OpenShift master URL: {}", userToken);
         LOG.info("OAth token: {}", userToken);
 
-        Config config = new ConfigBuilder().withMasterUrl(masterUrl).withOauthToken(userToken).build();
-        OpenShiftClient client = new DefaultOpenShiftClient(config);
-
+        Config openshiftConfig = new ConfigBuilder().withMasterUrl(masterUrl).withOauthToken(userToken).build();
+        OpenShiftClient client = new DefaultOpenShiftClient(openshiftConfig);
+        
         Template template = client.templates().load(cheServerTemplate.getInputStream()).get();
     }
 
