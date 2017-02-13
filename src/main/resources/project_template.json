@@ -1,0 +1,19 @@
+{
+  "name": "console-java-simple",
+  "type": "maven",
+  "description": "A hello world Java application.",
+  "path": "/console-java-simple",
+  "source": {
+    "parameters": {
+      "branch": "${project.git.branch}",
+      "keepVcs": "true"    
+    },
+    "type": "git",
+    "location": "${project.git.repo}"
+  },
+  "attributes": {},
+  "links": [ { } ],
+  "mixins": [
+    "git"
+  ]
+}

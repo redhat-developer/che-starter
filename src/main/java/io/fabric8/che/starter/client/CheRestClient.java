@@ -13,7 +13,9 @@
 package io.fabric8.che.starter.client;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,6 +29,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import io.fabric8.che.starter.model.Project;
+import io.fabric8.che.starter.model.ProjectTemplate;
 import io.fabric8.che.starter.model.Stack;
 import io.fabric8.che.starter.model.Workspace;
 import io.fabric8.che.starter.model.WorkspaceLink;
@@ -42,6 +46,9 @@ public class CheRestClient {
 
     @Autowired
     WorkspaceTemplate workspaceTemplate;
+    
+    @Autowired
+    ProjectTemplate projectTemplate;
 
     public List<WorkspaceInfo> listWorkspaces(String cheServerURL) {
         String url = generateURL(cheServerURL, CheRestEndpoints.LIST_WORKSPACES);
@@ -54,22 +61,23 @@ public class CheRestClient {
         return response.getBody();
     }
 
-    public WorkspaceInfo createWorkspace(String cheServerURL, String name, String repo, String branch)
+    public WorkspaceInfo createWorkspace(String cheServerURL, String name, String stack, String repo, String branch)
             throws IOException {
+    	// The first step is to create the workspace
         String url = generateURL(cheServerURL, CheRestEndpoints.CREATE_WORKSPACE);
         String jsonTemplate = workspaceTemplate.createRequest()
                                                 .setName(name)
-                                                .setRepo(repo)
-                                                .setBranch(branch)
+                                                .setStack(stack)
                                                 .getJSON();
 
+        
         RestTemplate template = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<String>(jsonTemplate, headers);
 
-        ResponseEntity<Workspace> response = template.exchange(url, HttpMethod.POST, entity, Workspace.class);
-        Workspace workspace = response.getBody();
+        ResponseEntity<Workspace> workspaceResponse = template.exchange(url, HttpMethod.POST, entity, Workspace.class);
+        Workspace workspace = workspaceResponse.getBody();
 
         LOG.info("Workspace has been created: {}", workspace);
 
@@ -83,14 +91,46 @@ public class CheRestClient {
                 break;
             }
         }
+        
+        // Before we can create a project, we must start the new workspace
+        startWorkspace(cheServerURL, workspaceInfo.getId());
+        
+        // Next we create a new project within the workspace
+        url = generateURL(cheServerURL, CheRestEndpoints.CREATE_PROJECT, workspaceInfo.getId());
+        jsonTemplate = projectTemplate.createRequest()
+        						.setName(name)
+        						.setRepo(repo)
+        						.setBranch(branch)
+        						.getJSON();
+        
+        template = new RestTemplate();
+        headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        entity = new HttpEntity<String>(jsonTemplate, headers);
+        
+        ResponseEntity<Project> projectResponse = template.exchange(url, HttpMethod.POST, entity, Project.class);
+        Project project = projectResponse.getBody();
 
+        //workspaceInfo.setRepository(project.getRepository());
+        
         return workspaceInfo;
+    }
+    
+    public void createProject(String cheServerURL, String name, String repo, String branch)
+    		throws IOException {
+    	
     }
 
     public void deleteWorkspace(String cheServerURL, String id) {
         String url = generateURL(cheServerURL, CheRestEndpoints.DELETE_WORKSPACE, id);
         RestTemplate template = new RestTemplate();
         template.delete(url);
+    }
+    
+    public void startWorkspace(String cheServerURL, String id) {
+    	String url = generateURL(cheServerURL, CheRestEndpoints.START_WORKSPACE, id);
+    	RestTemplate template = new RestTemplate();
+    	template.postForLocation(url,  null);
     }
 
     public void stopWorkspace(String cheServerURL, String id) {

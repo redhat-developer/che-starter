@@ -25,6 +25,7 @@ import io.swagger.annotations.ApiImplicitParam;
 public class WorkspaceCreateParams {
 
     private String name;
+    private String stack;
     private String repo;
     private String branch;
 
@@ -36,6 +37,14 @@ public class WorkspaceCreateParams {
 
     public void setName(String name) {
         this.name = name;
+    }
+    
+    public String getStack() {
+    	return stack;
+    }
+    
+    public void setStack(String stack) {
+    	this.stack = stack;
     }
 
     // @ApiImplicitParam(name = "repo", value = "Git repository URL", required =

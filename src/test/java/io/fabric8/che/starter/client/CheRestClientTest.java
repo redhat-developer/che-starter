@@ -31,6 +31,7 @@ import static org.junit.Assert.*;
 public class CheRestClientTest extends TestConfig {
     private static final String GITHUB_REPO = "https://github.com/che-samples/console-java-simple";
     private static final String BRANCH = "master";
+    private static final String STACK_ID = "java-default";
 
     private static final Logger LOG = LogManager.getLogger(CheRestClientTest.class);
 
@@ -52,7 +53,7 @@ public class CheRestClientTest extends TestConfig {
 
     @Test
     public void createAndDeleteWorkspace() throws IOException {
-        WorkspaceInfo workspace = client.createWorkspace(cheServerURL, generator.generateName(), GITHUB_REPO, BRANCH);
+        WorkspaceInfo workspace = client.createWorkspace(cheServerURL, generator.generateName(), STACK_ID, GITHUB_REPO, BRANCH);
         client.deleteWorkspace(cheServerURL, workspace.getId());
     }
 

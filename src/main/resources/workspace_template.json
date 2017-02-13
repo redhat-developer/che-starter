@@ -31,23 +31,6 @@
       "attributes": {}
     }
   ],
-  "projects": [
-    {
-      "name": "console-java-simple",
-      "type": "maven",
-      "description": "A hello world Java application.",
-      "path": "/console-java-simple",
-      "attributes": {},      
-      "source": {
-        "location": "${workspace.git.repo}",
-        "type": "git",
-        "parameters": {
-          "branch": "${workspace.git.branch}",
-          "keepVcs": "true"
-        }
-      },
-      "mixins": [ "git" ]
-    }
-  ],
+  "projects": [],
   "links": []
 }

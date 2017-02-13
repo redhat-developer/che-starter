@@ -57,7 +57,7 @@ public class WorkspaceController {
     @ApiOperation(value = "Create a new workspace")
     @PostMapping
     public WorkspaceInfo create(@RequestBody WorkspaceCreateParams params) throws IOException {
-    	return cheRestClient.createWorkspace(cheServerURL, params.getName(), params.getRepo(), params.getBranch());
+    	return cheRestClient.createWorkspace(cheServerURL, params.getName(), params.getStack(), params.getRepo(), params.getBranch());
     }
 
     @ApiOperation(value = "List the user's workspaces")

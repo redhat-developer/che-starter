@@ -27,39 +27,58 @@ import org.springframework.stereotype.Component;
 import io.fabric8.che.starter.client.Generator;
 
 @Component
-public class WorkspaceTemplate {
-    private final static String WORKSPACE_NAME = "${workspace.name}";
-    private final static String WORKSPACE_STACK = "${workspace.stack}";
+public class ProjectTemplate {
+    private final static String PROJECT_NAME = "${project.name}";
+    private final static String PROJECT_GIT_REPO = "${project.git.repo}";
+    private final static String PROJECT_GIT_BRANCH = "${project.git.branch}";
+    private final static String DEFAULT_PROJECT_GIT_BRANCH = "master";
 
-    @Value(value = "classpath:workspace_template.json")
+    @Value(value = "classpath:project_template.json")
     private Resource resource;
 
     @Autowired
     Generator generator;
 
-    public class WorkspaceCreateRequest {
+    public class ProjectCreateRequest {
         private String name;
+        private String repo;
+        private String branch;
         private String stack;
 
-        protected WorkspaceCreateRequest(WorkspaceTemplate template) {
+        protected ProjectCreateRequest(ProjectTemplate template) {
             this.name = generator.generateName();
         }
 
-        public WorkspaceCreateRequest setName(String name) {
+        public ProjectCreateRequest setName(String name) {
             this.name = name;
             return this;
         }
 
-        public WorkspaceCreateRequest setStack(String stack) {
+        public ProjectCreateRequest setRepo(String repo) {
+            this.repo = repo;
+            return this;
+        }
+
+        public ProjectCreateRequest setBranch(String branch) {
+            this.branch = branch;
+            return this;
+        }
+
+        public ProjectCreateRequest setStack(String stack) {
             this.stack = stack;
             return this;
         }
 
         public String getJSON() throws IOException {
             String json = read(resource.getInputStream());
-            json = StringUtils.replace(json, WORKSPACE_NAME, name);
-            json = StringUtils.replace(json,  WORKSPACE_STACK, stack);
+            json = StringUtils.replace(json, PROJECT_NAME, name);
+            json = StringUtils.replace(json, PROJECT_GIT_REPO, repo);
+            json = StringUtils.replace(json,  PROJECT_GIT_BRANCH, branch);
             return json;
+        }
+
+        public String getBranch() {
+            return branch;
         }
 
         public String getStack() {
@@ -67,8 +86,8 @@ public class WorkspaceTemplate {
         }
     }
 
-    public WorkspaceCreateRequest createRequest() {
-        return new WorkspaceCreateRequest(this);
+    public ProjectCreateRequest createRequest() {
+        return new ProjectCreateRequest(this);
     }
 
     public static String read(InputStream input) throws IOException {

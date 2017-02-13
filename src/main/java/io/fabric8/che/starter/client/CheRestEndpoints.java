@@ -14,10 +14,12 @@ package io.fabric8.che.starter.client;
 
 public enum CheRestEndpoints {
     CREATE_WORKSPACE("/api/workspace"),
+    START_WORKSPACE ("/api/workspace/{id}/runtime"),
     DELETE_WORKSPACE("/api/workspace/{id}"),
     LIST_WORKSPACES ("/api/workspace"),
     STOP_WORKSPACE  ("/api/workspace/{id}/runtime"),
-    LIST_STACKS     ("/api/stack");
+    LIST_STACKS     ("/api/stack"),	
+	CREATE_PROJECT  ("/api/workspace/{id}/project");	
 
     private final String endpoint;
 
