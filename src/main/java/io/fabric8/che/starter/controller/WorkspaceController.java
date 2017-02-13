@@ -54,13 +54,12 @@ public class WorkspaceController {
     @Autowired
     Generator generator; 
 
-    @ApiOperation(value = "Create a new workspace")
     @PostMapping
-    public WorkspaceInfo create(@RequestBody WorkspaceCreateParams params) throws IOException {
+    public WorkspaceInfo create(@RequestBody String masterUrl, @RequestBody String userToken, @RequestBody WorkspaceCreateParams params) throws IOException {
     	return cheRestClient.createWorkspace(cheServerURL, params.getName(), params.getStack(), params.getRepo(), params.getBranch());
     }
 
-    @ApiOperation(value = "List the user's workspaces")
+    @ApiIgnore
     @GetMapping
     public List<WorkspaceInfo> list() {
         return cheRestClient.listWorkspaces(cheServerURL);
