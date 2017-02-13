@@ -16,7 +16,7 @@ yum -y update
 yum -y install centos-release-scl java-1.8.0-openjdk-devel
 yum -y install rh-maven33
 
-scl enable rh-maven33 'mvn surefire:test -B'
+scl enable rh-maven33 'mvn clean verify -B'
 
 if [ $? -ne 0 ]; then
     echo 'Build Failed!'
