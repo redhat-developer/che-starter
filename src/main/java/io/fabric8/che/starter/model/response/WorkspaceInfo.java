@@ -24,7 +24,6 @@ public class WorkspaceInfo {
     private String repository;
     private String branch;
     private String location;
-
     private String workspaceIdeUrl;
 
     public String getWorkspaceIdeUrl() {

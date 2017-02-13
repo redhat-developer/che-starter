@@ -32,10 +32,7 @@ import io.fabric8.che.starter.client.CheRestClient;
 import io.fabric8.che.starter.client.Generator;
 import io.fabric8.che.starter.model.request.WorkspaceCreateParams;
 import io.fabric8.che.starter.model.response.WorkspaceInfo;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import springfox.documentation.annotations.ApiIgnore;
 
 @CrossOrigin
@@ -54,9 +51,10 @@ public class WorkspaceController {
     @Autowired
     Generator generator; 
 
+    @ApiOperation(value = "Creates and starts a new workspace. Also stops all other workspaces (only one workspace can be running at a time). If a workspace with the project already exists just starts it.")
     @PostMapping
     public WorkspaceInfo create(@RequestBody String masterUrl, @RequestBody String userToken, @RequestBody WorkspaceCreateParams params) throws IOException {
-    	return cheRestClient.createWorkspace(cheServerURL, params.getName(), params.getStack(), params.getRepo(), params.getBranch());
+        return cheRestClient.createWorkspace(cheServerURL, params.getName(), params.getStack(), params.getRepo(), params.getBranch());
     }
 
     @ApiIgnore

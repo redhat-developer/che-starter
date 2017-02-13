@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.fabric8.che.starter.model.CheServer;
+import io.fabric8.che.starter.model.OpenShiftConfig;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.ConfigBuilder;
 import io.fabric8.openshift.api.model.Template;
@@ -37,6 +38,7 @@ import io.fabric8.openshift.client.DefaultOpenShiftClient;
 import io.fabric8.openshift.client.OpenShiftClient;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import springfox.documentation.annotations.ApiIgnore;
 
 @CrossOrigin
@@ -49,8 +51,9 @@ public class CheServerController {
     @Value(value = "classpath:che_server_template.json")
     private Resource cheServerTemplate;
 
+    @ApiOperation(value = "Creates a new Che server on OpenShift instance")
     @PostMapping
-    public void startCheServer(@RequestParam Map<String, String> config, @RequestBody String masterUrl, @RequestBody String userToken) throws IOException {
+    public void startCheServer(@RequestParam OpenShiftConfig config, @RequestParam String masterUrl, @RequestParam String userToken) throws IOException {
         LOG.info("OpenShift config: {}", config);
         LOG.info("OpenShift master URL: {}", userToken);
         LOG.info("OAth token: {}", userToken);
