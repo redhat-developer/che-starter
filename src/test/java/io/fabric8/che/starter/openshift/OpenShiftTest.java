@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 
 import io.fabric8.che.starter.TestConfig;
+import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.ConfigBuilder;
 import io.fabric8.openshift.api.model.Parameter;
@@ -33,11 +34,14 @@ import io.fabric8.openshift.client.OpenShiftClient;
 public class OpenShiftTest extends TestConfig {
     private static final Logger LOG = LogManager.getLogger(OpenShiftTest.class);
 
-    @Value(value = "classpath:che_server_template.json")
+    @Value(value = "classpath:templates/che_server_template.json")
     private Resource cheServerTemplate;
 
     @Value("${che.openshift.endpoint}")
     private String endpoint;
+    
+    @Value("${che.openshift.project}")
+    private String project;
 
     @Value("${che.openshift.username}")
     private String username;
@@ -55,15 +59,31 @@ public class OpenShiftTest extends TestConfig {
 
         OpenShiftClient client = new DefaultOpenShiftClient(config);
         
+        LOG.info("Number of projects: {}", client.projects().list().getItems().size());
         LOG.info("Projects: {}", client.projects().list());
 
         Template template = client.templates().load(cheServerTemplate.getInputStream()).get();
+
         List<Parameter> parameters = template.getParameters();
+        LOG.info("Number of template parameters: {}", parameters.size());
         for (Parameter parameter : parameters) {
             LOG.info("Template Parameter: {}", parameter);
         }
 
-        LOG.info("Pods: {}", client.pods().list());
+        template.setParameters(parameters);
+
+        LOG.info("Number of templates", client.templates().inNamespace(project).list().getItems().size());
+
+        client.templates().inNamespace(project).createOrReplace(template);
+
+        LOG.info("Number of templates", client.templates().inNamespace(project).list().getItems().size());
+
+        Boolean isDeleted = client.resource(template).inNamespace(project).delete();
+        LOG.info("Templates has been deleted: {}", isDeleted);
+        
+        LOG.info("Number of templates", client.templates().inNamespace(project).list().getItems().size());
+
+        LOG.info("Pods: {}", client.pods().inNamespace(project).list());
     }
 
 }

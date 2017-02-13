@@ -33,7 +33,7 @@ public class ProjectTemplate {
     private final static String PROJECT_GIT_BRANCH = "${project.git.branch}";
     private final static String DEFAULT_PROJECT_GIT_BRANCH = "master";
 
-    @Value(value = "classpath:project_template.json")
+    @Value(value = "classpath:templates/project_template.json")
     private Resource resource;
 
     @Autowired

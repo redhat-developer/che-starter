@@ -31,7 +31,7 @@ public class WorkspaceTemplate {
     private final static String WORKSPACE_NAME = "${workspace.name}";
     private final static String WORKSPACE_STACK = "${workspace.stack}";
 
-    @Value(value = "classpath:workspace_template.json")
+    @Value(value = "classpath:templates/workspace_template.json")
     private Resource resource;
 
     @Autowired

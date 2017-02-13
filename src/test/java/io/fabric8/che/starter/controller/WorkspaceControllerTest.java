@@ -29,7 +29,7 @@ import io.fabric8.che.starter.TestConfig;
 public class WorkspaceControllerTest extends TestConfig {
     private static final Logger LOG = LogManager.getLogger(WorkspaceControllerTest.class);
 
-    @Value(value = "classpath:workspace_template.json")
+    @Value(value = "classpath:templates/workspace_template.json")
     private Resource workspaceTemplate;
 
     @Autowired

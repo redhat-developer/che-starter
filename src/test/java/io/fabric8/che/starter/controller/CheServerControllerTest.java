@@ -30,7 +30,7 @@ import io.fabric8.che.starter.client.Generator;
 public class CheServerControllerTest extends TestConfig {
     private static final Logger LOG = LogManager.getLogger(CheServerControllerTest.class);
 
-    @Value(value = "classpath:che_server_template.json")
+    @Value(value = "classpath:templates/che_server_template.json")
     private Resource cheServerTemplate;
 
     @Autowired
