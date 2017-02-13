@@ -13,9 +13,7 @@
 package io.fabric8.che.starter.client;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -93,7 +91,7 @@ public class CheRestClient {
         }
         
         // Before we can create a project, we must start the new workspace
-        startWorkspace(cheServerURL, workspaceInfo.getId());
+        //startWorkspace(cheServerURL, workspaceInfo.getId());
         
         // Next we create a new project within the workspace
         url = generateURL(cheServerURL, CheRestEndpoints.CREATE_PROJECT, workspaceInfo.getId());

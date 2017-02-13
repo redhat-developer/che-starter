@@ -23,14 +23,7 @@
   "defaultEnv": "default",
   "name": "${workspace.name}",
   "description": null,
-  "commands": [
-    {
-      "commandLine": "mvn clean install -f ${current.project.path}",
-      "name": "build",
-      "type": "mvn",
-      "attributes": {}
-    }
-  ],
+  "commands": [],
   "projects": [],
   "links": []
 }
