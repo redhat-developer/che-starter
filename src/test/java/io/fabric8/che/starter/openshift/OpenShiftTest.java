@@ -68,7 +68,7 @@ public class OpenShiftTest extends TestConfig {
         LOG.info("Number of projects: {}", getNumberOfProjects(client));
 
         Template template = loadTemplate(client);
-        LOG.info("Number of templates", getNumberOfTemplates(client));
+        LOG.info("Number of templates {}", getNumberOfTemplates(client));
 
         List<Parameter> parameters = template.getParameters();
         LOG.info("Number of template parameters: {}", parameters.size());
@@ -76,12 +76,11 @@ public class OpenShiftTest extends TestConfig {
             LOG.info("Template Parameter: {}", parameter.getName());
         }
 
-        LOG.info("Number of templates", getNumberOfTemplates(client));
+        LOG.info("Number of templates {}", getNumberOfTemplates(client));
         installTemplate(client, template);
-        LOG.info("Number of templates", getNumberOfTemplates(client));
-
-        LOG.info("Template has been deleted: {}", deleteTemplate(client, template));
-        LOG.info("Number of templates", getNumberOfTemplates(client));
+        LOG.info("Number of templates {}", getNumberOfTemplates(client));
+        deleteTemplate(client, template);
+        LOG.info("Number of templates {}", getNumberOfTemplates(client));
 
         LOG.info("Pods: {}", getNumberOfPods(client));
     }
