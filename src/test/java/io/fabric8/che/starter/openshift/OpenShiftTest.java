@@ -13,6 +13,7 @@
 package io.fabric8.che.starter.openshift;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -23,16 +24,21 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 
 import io.fabric8.che.starter.TestConfig;
+import io.fabric8.kubernetes.api.model.KubernetesList;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.ConfigBuilder;
+import io.fabric8.openshift.api.model.DoneableTemplate;
 import io.fabric8.openshift.api.model.Parameter;
 import io.fabric8.openshift.api.model.ProjectRequest;
 import io.fabric8.openshift.api.model.Template;
 import io.fabric8.openshift.client.DefaultOpenShiftClient;
 import io.fabric8.openshift.client.OpenShiftClient;
+import io.fabric8.openshift.client.ParameterValue;
+import io.fabric8.openshift.client.dsl.ClientTemplateResource;
 
 public class OpenShiftTest extends TestConfig {
     private static final Logger LOG = LogManager.getLogger(OpenShiftTest.class);
+    private static final String CHE_OPENSHIFT_ENDPOINT = "CHE_OPENSHIFT_ENDPOINT";
 
     @Value(value = "classpath:templates/che_server_template.json")
     private Resource cheServerTemplate;
@@ -59,8 +65,7 @@ public class OpenShiftTest extends TestConfig {
                             .build();
 
         OpenShiftClient client = new DefaultOpenShiftClient(config);
-
-        LOG.info("Number of projects: {}", getNumberOfProjects(client));
+        
         ProjectRequest projectRequest = createTestProject(client);
         LOG.info("Number of projects: {}", getNumberOfProjects(client));
         
@@ -72,14 +77,24 @@ public class OpenShiftTest extends TestConfig {
 
         List<Parameter> parameters = template.getParameters();
         LOG.info("Number of template parameters: {}", parameters.size());
+
+        List<ParameterValue> pvs = new ArrayList<>();
         for (Parameter parameter : parameters) {
-            LOG.info("Template Parameter: {}", parameter.getName());
+            String name = parameter.getName();
+            String value = parameter.getValue();
+            LOG.info("Template Parameter Name: {}", name);
+            LOG.info("Template Parameter Value: {}", value);
+            if (CHE_OPENSHIFT_ENDPOINT.equals(name) && value.isEmpty()) {
+                value = endpoint;
+            }
+            pvs.add(new ParameterValue(name, value));
         }
 
         LOG.info("Number of templates {}", getNumberOfTemplates(client));
-        installTemplate(client, template);
-        LOG.info("Number of templates {}", getNumberOfTemplates(client));
-        deleteTemplate(client, template);
+
+        KubernetesList list = processTemplate(client, pvs);
+        createResources(client, list);
+
         LOG.info("Number of templates {}", getNumberOfTemplates(client));
 
         LOG.info("Pods: {}", getNumberOfPods(client));
@@ -106,6 +121,11 @@ public class OpenShiftTest extends TestConfig {
                withDescription("Test Project").
                withDisplayName("Test Project").done();
     }
+    
+    private KubernetesList processTemplate(OpenShiftClient client, List<ParameterValue> parameterValues) throws IOException {
+          ClientTemplateResource<Template, KubernetesList, DoneableTemplate> templateHandle = client.templates().load(cheServerTemplate.getInputStream());
+          return templateHandle.process(parameterValues.toArray(new ParameterValue[parameterValues.size()]));
+    }
 
     private boolean deleteTestProject(OpenShiftClient client, ProjectRequest projectRequest) {
         return client.projects().withName(projectRequest.getMetadata().getName()).delete();
@@ -114,13 +134,9 @@ public class OpenShiftTest extends TestConfig {
     private Template loadTemplate(OpenShiftClient client) throws IOException {
         return client.templates().load(cheServerTemplate.getInputStream()).get();
     }
-
-    private Template installTemplate(OpenShiftClient client, Template template) throws IOException {
-        return client.templates().inNamespace(project).createOrReplace(template);
-    }
-
-    private boolean deleteTemplate(OpenShiftClient client, Template template) {
-        return client.resource(template).inNamespace(project).delete();
+    
+    private KubernetesList createResources(OpenShiftClient client, KubernetesList list) {
+        return client.lists().inNamespace(project).create(list);
     }
 
 }
