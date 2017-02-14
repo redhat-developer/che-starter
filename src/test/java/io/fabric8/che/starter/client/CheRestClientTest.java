@@ -54,6 +54,7 @@ public class CheRestClientTest extends TestConfig {
     @Test
     public void createAndDeleteWorkspace() throws IOException {
         WorkspaceInfo workspace = client.createWorkspace(cheServerURL, generator.generateName(), STACK_ID, GITHUB_REPO, BRANCH);
+        LOG.info("Workspace URL: {}",workspace.getWorkspaceIdeUrl());
         client.deleteWorkspace(cheServerURL, workspace.getId());
     }
 

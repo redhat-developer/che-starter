@@ -22,10 +22,28 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WorkspaceCreateParams {
 
+    private String masterURL;
+    private String userToken;
     private String name;
     private String stack;
     private String repo;
     private String branch;
+
+    public String getMasterURL() {
+        return masterURL;
+    }
+
+    public void setMasterURL(String masterURL) {
+        this.masterURL = masterURL;
+    }
+
+    public String getUserToken() {
+        return userToken;
+    }
+
+    public void setUserToken(String userToken) {
+        this.userToken = userToken;
+    }
 
     public String getName() {
         return name;
@@ -34,13 +52,13 @@ public class WorkspaceCreateParams {
     public void setName(String name) {
         this.name = name;
     }
-    
+
     public String getStack() {
-    	return stack;
+        return stack;
     }
-    
+
     public void setStack(String stack) {
-    	this.stack = stack;
+        this.stack = stack;
     }
 
     public String getRepo() {

@@ -109,7 +109,7 @@ public class CheRestClient {
         ResponseEntity<Project> projectResponse = template.exchange(url, HttpMethod.POST, entity, Project.class);
         Project project = projectResponse.getBody();
 
-        //workspaceInfo.setRepository(project.getRepository());
+        // workspaceInfo.setRepository(project.getRepository());
 
         return workspaceInfo;
     }
