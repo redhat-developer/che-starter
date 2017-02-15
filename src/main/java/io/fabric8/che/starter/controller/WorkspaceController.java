@@ -68,7 +68,7 @@ public class WorkspaceController {
 
     @ApiOperation(value = "List workspaces")
     @GetMapping
-    public List<WorkspaceInfo> list(@RequestParam(required = false) String repository, @RequestBody String masterURL, @RequestHeader("Authorization") String token) {
+    public List<WorkspaceInfo> list(@RequestParam String masterURL, @RequestParam(required = false) String repository, @RequestHeader("Authorization") String token) {
         if (!StringUtils.isEmpty(repository)) {
             LOG.info("Fetching workspaces for repositoriy: {}", repository);
             return cheRestClient.listWorkspacesPerRespository(cheServerURL, repository);
