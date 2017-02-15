@@ -22,10 +22,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.fabric8.che.starter.client.CheRestClient;
@@ -63,10 +66,9 @@ public class WorkspaceController {
         return cheRestClient.createWorkspace(cheServerURL, params.getName(), params.getStack(), params.getRepo(),params.getBranch());
     }
 
-    @ApiOperation(value = "List workspaces per repository. If repository is not specified return all existing workspaces")
-    @PostMapping("/list")
-    public List<WorkspaceInfo> list(@RequestBody WorkspaceListParams params) {
-        String repository = params.getRepository();
+    @ApiOperation(value = "List workspaces")
+    @GetMapping
+    public List<WorkspaceInfo> list(@RequestParam(required = false) String repository, @RequestBody String masterURL, @RequestHeader("Authorization") String token) {
         if (!StringUtils.isEmpty(repository)) {
             LOG.info("Fetching workspaces for repositoriy: {}", repository);
             return cheRestClient.listWorkspacesPerRespository(cheServerURL, repository);

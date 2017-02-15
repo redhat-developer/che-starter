@@ -18,6 +18,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class WorkspaceInfo {
     private String id;
     private String name;
+    private String description;
     private String login;
     private String status;
     private String repository;
@@ -87,6 +88,14 @@ public class WorkspaceInfo {
 
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
 }
