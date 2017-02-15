@@ -31,6 +31,16 @@ There are several ways for running the project:
 
 Once the service is running, it would be available with [Swagger](http://swagger.io/) documentation on [http://localhost:10000/](http://localhost:10000/)
 
+
+Profiles
+--------
+There are two available profiles, local and test. To select which profile to use, add the -Dspring.profiles.active property to the command line:
+
+```bash
+    $ java -Dspring.profiles.active=local -jar target/che-starter-1.0-SNAPSHOT.jar
+````
+
+
 Debugging
 ---------
 There are several ways for debugging the project:
