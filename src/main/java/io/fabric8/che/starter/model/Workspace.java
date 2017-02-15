@@ -54,4 +54,5 @@ public class Workspace {
     public void setLinks(List<WorkspaceLink> links) {
         this.links = links;
     }
+
 }

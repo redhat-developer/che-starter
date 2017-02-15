@@ -39,11 +39,6 @@ public class CheServerControllerTest extends TestConfig {
     @Autowired
     Generator generator;
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void stopCheServer() {
-        controller.stopCheServer(generator.generateId());
-    }
-
     @Test
     public void readTemplate() throws IOException {
         try (BufferedReader buffer = new BufferedReader(new InputStreamReader(cheServerTemplate.getInputStream()))) {

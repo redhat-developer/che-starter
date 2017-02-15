@@ -43,4 +43,5 @@ public class WorkspaceLink {
     public void setMethod(String method) {
         this.method = method;
     }
+
 }
