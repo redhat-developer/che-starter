@@ -14,6 +14,7 @@ package io.fabric8.che.starter.client;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -57,6 +58,11 @@ public class CheRestClient {
                                   null,
                                   new ParameterizedTypeReference<List<WorkspaceInfo>>() {});
         return response.getBody();
+    }
+
+    public List<WorkspaceInfo> listWorkspacesPerRespository(String cheServerURL, String repository) {
+        List<WorkspaceInfo> workspaces = listWorkspaces(cheServerURL);
+        return workspaces.stream().filter(w -> repository.equals(w.getRepository())).collect(Collectors.toList());
     }
 
     public WorkspaceInfo createWorkspace(String cheServerURL, String name, String stack, String repo, String branch)

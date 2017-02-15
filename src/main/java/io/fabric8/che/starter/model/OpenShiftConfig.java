@@ -16,24 +16,23 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OpenShiftConfig {
+    private String masterURL;
+    private String userToken;
 
-    private String ip;
-    private int port;
-
-    public String getIp() {
-        return ip;
+    public String getMasterURL() {
+        return masterURL;
     }
 
-    public void setIp(String ip) {
-        this.ip = ip;
+    public void setMasterURL(String masterURL) {
+        this.masterURL = masterURL;
     }
 
-    public int getPort() {
-        return port;
+    public String getUserToken() {
+        return userToken;
     }
 
-    public void setPort(int port) {
-        this.port = port;
+    public void setUserToken(String userToken) {
+        this.userToken = userToken;
     }
 
 }

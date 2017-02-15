@@ -10,20 +10,22 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package io.fabric8.che.starter.model.response;
+package io.fabric8.che.starter.model.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class CheServerInfo {
-    private String url;
+import io.fabric8.che.starter.model.OpenShiftConfig;
 
-    public String getUrl() {
-        return url;
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class CheServerCreateParams {
+    private OpenShiftConfig openShiftConfig;
+
+    public OpenShiftConfig getOpenShiftConfig() {
+        return openShiftConfig;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setOpenShiftConfig(OpenShiftConfig openShiftConfig) {
+        this.openShiftConfig = openShiftConfig;
     }
 
 }
