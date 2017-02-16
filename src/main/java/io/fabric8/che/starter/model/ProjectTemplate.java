@@ -73,7 +73,7 @@ public class ProjectTemplate {
             String json = read(resource.getInputStream());
             json = StringUtils.replace(json, PROJECT_NAME, name);
             json = StringUtils.replace(json, PROJECT_GIT_REPO, repo);
-            json = StringUtils.replace(json,  PROJECT_GIT_BRANCH, branch);
+            json = StringUtils.replace(json, PROJECT_GIT_BRANCH, branch);
             return json;
         }
 

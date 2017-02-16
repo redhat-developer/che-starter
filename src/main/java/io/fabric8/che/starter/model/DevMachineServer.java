@@ -16,22 +16,22 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DevMachineServer {
-	private String url;
-	private String ref;
-	
-	public String getUrl() {
-		return url;
-	}
+    private String url;
+    private String ref;
 
-	public void setUrl(String url) {
-		this.url = url;
-	}
-	
-	public String getRef() {
-		return ref;
-	}
-	
-	public void setRef(String ref) {
-		this.ref = ref;
-	}
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getRef() {
+        return ref;
+    }
+
+    public void setRef(String ref) {
+        this.ref = ref;
+    }
 }

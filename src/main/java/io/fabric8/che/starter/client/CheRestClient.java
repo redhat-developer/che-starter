@@ -46,9 +46,9 @@ public class CheRestClient {
     public static final String WORKSPACE_LINK_IDE_URL = "ide url";
     public static final String WORKSPACE_LINK_START_WORKSPACE = "start workspace";
     public static final String WORKSPACE_STATUS_RUNNING = "RUNNING";
-    
-    public static final long WORKSPACE_START_TIMEOUT_MS = 60000; 
-    
+
+    public static final long WORKSPACE_START_TIMEOUT_MS = 60000;
+
     @Autowired
     WorkspaceTemplate workspaceTemplate;
 
@@ -58,11 +58,9 @@ public class CheRestClient {
     public List<WorkspaceInfo> listWorkspaces(String cheServerURL) {
         String url = generateURL(cheServerURL, CheRestEndpoints.LIST_WORKSPACES);
         RestTemplate template = new RestTemplate();
-        ResponseEntity<List<WorkspaceInfo>> response =
-                template.exchange(url,
-                                  HttpMethod.GET,
-                                  null,
-                                  new ParameterizedTypeReference<List<WorkspaceInfo>>() {});
+        ResponseEntity<List<WorkspaceInfo>> response = template.exchange(url, HttpMethod.GET, null,
+                new ParameterizedTypeReference<List<WorkspaceInfo>>() {
+                });
         return response.getBody();
     }
 
@@ -75,12 +73,8 @@ public class CheRestClient {
             throws IOException {
         // The first step is to create the workspace
         String url = generateURL(cheServerURL, CheRestEndpoints.CREATE_WORKSPACE);
-        String jsonTemplate = workspaceTemplate.createRequest()
-                                                .setName(name)
-                                                .setStack(stack)
-                                                .getJSON();
+        String jsonTemplate = workspaceTemplate.createRequest().setName(name).setStack(stack).getJSON();
 
-        
         RestTemplate template = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -104,61 +98,58 @@ public class CheRestClient {
 
         return workspaceInfo;
     }
-    
+
     @Async
-    public void createProject(String cheServerURL, String workspaceId, String name, String repo, String branch) throws IOException {
+    public void createProject(String cheServerURL, String workspaceId, String name, String repo, String branch)
+            throws IOException {
 
         // Before we can create a project, we must start the new workspace
         startWorkspace(cheServerURL, workspaceId);
-        
+
         // Poll until the workspace is started
         WorkspaceStatus status;
-        
+
         status = checkWorkspace(cheServerURL, workspaceId);
         long currentTime = System.currentTimeMillis();
-        while (!WORKSPACE_STATUS_RUNNING.equals(status.getWorkspaceStatus()) 
-        		&& System.currentTimeMillis() < (currentTime + WORKSPACE_START_TIMEOUT_MS)) {
-        	try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				LOG.error("Error while polling for workspace status", e);
-				break;
-			}
-        	status = checkWorkspace(cheServerURL, workspaceId);
+        while (!WORKSPACE_STATUS_RUNNING.equals(status.getWorkspaceStatus())
+                && System.currentTimeMillis() < (currentTime + WORKSPACE_START_TIMEOUT_MS)) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                LOG.error("Error while polling for workspace status", e);
+                break;
+            }
+            status = checkWorkspace(cheServerURL, workspaceId);
         }
-        
+
         Workspace workspace = getWorkspaceByKey(cheServerURL, workspaceId);
-        
+
         DevMachineServer server = workspace.getRuntime().getDevMachine().getRuntime().getServers().get("4401/tcp");
 
         // Next we create a new project within the workspace
         String url = generateURL(server.getUrl(), CheRestEndpoints.CREATE_PROJECT, workspaceId);
         LOG.info("Creating project against workspace agent URL: {}", url);
-        
-        String jsonTemplate = projectTemplate.createRequest()
-                                .setName(name)
-                                .setRepo(repo)
-                                .setBranch(branch)
-                                .getJSON();
+
+        String jsonTemplate = projectTemplate.createRequest().setName(name).setRepo(repo).setBranch(branch).getJSON();
 
         RestTemplate template = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<String>(jsonTemplate, headers);
-        
+
         ResponseEntity<Project[]> response = template.exchange(url, HttpMethod.POST, entity, Project[].class);
-        
+
         if (response.getBody().length > 0) {
-        	Project p = response.getBody()[0];
-        	LOG.info("Successfully created project {}", p.getName());
+            Project p = response.getBody()[0];
+            LOG.info("Successfully created project {}", p.getName());
         } else {
-        	LOG.info("There seems to have been a problem creating project {}",  name);
+            LOG.info("There seems to have been a problem creating project {}", name);
         }
     }
-    
+
     public Workspace getWorkspaceByKey(String cheServerURL, String workspaceId) {
-    	String url = generateURL(cheServerURL, CheRestEndpoints.GET_WORKSPACE_BY_KEY, workspaceId);
-    	
+        String url = generateURL(cheServerURL, CheRestEndpoints.GET_WORKSPACE_BY_KEY, workspaceId);
+
         RestTemplate template = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -178,7 +169,7 @@ public class CheRestClient {
         RestTemplate template = new RestTemplate();
         template.postForLocation(url, null);
     }
-    
+
     public WorkspaceStatus checkWorkspace(String cheServerURL, String workspaceId) {
         String url = generateURL(cheServerURL, CheRestEndpoints.CHECK_WORKSPACE, workspaceId);
 
@@ -186,9 +177,9 @@ public class CheRestClient {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<String>(headers);
-        
+
         ResponseEntity<WorkspaceStatus> status = template.exchange(url, HttpMethod.GET, entity, WorkspaceStatus.class);
-        return status.getBody();    	
+        return status.getBody();
     }
 
     public void stopWorkspace(String cheServerURL, String id) {
@@ -204,11 +195,9 @@ public class CheRestClient {
     public List<Stack> listStacks(String cheServerURL) {
         String url = generateURL(cheServerURL, CheRestEndpoints.LIST_STACKS);
         RestTemplate template = new RestTemplate();
-        ResponseEntity<List<Stack>> response =
-                template.exchange(url,
-                                  HttpMethod.GET,
-                                  null,
-                                  new ParameterizedTypeReference<List<Stack>>() {});
+        ResponseEntity<List<Stack>> response = template.exchange(url, HttpMethod.GET, null,
+                new ParameterizedTypeReference<List<Stack>>() {
+                });
         return response.getBody();
     }
 

@@ -58,7 +58,7 @@ public class WorkspaceTemplate {
         public String getJSON() throws IOException {
             String json = read(resource.getInputStream());
             json = StringUtils.replace(json, WORKSPACE_NAME, name);
-            json = StringUtils.replace(json,  WORKSPACE_STACK, stack);
+            json = StringUtils.replace(json, WORKSPACE_STACK, stack);
             return json;
         }
 

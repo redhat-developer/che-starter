@@ -16,13 +16,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WorkspaceRuntime {
-	private DevMachine devMachine;
+    private DevMachine devMachine;
 
-	public DevMachine getDevMachine() {
-		return devMachine;
-	}
+    public DevMachine getDevMachine() {
+        return devMachine;
+    }
 
-	public void setDevMachine(DevMachine devMachine) {
-		this.devMachine = devMachine;
-	}
+    public void setDevMachine(DevMachine devMachine) {
+        this.devMachine = devMachine;
+    }
 }

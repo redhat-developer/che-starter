@@ -53,26 +53,28 @@ public class WorkspaceController {
     CheRestClient cheRestClient;
 
     @Autowired
-    Generator generator; 
+    Generator generator;
 
     @ApiOperation(value = "Create and start a new workspace. Stop all other workspaces (only one workspace can be running at a time). If a workspace with the imported project already exists, just start it")
     @PostMapping
     public WorkspaceInfo create(@RequestBody WorkspaceCreateParams params) throws IOException {
 
-		OpenShiftConfig openShiftConfig = params.getOpenShiftConfig();
-		if (openShiftConfig != null) {
-		    LOG.info("OpenShift MasterURL: {}", openShiftConfig.getMasterURL());
-		}
-        WorkspaceInfo ws = cheRestClient.createWorkspace(cheServerURL, params.getName(), params.getStack(), params.getRepo(), params.getBranch());         
+        OpenShiftConfig openShiftConfig = params.getOpenShiftConfig();
+        if (openShiftConfig != null) {
+            LOG.info("OpenShift MasterURL: {}", openShiftConfig.getMasterURL());
+        }
+        WorkspaceInfo ws = cheRestClient.createWorkspace(cheServerURL, params.getName(), params.getStack(),
+                params.getRepo(), params.getBranch());
 
         cheRestClient.createProject(cheServerURL, ws.getId(), null, params.getRepo(), params.getBranch());
-        
+
         return ws;
     }
 
     @ApiOperation(value = "List workspaces")
     @GetMapping
-    public List<WorkspaceInfo> list(@RequestParam String masterURL, @RequestParam(required = false) String repository, @RequestHeader("Authorization") String token) {
+    public List<WorkspaceInfo> list(@RequestParam String masterURL, @RequestParam(required = false) String repository,
+            @RequestHeader("Authorization") String token) {
         if (!StringUtils.isEmpty(repository)) {
             LOG.info("Fetching workspaces for repositoriy: {}", repository);
             return cheRestClient.listWorkspacesPerRespository(cheServerURL, repository);

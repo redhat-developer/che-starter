@@ -18,13 +18,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DevMachineRuntime {
-	private Map<String,DevMachineServer> servers;
+    private Map<String, DevMachineServer> servers;
 
-	public Map<String, DevMachineServer> getServers() {
-		return servers;
-	}
+    public Map<String, DevMachineServer> getServers() {
+        return servers;
+    }
 
-	public void setServers(Map<String, DevMachineServer> servers) {
-		this.servers = servers;
-	}
+    public void setServers(Map<String, DevMachineServer> servers) {
+        this.servers = servers;
+    }
 }

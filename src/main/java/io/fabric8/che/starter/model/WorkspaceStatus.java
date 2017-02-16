@@ -17,24 +17,23 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WorkspaceStatus {
 
-	private String code;
-	private String workspaceStatus;
-	
-	public String getCode() {
-		return code;
-	}
-	
-	public void setCode(String code) {
-		this.code = code;
-	}
-	
-	public String getWorkspaceStatus() {
-		return workspaceStatus;
-	}
-	
-	public void setWorkspaceStatus(String workspaceStatus) {
-		this.workspaceStatus = workspaceStatus;
-	}
-	
-	
+    private String code;
+    private String workspaceStatus;
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public String getWorkspaceStatus() {
+        return workspaceStatus;
+    }
+
+    public void setWorkspaceStatus(String workspaceStatus) {
+        this.workspaceStatus = workspaceStatus;
+    }
+
 }
