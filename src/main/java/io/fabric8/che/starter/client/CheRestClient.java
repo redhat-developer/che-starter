@@ -13,6 +13,7 @@
 package io.fabric8.che.starter.client;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -58,15 +59,26 @@ public class CheRestClient {
     public List<WorkspaceInfo> listWorkspaces(String cheServerURL) {
         String url = generateURL(cheServerURL, CheRestEndpoints.LIST_WORKSPACES);
         RestTemplate template = new RestTemplate();
-        ResponseEntity<List<WorkspaceInfo>> response = template.exchange(url, HttpMethod.GET, null,
-                new ParameterizedTypeReference<List<WorkspaceInfo>>() {
+        ResponseEntity<List<Workspace>> response = template.exchange(url, HttpMethod.GET, null,
+                new ParameterizedTypeReference<List<Workspace>>() {
                 });
-        return response.getBody();
+
+        List<WorkspaceInfo> workspaces = new ArrayList<>();
+        for (Workspace workspace : response.getBody()) {
+            WorkspaceInfo workspaceInfo = new WorkspaceInfo();
+            workspaceInfo.setId(workspace.getId());
+            workspaceInfo.setStatus(workspace.getStatus());
+            workspaceInfo.setName(workspace.getConfig().getName());
+            workspaceInfo.setDescription(workspace.getConfig().getDescription());
+            workspaces.add(workspaceInfo);
+        }
+        return workspaces;
     }
 
     public List<WorkspaceInfo> listWorkspacesPerRespository(String cheServerURL, String repository) {
         List<WorkspaceInfo> workspaces = listWorkspaces(cheServerURL);
-        return workspaces.stream().filter(w -> w.getDescription().startsWith(repository)).collect(Collectors.toList());
+        return workspaces.stream().filter(w -> w.getDescription().split("#")[0].equals(repository))
+                .collect(Collectors.toList());
     }
 
     public WorkspaceInfo createWorkspace(String cheServerURL, String name, String stack, String repo, String branch)
@@ -92,6 +104,7 @@ public class CheRestClient {
         WorkspaceInfo workspaceInfo = new WorkspaceInfo();
         workspaceInfo.setId(workspace.getId());
         workspaceInfo.setName(workspace.getConfig().getName());
+        workspaceInfo.setDescription(workspace.getConfig().getDescription());
 
         for (WorkspaceLink link : workspace.getLinks()) {
             if (WORKSPACE_LINK_IDE_URL.equals(link.getRel())) {

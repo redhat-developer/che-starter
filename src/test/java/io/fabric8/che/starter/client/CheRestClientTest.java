@@ -12,6 +12,8 @@
  */
 package io.fabric8.che.starter.client;
 
+import static org.junit.Assert.assertFalse;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,8 +27,6 @@ import org.springframework.beans.factory.annotation.Value;
 import io.fabric8.che.starter.TestConfig;
 import io.fabric8.che.starter.model.Stack;
 import io.fabric8.che.starter.model.response.WorkspaceInfo;
-
-import static org.junit.Assert.*;
 
 public class CheRestClientTest extends TestConfig {
     private static final String GITHUB_REPO = "https://github.com/che-samples/console-java-simple";

@@ -31,7 +31,6 @@ public class ProjectTemplate {
     private final static String PROJECT_NAME = "${project.name}";
     private final static String PROJECT_GIT_REPO = "${project.git.repo}";
     private final static String PROJECT_GIT_BRANCH = "${project.git.branch}";
-    private final static String DEFAULT_PROJECT_GIT_BRANCH = "master";
 
     @Value(value = "classpath:templates/project_template.json")
     private Resource resource;
