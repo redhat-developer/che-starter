@@ -1,4 +1,4 @@
-{
+[{
   "name": "console-java-simple",
   "type": "maven",
   "description": "A hello world Java application.",
@@ -16,4 +16,4 @@
   "mixins": [
     "git"
   ]
-}
+}]

@@ -104,7 +104,7 @@ public class CheRestClient {
 
         return workspaceInfo;
     }
-
+    
     @Async
     public void createProject(String cheServerURL, String workspaceId, String name, String repo, String branch) throws IOException {
 
@@ -132,7 +132,7 @@ public class CheRestClient {
         DevMachineServer server = workspace.getRuntime().getDevMachine().getRuntime().getServers().get("4401/tcp");
 
         // Next we create a new project within the workspace
-        String url = server.getUrl(); //generateURL(server.getUrl(), CheRestEndpoints.CREATE_PROJECT, workspaceId);
+        String url = generateURL(server.getUrl(), CheRestEndpoints.CREATE_PROJECT, workspaceId);
         LOG.info("Creating project against workspace agent URL: {}", url);
         
         String jsonTemplate = projectTemplate.createRequest()
@@ -146,9 +146,14 @@ public class CheRestClient {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<String>(jsonTemplate, headers);
         
-        template.exchange(url,  HttpMethod.POST, entity, Project.class);
+        ResponseEntity<Project[]> response = template.exchange(url, HttpMethod.POST, entity, Project[].class);
         
-        LOG.info("Created Project {}", entity.getBody());
+        if (response.getBody().length > 0) {
+        	Project p = response.getBody()[0];
+        	LOG.info("Successfully created project {}", p.getName());
+        } else {
+        	LOG.info("There seems to have been a problem creating project {}",  name);
+        }
     }
     
     public Workspace getWorkspaceByKey(String cheServerURL, String workspaceId) {
