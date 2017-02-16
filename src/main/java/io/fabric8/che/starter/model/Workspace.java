@@ -22,8 +22,9 @@ public class Workspace {
     private String status;
     private WorkspaceConfig config;
     private List<WorkspaceLink> links;
+    private WorkspaceRuntime runtime;
 
-    public String getId() {
+	public String getId() {
         return id;
     }
 
@@ -54,5 +55,12 @@ public class Workspace {
     public void setLinks(List<WorkspaceLink> links) {
         this.links = links;
     }
+    
+    public WorkspaceRuntime getRuntime() {
+		return runtime;
+	}
 
+	public void setRuntime(WorkspaceRuntime runtime) {
+		this.runtime = runtime;
+	}    
 }

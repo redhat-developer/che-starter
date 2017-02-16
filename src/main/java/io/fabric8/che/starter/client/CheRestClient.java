@@ -25,14 +25,17 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import io.fabric8.che.starter.model.DevMachineServer;
 import io.fabric8.che.starter.model.Project;
 import io.fabric8.che.starter.model.ProjectTemplate;
 import io.fabric8.che.starter.model.Stack;
 import io.fabric8.che.starter.model.Workspace;
 import io.fabric8.che.starter.model.WorkspaceLink;
+import io.fabric8.che.starter.model.WorkspaceStatus;
 import io.fabric8.che.starter.model.WorkspaceTemplate;
 import io.fabric8.che.starter.model.response.WorkspaceInfo;
 
@@ -42,7 +45,10 @@ public class CheRestClient {
 
     public static final String WORKSPACE_LINK_IDE_URL = "ide url";
     public static final String WORKSPACE_LINK_START_WORKSPACE = "start workspace";
-
+    public static final String WORKSPACE_STATUS_RUNNING = "RUNNING";
+    
+    public static final long WORKSPACE_START_TIMEOUT_MS = 60000; 
+    
     @Autowired
     WorkspaceTemplate workspaceTemplate;
 
@@ -96,44 +102,88 @@ public class CheRestClient {
             }
         }
 
+        return workspaceInfo;
+    }
+
+    @Async
+    public void createProject(String cheServerURL, String workspaceId, String name, String repo, String branch) throws IOException {
+
         // Before we can create a project, we must start the new workspace
-        //startWorkspace(cheServerURL, workspaceInfo.getId());
+        startWorkspace(cheServerURL, workspaceId);
+        
+        // Poll until the workspace is started
+        WorkspaceStatus status;
+        
+        status = checkWorkspace(cheServerURL, workspaceId);
+        long currentTime = System.currentTimeMillis();
+        while (!WORKSPACE_STATUS_RUNNING.equals(status.getWorkspaceStatus()) 
+        		&& System.currentTimeMillis() < (currentTime + WORKSPACE_START_TIMEOUT_MS)) {
+        	try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				LOG.error("Error while polling for workspace status", e);
+				break;
+			}
+        	status = checkWorkspace(cheServerURL, workspaceId);
+        }
+        
+        Workspace workspace = getWorkspaceByKey(cheServerURL, workspaceId);
+        
+        DevMachineServer server = workspace.getRuntime().getDevMachine().getRuntime().getServers().get("4401/tcp");
 
         // Next we create a new project within the workspace
-        url = generateURL(cheServerURL, CheRestEndpoints.CREATE_PROJECT, workspaceInfo.getId());
-        jsonTemplate = projectTemplate.createRequest()
+        String url = server.getUrl(); //generateURL(server.getUrl(), CheRestEndpoints.CREATE_PROJECT, workspaceId);
+        LOG.info("Creating project against workspace agent URL: {}", url);
+        
+        String jsonTemplate = projectTemplate.createRequest()
                                 .setName(name)
                                 .setRepo(repo)
                                 .setBranch(branch)
                                 .getJSON();
 
-        template = new RestTemplate();
-        headers = new HttpHeaders();
+        RestTemplate template = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        entity = new HttpEntity<String>(jsonTemplate, headers);
+        HttpEntity<String> entity = new HttpEntity<String>(jsonTemplate, headers);
         
-        ResponseEntity<Project> projectResponse = template.exchange(url, HttpMethod.POST, entity, Project.class);
-        Project project = projectResponse.getBody();
+        template.exchange(url,  HttpMethod.POST, entity, Project.class);
+        
+        LOG.info("Created Project {}", entity.getBody());
+    }
+    
+    public Workspace getWorkspaceByKey(String cheServerURL, String workspaceId) {
+    	String url = generateURL(cheServerURL, CheRestEndpoints.GET_WORKSPACE_BY_KEY, workspaceId);
+    	
+        RestTemplate template = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> entity = new HttpEntity<String>(headers);
 
-        // workspaceInfo.setRepository(project.getRepository());
-
-        return workspaceInfo;
+        return template.exchange(url, HttpMethod.GET, entity, Workspace.class).getBody();
     }
 
-    public void createProject(String cheServerURL, String name, String repo, String branch) throws IOException {
-
-    }
-
-    public void deleteWorkspace(String cheServerURL, String id) {
-        String url = generateURL(cheServerURL, CheRestEndpoints.DELETE_WORKSPACE, id);
+    public void deleteWorkspace(String cheServerURL, String workspaceId) {
+        String url = generateURL(cheServerURL, CheRestEndpoints.DELETE_WORKSPACE, workspaceId);
         RestTemplate template = new RestTemplate();
         template.delete(url);
     }
 
-    public void startWorkspace(String cheServerURL, String id) {
-        String url = generateURL(cheServerURL, CheRestEndpoints.START_WORKSPACE, id);
+    public void startWorkspace(String cheServerURL, String workspaceId) {
+        String url = generateURL(cheServerURL, CheRestEndpoints.START_WORKSPACE, workspaceId);
         RestTemplate template = new RestTemplate();
         template.postForLocation(url, null);
+    }
+    
+    public WorkspaceStatus checkWorkspace(String cheServerURL, String workspaceId) {
+        String url = generateURL(cheServerURL, CheRestEndpoints.CHECK_WORKSPACE, workspaceId);
+
+        RestTemplate template = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> entity = new HttpEntity<String>(headers);
+        
+        ResponseEntity<WorkspaceStatus> status = template.exchange(url, HttpMethod.GET, entity, WorkspaceStatus.class);
+        return status.getBody();    	
     }
 
     public void stopWorkspace(String cheServerURL, String id) {

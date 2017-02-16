@@ -35,7 +35,6 @@ import io.fabric8.che.starter.client.CheRestClient;
 import io.fabric8.che.starter.client.Generator;
 import io.fabric8.che.starter.model.OpenShiftConfig;
 import io.fabric8.che.starter.model.request.WorkspaceCreateParams;
-import io.fabric8.che.starter.model.request.WorkspaceListParams;
 import io.fabric8.che.starter.model.response.WorkspaceInfo;
 import io.swagger.annotations.ApiOperation;
 import springfox.documentation.annotations.ApiIgnore;
@@ -59,11 +58,16 @@ public class WorkspaceController {
     @ApiOperation(value = "Create and start a new workspace. Stop all other workspaces (only one workspace can be running at a time). If a workspace with the imported project already exists, just start it")
     @PostMapping
     public WorkspaceInfo create(@RequestBody WorkspaceCreateParams params) throws IOException {
-        OpenShiftConfig openShiftConfig = params.getOpenShiftConfig();
-        if (openShiftConfig != null) {
-            LOG.info("OpenShift MasterURL: {}", openShiftConfig.getMasterURL());
-        }
-        return cheRestClient.createWorkspace(cheServerURL, params.getName(), params.getStack(), params.getRepo(),params.getBranch());
+
+		OpenShiftConfig openShiftConfig = params.getOpenShiftConfig();
+		if (openShiftConfig != null) {
+		    LOG.info("OpenShift MasterURL: {}", openShiftConfig.getMasterURL());
+		}
+        WorkspaceInfo ws = cheRestClient.createWorkspace(cheServerURL, params.getName(), params.getStack(), params.getRepo(), params.getBranch());         
+
+        cheRestClient.createProject(cheServerURL, ws.getId(), null, params.getRepo(), params.getBranch());
+        
+        return ws;
     }
 
     @ApiOperation(value = "List workspaces")
