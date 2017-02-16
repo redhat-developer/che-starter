@@ -30,6 +30,7 @@ import io.fabric8.che.starter.client.Generator;
 public class WorkspaceTemplate {
     private final static String WORKSPACE_NAME = "${workspace.name}";
     private final static String WORKSPACE_STACK = "${workspace.stack}";
+    private final static String WORKSPACE_DESCRIPTION = "${workspace.description}";
 
     @Value(value = "classpath:templates/workspace_template.json")
     private Resource resource;
@@ -40,6 +41,7 @@ public class WorkspaceTemplate {
     public class WorkspaceCreateRequest {
         private String name;
         private String stack;
+        private String description;
 
         protected WorkspaceCreateRequest(WorkspaceTemplate template) {
             this.name = generator.generateName();
@@ -55,16 +57,33 @@ public class WorkspaceTemplate {
             return this;
         }
 
-        public String getJSON() throws IOException {
-            String json = read(resource.getInputStream());
-            json = StringUtils.replace(json, WORKSPACE_NAME, name);
-            json = StringUtils.replace(json, WORKSPACE_STACK, stack);
-            return json;
+        public WorkspaceCreateRequest setDescription(String description) {
+            this.description = description;
+            return this;
+        }
+
+        public String getName() {
+            return name;
         }
 
         public String getStack() {
             return stack;
         }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public String getJSON() throws IOException {
+            String json = read(resource.getInputStream());
+            json = StringUtils.replace(json, WORKSPACE_NAME, name);
+            json = StringUtils.replace(json, WORKSPACE_STACK, stack);
+            json = StringUtils.replace(json, WORKSPACE_DESCRIPTION, description);
+            return json;
+        }
+
+
+        
     }
 
     public WorkspaceCreateRequest createRequest() {

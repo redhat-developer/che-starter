@@ -20,9 +20,8 @@ public enum CheRestEndpoints {
     GET_WORKSPACE_BY_KEY("/api/workspace/{id}"),
     LIST_WORKSPACES     ("/api/workspace"),
     STOP_WORKSPACE      ("/api/workspace/{id}/runtime"),
-    LIST_STACKS         ("/api/stack"),	
-    
-    CREATE_PROJECT      ("/project/batch");	
+    LIST_STACKS         ("/api/stack"),
+    CREATE_PROJECT      ("/project/batch");
 
     private final String endpoint;
 

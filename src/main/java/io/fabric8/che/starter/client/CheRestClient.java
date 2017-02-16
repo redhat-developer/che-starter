@@ -66,14 +66,18 @@ public class CheRestClient {
 
     public List<WorkspaceInfo> listWorkspacesPerRespository(String cheServerURL, String repository) {
         List<WorkspaceInfo> workspaces = listWorkspaces(cheServerURL);
-        return workspaces.stream().filter(w -> repository.equals(w.getRepository())).collect(Collectors.toList());
+        return workspaces.stream().filter(w -> w.getDescription().startsWith(repository)).collect(Collectors.toList());
     }
 
     public WorkspaceInfo createWorkspace(String cheServerURL, String name, String stack, String repo, String branch)
             throws IOException {
         // The first step is to create the workspace
         String url = generateURL(cheServerURL, CheRestEndpoints.CREATE_WORKSPACE);
-        String jsonTemplate = workspaceTemplate.createRequest().setName(name).setStack(stack).getJSON();
+        String jsonTemplate = workspaceTemplate.createRequest().
+                                                setName(name).
+                                                setStack(stack).
+                                                setDescription(repo + "#" + branch).
+                                                getJSON();
 
         RestTemplate template = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();

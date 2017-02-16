@@ -13,6 +13,7 @@
 package io.fabric8.che.starter.openshift;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,6 +43,9 @@ public class OpenShiftTest extends TestConfig {
 
     @Value(value = "classpath:templates/che_server_template.json")
     private Resource cheServerTemplate;
+
+    @Value("${che.server.template.url}")
+    private String templateUrl;
 
     @Value("${che.openshift.endpoint}")
     private String endpoint;
@@ -132,7 +136,7 @@ public class OpenShiftTest extends TestConfig {
     }
 
     private Template loadTemplate(OpenShiftClient client) throws IOException {
-        return client.templates().load(cheServerTemplate.getInputStream()).get();
+        return client.templates().load(new URL(templateUrl)).get();
     }
     
     private KubernetesList createResources(OpenShiftClient client, KubernetesList list) {

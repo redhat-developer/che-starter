@@ -22,7 +22,7 @@
   },
   "defaultEnv": "default",
   "name": "${workspace.name}",
-  "description": null,
+  "description": "${workspace.description}",
   "commands": [],
   "projects": [],
   "links": []
