@@ -19,13 +19,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.fabric8.che.starter.model.request.WorkspaceCreateParams;
 import io.fabric8.che.starter.model.response.CheServerInfo;
 import io.fabric8.che.starter.template.CheServerTemplate;
 import io.fabric8.kubernetes.api.Controller;
@@ -49,8 +47,7 @@ public class CheServerController {
 
     @ApiOperation(value = "Create a new Che server on OpenShift instance")
     @PostMapping
-    public CheServerInfo startCheServer(@RequestParam String masterURL, @RequestBody WorkspaceCreateParams params,
-            @RequestHeader("Authorization") String token) throws Exception {
+    public CheServerInfo startCheServer(@RequestParam String masterURL, @RequestHeader("Authorization") String token) throws Exception {
         LOG.info("OpenShift master URL: {}", masterURL);
 
         Config openshiftConfig = getConfig(masterURL, token);
