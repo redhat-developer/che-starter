@@ -30,11 +30,11 @@ import io.fabric8.che.starter.model.response.WorkspaceInfo;
 import io.fabric8.che.starter.util.Generator;
 
 public class CheRestClientTest extends TestConfig {
+    private static final Logger LOG = LogManager.getLogger(CheRestClientTest.class);
     private static final String GITHUB_REPO = "https://github.com/che-samples/console-java-simple";
     private static final String BRANCH = "master";
     private static final String STACK_ID = "java-default";
 
-    private static final Logger LOG = LogManager.getLogger(CheRestClientTest.class);
 
     @Value("${che.server.url}")
     String cheServerURL;

@@ -14,8 +14,6 @@ package io.fabric8.che.starter.model.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import io.fabric8.che.starter.model.OpenShiftConfig;
-
 /**
  * This DTO is used to manage the workspace creation parameters coming from a
  * client calling the workspace create method.
@@ -29,7 +27,6 @@ public class WorkspaceCreateParams {
     private String stack;
     private String repo;
     private String branch;
-    private OpenShiftConfig openShiftConfig;
 
     public String getId() {
         return id;
@@ -77,14 +74,6 @@ public class WorkspaceCreateParams {
 
     public void setBranch(String branch) {
         this.branch = branch;
-    }
-
-    public OpenShiftConfig getOpenShiftConfig() {
-        return openShiftConfig;
-    }
-
-    public void setOpenShiftConfig(OpenShiftConfig openShiftConfig) {
-        this.openShiftConfig = openShiftConfig;
     }
 
 }

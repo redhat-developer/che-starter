@@ -32,7 +32,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.fabric8.che.starter.client.CheRestClient;
-import io.fabric8.che.starter.model.OpenShiftConfig;
 import io.fabric8.che.starter.model.request.WorkspaceCreateParams;
 import io.fabric8.che.starter.model.response.WorkspaceInfo;
 import io.fabric8.che.starter.util.Generator;
@@ -57,12 +56,10 @@ public class WorkspaceController {
 
     @ApiOperation(value = "Create and start a new workspace. Stop all other workspaces (only one workspace can be running at a time). If a workspace with the imported project already exists, just start it")
     @PostMapping
-    public WorkspaceInfo create(@RequestBody WorkspaceCreateParams params) throws IOException {
+    public WorkspaceInfo create(@RequestParam String masterURL, @RequestBody WorkspaceCreateParams params, @RequestHeader("Authorization") String token) throws IOException {
 
-        OpenShiftConfig openShiftConfig = params.getOpenShiftConfig();
-        if (openShiftConfig != null) {
-            LOG.info("OpenShift MasterURL: {}", openShiftConfig.getMasterURL());
-        }
+        LOG.info("OpenShift MasterURL: {}", masterURL);
+
         WorkspaceInfo ws = cheRestClient.createWorkspace(cheServerURL, params.getName(), params.getStack(),
                 params.getRepo(), params.getBranch());
 

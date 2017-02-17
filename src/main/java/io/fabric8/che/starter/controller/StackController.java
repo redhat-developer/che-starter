@@ -20,7 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.fabric8.che.starter.client.CheRestClient;
@@ -46,8 +48,8 @@ public class StackController {
 
     @ApiOperation(value = "List the available stacks")
     @GetMapping
-    public List<Stack> list() {
-        LOG.info("Getting stacks from {}", cheServerURL);
+    public List<Stack> list(@RequestParam String masterURL, @RequestHeader("Authorization") String token) {
+        LOG.info("Getting stacks from {}", masterURL);
         return cheRestClient.listStacks(cheServerURL);
     }
 

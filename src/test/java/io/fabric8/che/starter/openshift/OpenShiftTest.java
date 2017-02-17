@@ -75,39 +75,36 @@ public class OpenShiftTest extends TestConfig {
 
         OpenShiftClient client = new DefaultOpenShiftClient(config);
 
-        Controller controller = new Controller(client);
-        controller.applyJson(template.get());
-        
         ProjectRequest projectRequest = createTestProject(client);
         LOG.info("Number of projects: {}", getNumberOfProjects(client));
-        
+
         LOG.info("Test project has been deleted: {}", deleteTestProject(client, projectRequest));
         LOG.info("Number of projects: {}", getNumberOfProjects(client));
 
-        Template template = loadTemplate(client);
-        LOG.info("Number of templates {}", getNumberOfTemplates(client));
+        Controller controller = new Controller(client);
+        controller.applyJson(template.get());
 
-        List<Parameter> parameters = template.getParameters();
-        LOG.info("Number of template parameters: {}", parameters.size());
+//        Template template = loadTemplate(client);
+//        LOG.info("Number of templates {}", getNumberOfTemplates(client));
+//
+//        List<Parameter> parameters = template.getParameters();
+//        LOG.info("Number of template parameters: {}", parameters.size());
+//
+//        List<ParameterValue> pvs = new ArrayList<>();
+//        for (Parameter parameter : parameters) {
+//            String name = parameter.getName();
+//            String value = parameter.getValue();
+//            LOG.info("Template Parameter Name: {}", name);
+//            LOG.info("Template Parameter Value: {}", value);
+//            if (CHE_OPENSHIFT_ENDPOINT.equals(name) && value.isEmpty()) {
+//                value = endpoint;
+//            }
+//            pvs.add(new ParameterValue(name, value));
+//        }
 
-        List<ParameterValue> pvs = new ArrayList<>();
-        for (Parameter parameter : parameters) {
-            String name = parameter.getName();
-            String value = parameter.getValue();
-            LOG.info("Template Parameter Name: {}", name);
-            LOG.info("Template Parameter Value: {}", value);
-            if (CHE_OPENSHIFT_ENDPOINT.equals(name) && value.isEmpty()) {
-                value = endpoint;
-            }
-            pvs.add(new ParameterValue(name, value));
-        }
-
-        LOG.info("Number of templates {}", getNumberOfTemplates(client));
-
-        KubernetesList list = processTemplate(client, pvs);
+//        LOG.info("Number of templates {}", getNumberOfTemplates(client));
+//        KubernetesList list = processTemplate(client, pvs);
 //        createResources(client, list);
-
-        LOG.info("Number of templates {}", getNumberOfTemplates(client));
 
         LOG.info("Pods: {}", getNumberOfPods(client));
     }
