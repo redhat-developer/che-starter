@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.fabric8.che.starter.client.CheRestClient;
-import io.fabric8.che.starter.client.Generator;
+import io.fabric8.che.starter.client.util.Generator;
 import io.fabric8.che.starter.model.Stack;
 import io.swagger.annotations.ApiOperation;
 

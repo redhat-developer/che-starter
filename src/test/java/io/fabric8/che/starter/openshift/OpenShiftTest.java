@@ -13,7 +13,6 @@
 package io.fabric8.che.starter.openshift;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,10 +20,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 
 import io.fabric8.che.starter.TestConfig;
+import io.fabric8.che.starter.template.CheServerTemplate;
+import io.fabric8.kubernetes.api.Controller;
 import io.fabric8.kubernetes.api.model.KubernetesList;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.ConfigBuilder;
@@ -40,6 +42,9 @@ import io.fabric8.openshift.client.dsl.ClientTemplateResource;
 public class OpenShiftTest extends TestConfig {
     private static final Logger LOG = LogManager.getLogger(OpenShiftTest.class);
     private static final String CHE_OPENSHIFT_ENDPOINT = "CHE_OPENSHIFT_ENDPOINT";
+
+    @Autowired
+    private CheServerTemplate template;
 
     @Value(value = "classpath:templates/che_server_template.json")
     private Resource cheServerTemplate;
@@ -61,7 +66,7 @@ public class OpenShiftTest extends TestConfig {
 
     @Ignore("Test is run against local minishift cluster and requires additional setup")
     @Test
-    public void createCheServer() throws IOException {
+    public void createCheServer() throws Exception {
         Config config = new ConfigBuilder()
                             .withMasterUrl(endpoint)
                             .withUsername(username)
@@ -102,6 +107,9 @@ public class OpenShiftTest extends TestConfig {
         LOG.info("Number of templates {}", getNumberOfTemplates(client));
 
         LOG.info("Pods: {}", getNumberOfPods(client));
+        
+        Controller controller = new Controller(client);
+        controller.applyJson(this.template.get());
     }
 
     private int getNumberOfProjects(OpenShiftClient client) {
@@ -136,7 +144,7 @@ public class OpenShiftTest extends TestConfig {
     }
 
     private Template loadTemplate(OpenShiftClient client) throws IOException {
-        return client.templates().load(new URL(templateUrl)).get();
+        return client.templates().load(cheServerTemplate.getInputStream()).get();
     }
     
     private KubernetesList createResources(OpenShiftClient client, KubernetesList list) {

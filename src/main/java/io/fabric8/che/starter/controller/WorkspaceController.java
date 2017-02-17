@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.fabric8.che.starter.client.CheRestClient;
-import io.fabric8.che.starter.client.Generator;
+import io.fabric8.che.starter.client.util.Generator;
 import io.fabric8.che.starter.model.OpenShiftConfig;
 import io.fabric8.che.starter.model.request.WorkspaceCreateParams;
 import io.fabric8.che.starter.model.response.WorkspaceInfo;

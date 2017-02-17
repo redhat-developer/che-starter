@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 import io.fabric8.che.starter.model.OpenShiftConfig;
 import io.fabric8.che.starter.model.request.CheServerCreateParams;
 import io.fabric8.che.starter.model.response.CheServerInfo;
+import io.fabric8.che.starter.template.CheServerTemplate;
 import io.fabric8.kubernetes.api.model.KubernetesList;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.ConfigBuilder;
@@ -53,7 +55,10 @@ public class CheServerController {
 
     private static final Logger LOG = LogManager.getLogger(CheServerController.class);
 
-    @Value(value = "classpath:che_server_template.json")
+    @Autowired
+    CheServerTemplate template;
+
+    @Value(value = "classpath:templates/che_server_template.json")
     private Resource cheServerTemplate;
 
     @ApiOperation(value = "Create a new Che server on OpenShift instance")

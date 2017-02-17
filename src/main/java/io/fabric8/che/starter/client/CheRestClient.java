@@ -32,13 +32,13 @@ import org.springframework.web.client.RestTemplate;
 
 import io.fabric8.che.starter.model.DevMachineServer;
 import io.fabric8.che.starter.model.Project;
-import io.fabric8.che.starter.model.ProjectTemplate;
 import io.fabric8.che.starter.model.Stack;
 import io.fabric8.che.starter.model.Workspace;
 import io.fabric8.che.starter.model.WorkspaceLink;
 import io.fabric8.che.starter.model.WorkspaceStatus;
-import io.fabric8.che.starter.model.WorkspaceTemplate;
 import io.fabric8.che.starter.model.response.WorkspaceInfo;
+import io.fabric8.che.starter.template.ProjectTemplate;
+import io.fabric8.che.starter.template.WorkspaceTemplate;
 
 @Service
 public class CheRestClient {

@@ -12,7 +12,7 @@
  */
 package io.fabric8.che.starter.client;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.List;
@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import io.fabric8.che.starter.TestConfig;
+import io.fabric8.che.starter.client.util.Generator;
 import io.fabric8.che.starter.model.Stack;
 import io.fabric8.che.starter.model.response.WorkspaceInfo;
 
@@ -73,7 +74,7 @@ public class CheRestClientTest extends TestConfig {
     @Test
     public void listStacks() {
         List<Stack> stacks = client.listStacks(cheServerURL);
-        assertFalse(stacks.isEmpty());
+        assertTrue(!stacks.isEmpty());
     }
 
     @Test(expected = UnsupportedOperationException.class)
