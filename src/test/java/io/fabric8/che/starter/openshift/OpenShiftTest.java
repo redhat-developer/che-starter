@@ -74,6 +74,9 @@ public class OpenShiftTest extends TestConfig {
                             .build();
 
         OpenShiftClient client = new DefaultOpenShiftClient(config);
+
+        Controller controller = new Controller(client);
+        controller.applyJson(template.get());
         
         ProjectRequest projectRequest = createTestProject(client);
         LOG.info("Number of projects: {}", getNumberOfProjects(client));
@@ -102,14 +105,11 @@ public class OpenShiftTest extends TestConfig {
         LOG.info("Number of templates {}", getNumberOfTemplates(client));
 
         KubernetesList list = processTemplate(client, pvs);
-        createResources(client, list);
+//        createResources(client, list);
 
         LOG.info("Number of templates {}", getNumberOfTemplates(client));
 
         LOG.info("Pods: {}", getNumberOfPods(client));
-        
-        Controller controller = new Controller(client);
-        controller.applyJson(this.template.get());
     }
 
     private int getNumberOfProjects(OpenShiftClient client) {

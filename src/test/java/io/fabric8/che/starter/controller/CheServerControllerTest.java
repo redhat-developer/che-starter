@@ -25,7 +25,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 
 import io.fabric8.che.starter.TestConfig;
-import io.fabric8.che.starter.client.util.Generator;
+import io.fabric8.che.starter.util.Generator;
 
 public class CheServerControllerTest extends TestConfig {
     private static final Logger LOG = LogManager.getLogger(CheServerControllerTest.class);

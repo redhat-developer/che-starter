@@ -20,8 +20,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
-import io.fabric8.che.starter.client.util.Generator;
-import io.fabric8.che.starter.client.util.Reader;
+import io.fabric8.che.starter.util.Generator;
+import io.fabric8.che.starter.util.Reader;
 
 @Component
 public class WorkspaceTemplate {

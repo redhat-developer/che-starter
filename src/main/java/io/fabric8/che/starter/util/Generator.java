@@ -10,7 +10,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package io.fabric8.che.starter.client.util;
+package io.fabric8.che.starter.util;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Component;

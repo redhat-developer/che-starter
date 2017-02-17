@@ -10,7 +10,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package io.fabric8.che.starter.client.util;
+package io.fabric8.che.starter.util;
 
 import java.io.BufferedReader;
 import java.io.IOException;

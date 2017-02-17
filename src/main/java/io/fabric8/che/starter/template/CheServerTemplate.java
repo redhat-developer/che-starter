@@ -16,14 +16,18 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import io.fabric8.che.starter.client.util.Reader;
+import io.fabric8.che.starter.util.Reader;
 
 @Component
 public class CheServerTemplate {
+    private static final Logger LOG = LogManager.getLogger(CheServerTemplate.class);
+
     private String template;
 
     @Value("${che.server.template.url}")
@@ -33,8 +37,9 @@ public class CheServerTemplate {
     private Reader reader;
 
     public String get() throws MalformedURLException, IOException {
-        if (template != null) {
+        if (template == null) {
             template = reader.read(new URL(templateUrl));
+            LOG.info("Che Server Template: {}", template);
         }
         return template;
     }

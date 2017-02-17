@@ -25,9 +25,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import io.fabric8.che.starter.TestConfig;
-import io.fabric8.che.starter.client.util.Generator;
 import io.fabric8.che.starter.model.Stack;
 import io.fabric8.che.starter.model.response.WorkspaceInfo;
+import io.fabric8.che.starter.util.Generator;
 
 public class CheRestClientTest extends TestConfig {
     private static final String GITHUB_REPO = "https://github.com/che-samples/console-java-simple";
