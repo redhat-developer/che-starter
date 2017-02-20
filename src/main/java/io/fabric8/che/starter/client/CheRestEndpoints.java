@@ -17,7 +17,7 @@ public enum CheRestEndpoints {
     START_WORKSPACE     ("/api/workspace/{id}/runtime"),
     CHECK_WORKSPACE     ("/api/workspace/{id}/check"),
     DELETE_WORKSPACE    ("/api/workspace/{id}"),
-    GET_WORKSPACE_BY_KEY("/api/workspace/{id}"),
+    GET_WORKSPACE_BY_ID ("/api/workspace/{id}"),
     LIST_WORKSPACES     ("/api/workspace"),
     STOP_WORKSPACE      ("/api/workspace/{id}/runtime"),
     LIST_STACKS         ("/api/stack"),
