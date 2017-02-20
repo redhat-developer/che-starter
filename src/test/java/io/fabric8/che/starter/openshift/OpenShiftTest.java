@@ -13,6 +13,7 @@
 package io.fabric8.che.starter.openshift;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -27,9 +28,12 @@ import io.fabric8.che.starter.TestConfig;
 import io.fabric8.che.starter.template.CheServerTemplate;
 import io.fabric8.kubernetes.api.Controller;
 import io.fabric8.kubernetes.api.model.KubernetesList;
+import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.openshift.api.model.DoneableTemplate;
+import io.fabric8.openshift.api.model.Parameter;
 import io.fabric8.openshift.api.model.ProjectRequest;
+import io.fabric8.openshift.api.model.Route;
 import io.fabric8.openshift.api.model.Template;
 import io.fabric8.openshift.client.DefaultOpenShiftClient;
 import io.fabric8.openshift.client.OpenShiftClient;
@@ -76,30 +80,32 @@ public class OpenShiftTest extends TestConfig {
         LOG.info("Test project has been deleted: {}", deleteTestProject(client, projectRequest));
         LOG.info("Number of projects: {}", getNumberOfProjects(client));
 
-        Controller controller = new Controller(client);
-        controller.applyJson(template.get());
+//        Controller controller = new Controller(client);
+//        controller.applyJson(template.get());
 
-//        Template template = loadTemplate(client);
-//        LOG.info("Number of templates {}", getNumberOfTemplates(client));
-//
-//        List<Parameter> parameters = template.getParameters();
-//        LOG.info("Number of template parameters: {}", parameters.size());
-//
-//        List<ParameterValue> pvs = new ArrayList<>();
-//        for (Parameter parameter : parameters) {
-//            String name = parameter.getName();
-//            String value = parameter.getValue();
-//            LOG.info("Template Parameter Name: {}", name);
-//            LOG.info("Template Parameter Value: {}", value);
-//            if (CHE_OPENSHIFT_ENDPOINT.equals(name) && value.isEmpty()) {
-//                value = endpoint;
-//            }
-//            pvs.add(new ParameterValue(name, value));
-//        }
+        Template template = loadTemplate(client);
 
-//        LOG.info("Number of templates {}", getNumberOfTemplates(client));
-//        KubernetesList list = processTemplate(client, pvs);
-//        createResources(client, list);
+        List<Parameter> parameters = template.getParameters();
+        LOG.info("Number of template parameters: {}", parameters.size());
+
+        List<ParameterValue> pvs = new ArrayList<>();
+        for (Parameter parameter : parameters) {
+            String name = parameter.getName();
+            String value = parameter.getValue();
+            LOG.info("Template Parameter Name: {}", name);
+            LOG.info("Template Parameter Value: {}", value);
+            if (CHE_OPENSHIFT_ENDPOINT.equals(name) && value.isEmpty()) {
+                value = endpoint;
+            }
+            pvs.add(new ParameterValue(name, value));
+        }
+
+        KubernetesList list = processTemplate(client, pvs);
+        createResources(client, list);
+
+        Pod pod = client.pods().inNamespace(project).withName("che-host").get();
+
+        Route route = client.routes().inNamespace(project).withName("che-host").get();
 
         LOG.info("Pods: {}", getNumberOfPods(client));
     }
