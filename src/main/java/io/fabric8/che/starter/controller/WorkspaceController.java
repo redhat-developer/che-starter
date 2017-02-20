@@ -13,7 +13,11 @@
 package io.fabric8.che.starter.controller;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -45,6 +49,8 @@ public class WorkspaceController {
 
     private static final Logger LOG = LogManager.getLogger(WorkspaceController.class);
 
+    Pattern gitUrlPattern = Pattern.compile("(\\w+://)(.+@)*([\\w\\d\\.]+)(:[\\d]+){0,1}/*(.*)");
+    
     @Value("${che.server.url}")
     String cheServerURL;
 
@@ -59,11 +65,21 @@ public class WorkspaceController {
     public WorkspaceInfo create(@RequestParam String masterURL, @RequestBody WorkspaceCreateParams params, @RequestHeader("Authorization") String token) throws IOException {
 
         LOG.info("OpenShift MasterURL: {}", masterURL);
-
-        WorkspaceInfo ws = cheRestClient.createWorkspace(cheServerURL, params.getName(), params.getStack(),
-                params.getRepo(), params.getBranch());
-
-        cheRestClient.createProject(cheServerURL, ws.getId(), null, params.getRepo(), params.getBranch());
+        
+        WorkspaceInfo ws = null;
+       
+        try {
+            URI repoUri = new URI(params.getRepo());
+            
+            ws = cheRestClient.createWorkspace(cheServerURL, params.getName(), params.getStack(),
+                    params.getRepo(), params.getBranch());
+            
+            String projectName = repoUri.getPath().substring(repoUri.getPath().lastIndexOf("/") + 1, repoUri.getPath().lastIndexOf("."));
+            
+            cheRestClient.createProject(cheServerURL, ws.getId(), projectName, params.getRepo(), params.getBranch());            
+        } catch (URISyntaxException e) {
+            LOG.error("Invalid repository URL {}", params.getRepo());
+        }
 
         return ws;
     }

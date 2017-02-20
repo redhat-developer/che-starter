@@ -1,8 +1,8 @@
 [{
-  "name": "console-java-simple",
+  "name": "${project.name}",
   "type": "maven",
   "description": "A hello world Java application.",
-  "path": "/console-java-simple",
+  "path": "/${project.name}",
   "source": {
     "parameters": {
       "branch": "${project.git.branch}",
