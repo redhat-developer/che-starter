@@ -12,10 +12,7 @@
  */
 package io.fabric8.che.starter.controller;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -25,6 +22,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 
 import io.fabric8.che.starter.TestConfig;
+import io.fabric8.che.starter.util.Reader;
 
 public class WorkspaceControllerTest extends TestConfig {
     private static final Logger LOG = LogManager.getLogger(WorkspaceControllerTest.class);
@@ -34,6 +32,9 @@ public class WorkspaceControllerTest extends TestConfig {
 
     @Autowired
     WorkspaceController controller;
+    
+    @Autowired
+    Reader reader;
 
     @Test(expected = UnsupportedOperationException.class)
     public void stopAllWorskpaces() {
@@ -42,10 +43,8 @@ public class WorkspaceControllerTest extends TestConfig {
 
     @Test
     public void readTemplate() throws IOException {
-        try (BufferedReader buffer = new BufferedReader(new InputStreamReader(workspaceTemplate.getInputStream()))) {
-            String template = buffer.lines().collect(Collectors.joining("\n"));
-            LOG.info("Workspace template: {}", template);
-        }
+        String template = reader.read(workspaceTemplate.getInputStream());
+        LOG.info("Workspace template: {}", template);
     }
 
 }

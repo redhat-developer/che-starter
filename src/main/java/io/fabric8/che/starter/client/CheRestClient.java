@@ -47,7 +47,6 @@ public class CheRestClient {
     public static final String WORKSPACE_LINK_IDE_URL = "ide url";
     public static final String WORKSPACE_LINK_START_WORKSPACE = "start workspace";
     public static final String WORKSPACE_STATUS_RUNNING = "RUNNING";
-
     public static final long WORKSPACE_START_TIMEOUT_MS = 60000;
 
     @Autowired
@@ -165,7 +164,7 @@ public class CheRestClient {
     }
 
     public Workspace getWorkspaceByKey(String cheServerURL, String workspaceId) {
-        String url = generateURL(cheServerURL, CheRestEndpoints.GET_WORKSPACE_BY_KEY, workspaceId);
+        String url = generateURL(cheServerURL, CheRestEndpoints.GET_WORKSPACE_BY_ID, workspaceId);
 
         RestTemplate template = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();

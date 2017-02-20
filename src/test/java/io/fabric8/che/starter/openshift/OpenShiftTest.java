@@ -13,7 +13,6 @@
 package io.fabric8.che.starter.openshift;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -29,9 +28,7 @@ import io.fabric8.che.starter.template.CheServerTemplate;
 import io.fabric8.kubernetes.api.Controller;
 import io.fabric8.kubernetes.api.model.KubernetesList;
 import io.fabric8.kubernetes.client.Config;
-import io.fabric8.kubernetes.client.ConfigBuilder;
 import io.fabric8.openshift.api.model.DoneableTemplate;
-import io.fabric8.openshift.api.model.Parameter;
 import io.fabric8.openshift.api.model.ProjectRequest;
 import io.fabric8.openshift.api.model.Template;
 import io.fabric8.openshift.client.DefaultOpenShiftClient;
@@ -45,6 +42,9 @@ public class OpenShiftTest extends TestConfig {
 
     @Autowired
     private CheServerTemplate template;
+    
+    @Autowired
+    private OpenShiftConfig openShiftConfig;
 
     @Value(value = "classpath:templates/che_server_template.json")
     private Resource cheServerTemplate;
@@ -67,12 +67,7 @@ public class OpenShiftTest extends TestConfig {
     @Ignore("Test is run against local minishift cluster and requires additional setup")
     @Test
     public void createCheServer() throws Exception {
-        Config config = new ConfigBuilder()
-                            .withMasterUrl(endpoint)
-                            .withUsername(username)
-                            .withPassword(password)
-                            .build();
-
+        Config config = openShiftConfig.get(endpoint, username, password);
         OpenShiftClient client = new DefaultOpenShiftClient(config);
 
         ProjectRequest projectRequest = createTestProject(client);

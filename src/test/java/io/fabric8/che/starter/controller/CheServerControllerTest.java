@@ -12,10 +12,7 @@
  */
 package io.fabric8.che.starter.controller;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -26,6 +23,7 @@ import org.springframework.core.io.Resource;
 
 import io.fabric8.che.starter.TestConfig;
 import io.fabric8.che.starter.util.Generator;
+import io.fabric8.che.starter.util.Reader;
 
 public class CheServerControllerTest extends TestConfig {
     private static final Logger LOG = LogManager.getLogger(CheServerControllerTest.class);
@@ -39,12 +37,13 @@ public class CheServerControllerTest extends TestConfig {
     @Autowired
     Generator generator;
 
+    @Autowired
+    Reader reader;
+
     @Test
     public void readTemplate() throws IOException {
-        try (BufferedReader buffer = new BufferedReader(new InputStreamReader(cheServerTemplate.getInputStream()))) {
-            String template = buffer.lines().collect(Collectors.joining("\n"));
-            LOG.info("Che server template: {}", template);
-        }
+        String template = reader.read(cheServerTemplate.getInputStream());
+        LOG.info("Che server template: {}", template);
     }
 
 }

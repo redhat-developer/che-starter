@@ -39,7 +39,7 @@ public class ErrorController implements org.springframework.boot.autoconfigure.w
         return PATH;
     }
 
-    @RequestMapping(value = PATH)
+    @RequestMapping(PATH)
     public Error error(HttpServletRequest request, HttpServletResponse response) {
         // Appropriate HTTP response code (e.g. 404) is set automatically
         return new Error(response.getStatus(), getErrorAttributes(request, includeStackTrace));

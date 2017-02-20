@@ -15,8 +15,6 @@ package io.fabric8.che.starter.controller;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -25,10 +23,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.fabric8.che.starter.model.response.CheServerInfo;
+import io.fabric8.che.starter.openshift.OpenShiftConfig;
 import io.fabric8.che.starter.template.CheServerTemplate;
 import io.fabric8.kubernetes.api.Controller;
 import io.fabric8.kubernetes.client.Config;
-import io.fabric8.kubernetes.client.ConfigBuilder;
 import io.fabric8.openshift.client.DefaultOpenShiftClient;
 import io.fabric8.openshift.client.OpenShiftClient;
 import io.swagger.annotations.ApiOperation;
@@ -42,25 +40,18 @@ public class CheServerController {
     @Autowired
     CheServerTemplate template;
 
-    @Value(value = "classpath:templates/che_server_template.json")
-    private Resource cheServerTemplate;
+    @Autowired
+    OpenShiftConfig config;
 
     @ApiOperation(value = "Create a new Che server on OpenShift instance")
     @PostMapping
     public CheServerInfo startCheServer(@RequestParam String masterURL, @RequestHeader("Authorization") String token) throws Exception {
         LOG.info("OpenShift master URL: {}", masterURL);
-
-        Config openshiftConfig = getConfig(masterURL, token);
+        Config openshiftConfig = config.get(masterURL, token);
         OpenShiftClient client = new DefaultOpenShiftClient(openshiftConfig);
-
         Controller controller = new Controller(client);
         controller.applyJson(template.get());
-
         return new CheServerInfo();
-    }
-
-    private Config getConfig(String masterURL, String token) {
-        return new ConfigBuilder().withMasterUrl(masterURL).withOauthToken(token).build();
     }
 
 }

@@ -13,11 +13,8 @@
 package io.fabric8.che.starter.controller;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -39,6 +36,7 @@ import io.fabric8.che.starter.client.CheRestClient;
 import io.fabric8.che.starter.model.request.WorkspaceCreateParams;
 import io.fabric8.che.starter.model.response.WorkspaceInfo;
 import io.fabric8.che.starter.util.Generator;
+import io.fabric8.che.starter.util.ProjectHelper;
 import io.swagger.annotations.ApiOperation;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -46,42 +44,36 @@ import springfox.documentation.annotations.ApiIgnore;
 @RestController
 @RequestMapping("/workspace")
 public class WorkspaceController {
-
     private static final Logger LOG = LogManager.getLogger(WorkspaceController.class);
 
-    Pattern gitUrlPattern = Pattern.compile("(\\w+://)(.+@)*([\\w\\d\\.]+)(:[\\d]+){0,1}/*(.*)");
-    
     @Value("${che.server.url}")
     String cheServerURL;
 
     @Autowired
     CheRestClient cheRestClient;
+    
+    @Autowired
+    ProjectHelper projectHelper;
 
     @Autowired
     Generator generator;
 
     @ApiOperation(value = "Create and start a new workspace. Stop all other workspaces (only one workspace can be running at a time). If a workspace with the imported project already exists, just start it")
     @PostMapping
-    public WorkspaceInfo create(@RequestParam String masterURL, @RequestBody WorkspaceCreateParams params, @RequestHeader("Authorization") String token) throws IOException {
+    public WorkspaceInfo create(@RequestParam String masterURL, @RequestBody WorkspaceCreateParams params,
+            @RequestHeader("Authorization") String token) throws IOException, URISyntaxException {
 
         LOG.info("OpenShift MasterURL: {}", masterURL);
-        
-        WorkspaceInfo ws = null;
-       
-        try {
-            URI repoUri = new URI(params.getRepo());
-            
-            ws = cheRestClient.createWorkspace(cheServerURL, params.getName(), params.getStack(),
-                    params.getRepo(), params.getBranch());
-            
-            String projectName = repoUri.getPath().substring(repoUri.getPath().lastIndexOf("/") + 1, repoUri.getPath().lastIndexOf("."));
-            
-            cheRestClient.createProject(cheServerURL, ws.getId(), projectName, params.getRepo(), params.getBranch());            
-        } catch (URISyntaxException e) {
-            LOG.error("Invalid repository URL {}", params.getRepo());
-        }
 
-        return ws;
+        String projectName = projectHelper.getProjectNameFromGitRepository(params.getRepo());
+
+        WorkspaceInfo workspaceInfo = cheRestClient.createWorkspace(cheServerURL, params.getName(), params.getStack(),
+                params.getRepo(), params.getBranch());
+
+        cheRestClient.createProject(cheServerURL, workspaceInfo.getId(), projectName, params.getRepo(),
+                params.getBranch());
+        
+        return workspaceInfo;
     }
 
     @ApiOperation(value = "List workspaces")
