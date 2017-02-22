@@ -33,6 +33,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.fabric8.che.starter.client.CheRestClient;
+import io.fabric8.che.starter.model.WorkspaceLink;
+import io.fabric8.che.starter.model.WorkspaceStatus;
 import io.fabric8.che.starter.model.request.WorkspaceCreateParams;
 import io.fabric8.che.starter.model.response.WorkspaceInfo;
 import io.fabric8.che.starter.util.Generator;
@@ -66,6 +68,22 @@ public class WorkspaceController {
         LOG.info("OpenShift MasterURL: {}", masterURL);
 
         String projectName = projectHelper.getProjectNameFromGitRepository(params.getRepo());
+        
+        List<WorkspaceInfo> workspaces = cheRestClient.listWorkspaces(cheServerURL);
+        
+        String workspaceLocator = cheRestClient.workspaceLocatorKey(params.getRepo(), params.getBranch());
+        
+        for (WorkspaceInfo ws : workspaces) {
+            if (ws.getDescription().equals(workspaceLocator)) {
+                // Before we can create a project, we must start the new workspace.  First check it's not already running
+                if (!CheRestClient.WORKSPACE_STATUS_RUNNING.equals(ws.getStatus()) && 
+                        !CheRestClient.WORKSPACE_STATUS_STARTING.equals(ws.getStatus())) {               
+                    cheRestClient.startWorkspace(cheServerURL, ws.getId());
+                }
+                
+                return ws;
+            }
+        }
 
         WorkspaceInfo workspaceInfo = cheRestClient.createWorkspace(cheServerURL, params.getName(), params.getStack(),
                 params.getRepo(), params.getBranch());
@@ -82,7 +100,7 @@ public class WorkspaceController {
             @RequestHeader("Authorization") String token) {
         if (!StringUtils.isEmpty(repository)) {
             LOG.info("Fetching workspaces for repositoriy: {}", repository);
-            return cheRestClient.listWorkspacesPerRespository(cheServerURL, repository);
+            return cheRestClient.listWorkspacesPerRepository(cheServerURL, repository);
         }
         return cheRestClient.listWorkspaces(cheServerURL);
     }

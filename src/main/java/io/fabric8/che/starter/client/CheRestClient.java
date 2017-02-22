@@ -47,6 +47,7 @@ public class CheRestClient {
     public static final String WORKSPACE_LINK_IDE_URL = "ide url";
     public static final String WORKSPACE_LINK_START_WORKSPACE = "start workspace";
     public static final String WORKSPACE_STATUS_RUNNING = "RUNNING";
+    public static final String WORKSPACE_STATUS_STARTING = "STARTING";
     public static final long WORKSPACE_START_TIMEOUT_MS = 60000;
 
     @Autowired
@@ -69,12 +70,20 @@ public class CheRestClient {
             workspaceInfo.setStatus(workspace.getStatus());
             workspaceInfo.setName(workspace.getConfig().getName());
             workspaceInfo.setDescription(workspace.getConfig().getDescription());
+            
+            for (WorkspaceLink link : workspace.getLinks()) {
+                if (WORKSPACE_LINK_IDE_URL.equals(link.getRel())) {
+                    workspaceInfo.setWorkspaceIdeUrl(link.getHref());
+                    break;
+                }
+            }            
+            
             workspaces.add(workspaceInfo);
         }
         return workspaces;
     }
 
-    public List<WorkspaceInfo> listWorkspacesPerRespository(String cheServerURL, String repository) {
+    public List<WorkspaceInfo> listWorkspacesPerRepository(String cheServerURL, String repository) {
         List<WorkspaceInfo> workspaces = listWorkspaces(cheServerURL);
         return workspaces.stream().filter(w -> w.getDescription().split("#")[0].equals(repository))
                 .collect(Collectors.toList());
@@ -82,12 +91,13 @@ public class CheRestClient {
 
     public WorkspaceInfo createWorkspace(String cheServerURL, String name, String stack, String repo, String branch)
             throws IOException {
+               
         // The first step is to create the workspace
         String url = generateURL(cheServerURL, CheRestEndpoints.CREATE_WORKSPACE);
         String jsonTemplate = workspaceTemplate.createRequest().
                                                 setName(name).
                                                 setStack(stack).
-                                                setDescription(repo + "#" + branch).
+                                                setDescription(workspaceLocatorKey(repo, branch)).
                                                 getJSON();
 
         RestTemplate template = new RestTemplate();
@@ -123,9 +133,7 @@ public class CheRestClient {
         startWorkspace(cheServerURL, workspaceId);
 
         // Poll until the workspace is started
-        WorkspaceStatus status;
-
-        status = checkWorkspace(cheServerURL, workspaceId);
+        WorkspaceStatus status = checkWorkspace(cheServerURL, workspaceId);
         long currentTime = System.currentTimeMillis();
         while (!WORKSPACE_STATUS_RUNNING.equals(status.getWorkspaceStatus())
                 && System.currentTimeMillis() < (currentTime + WORKSPACE_START_TIMEOUT_MS)) {
@@ -225,4 +233,7 @@ public class CheRestClient {
         return cheServerURL + endpoint.toString().replace("{id}", id);
     }
 
+    public String workspaceLocatorKey(String repo, String branch) {
+        return repo + "#" + branch;
+    }
 }
