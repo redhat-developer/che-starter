@@ -32,14 +32,9 @@ public class WorkspaceControllerTest extends TestConfig {
 
     @Autowired
     WorkspaceController controller;
-    
+
     @Autowired
     Reader reader;
-
-    @Test(expected = UnsupportedOperationException.class)
-    public void stopAllWorskpaces() {
-        controller.stopAll();
-    }
 
     @Test
     public void readTemplate() throws IOException {
