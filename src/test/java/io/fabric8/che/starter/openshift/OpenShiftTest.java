@@ -48,7 +48,7 @@ public class OpenShiftTest extends TestConfig {
     private CheServerTemplate template;
     
     @Autowired
-    private OpenShiftConfig openShiftConfig;
+    private Client client;
 
     @Value(value = "classpath:templates/che_server_template.json")
     private Resource cheServerTemplate;
@@ -71,19 +71,18 @@ public class OpenShiftTest extends TestConfig {
     @Ignore("Test is run against local minishift cluster and requires additional setup")
     @Test
     public void createCheServer() throws Exception {
-        Config config = openShiftConfig.get(endpoint, username, password);
-        OpenShiftClient client = new DefaultOpenShiftClient(config);
+        OpenShiftClient openShiftClient = client.get(endpoint, username, password);
 
-        ProjectRequest projectRequest = createTestProject(client);
-        LOG.info("Number of projects: {}", getNumberOfProjects(client));
+        ProjectRequest projectRequest = createTestProject(openShiftClient);
+        LOG.info("Number of projects: {}", getNumberOfProjects(openShiftClient));
 
-        LOG.info("Test project has been deleted: {}", deleteTestProject(client, projectRequest));
-        LOG.info("Number of projects: {}", getNumberOfProjects(client));
+        LOG.info("Test project has been deleted: {}", deleteTestProject(openShiftClient, projectRequest));
+        LOG.info("Number of projects: {}", getNumberOfProjects(openShiftClient));
 
 //        Controller controller = new Controller(client);
 //        controller.applyJson(template.get());
 
-        Template template = loadTemplate(client);
+        Template template = loadTemplate(openShiftClient);
 
         List<Parameter> parameters = template.getParameters();
         LOG.info("Number of template parameters: {}", parameters.size());
@@ -100,14 +99,14 @@ public class OpenShiftTest extends TestConfig {
             pvs.add(new ParameterValue(name, value));
         }
 
-        KubernetesList list = processTemplate(client, pvs);
-        createResources(client, list);
+        KubernetesList list = processTemplate(openShiftClient, pvs);
+        createResources(openShiftClient, list);
 
-        Pod pod = client.pods().inNamespace(project).withName("che-host").get();
+        Pod pod = openShiftClient.pods().inNamespace(project).withName("che-host").get();
 
-        Route route = client.routes().inNamespace(project).withName("che-host").get();
+        Route route = openShiftClient.routes().inNamespace(project).withName("che-host").get();
 
-        LOG.info("Pods: {}", getNumberOfPods(client));
+        LOG.info("Pods: {}", getNumberOfPods(openShiftClient));
     }
 
     private int getNumberOfProjects(OpenShiftClient client) {

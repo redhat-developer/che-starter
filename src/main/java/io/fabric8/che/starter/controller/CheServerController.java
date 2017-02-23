@@ -23,11 +23,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.fabric8.che.starter.model.response.CheServerInfo;
-import io.fabric8.che.starter.openshift.OpenShiftConfig;
+import io.fabric8.che.starter.openshift.Client;
 import io.fabric8.che.starter.template.CheServerTemplate;
 import io.fabric8.kubernetes.api.Controller;
-import io.fabric8.kubernetes.client.Config;
-import io.fabric8.openshift.client.DefaultOpenShiftClient;
 import io.fabric8.openshift.client.OpenShiftClient;
 import io.swagger.annotations.ApiOperation;
 
@@ -41,15 +39,14 @@ public class CheServerController {
     CheServerTemplate template;
 
     @Autowired
-    OpenShiftConfig config;
+    Client client;
 
     @ApiOperation(value = "Create a new Che server on OpenShift instance")
     @PostMapping
     public CheServerInfo startCheServer(@RequestParam String masterURL, @RequestHeader("Authorization") String token) throws Exception {
         LOG.info("OpenShift master URL: {}", masterURL);
-        Config openshiftConfig = config.get(masterURL, token);
-        OpenShiftClient client = new DefaultOpenShiftClient(openshiftConfig);
-        Controller controller = new Controller(client);
+        OpenShiftClient openShiftClient = client.get(masterURL, token);
+        Controller controller = new Controller(openShiftClient);
         controller.applyJson(template.get());
         return new CheServerInfo();
     }
