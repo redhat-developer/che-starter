@@ -31,6 +31,12 @@ There are several ways for running the project:
 
 Once the service is running, it would be available with [Swagger](http://swagger.io/) documentation on [http://localhost:10000/](http://localhost:10000/)
 
+* Docker container:
+
+```bash
+docker build -t rhche/che-starter .
+docker run -p 10000:10000 -t rhche/che-starter
+````
 
 Profiles
 --------
