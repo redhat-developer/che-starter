@@ -19,7 +19,6 @@ yum -y update
 yum -y install centos-release-scl java-1.8.0-openjdk-devel docker
 yum -y install rh-maven33
 
-sed -i '/OPTIONS=.*/c\OPTIONS="--selinux-enabled --log-driver=journald --insecure-registry registry.ci.centos.org:5000"' /etc/sysconfig/docker
 systemctl start docker
 
 scl enable rh-maven33 'mvn clean verify -B'
@@ -38,8 +37,8 @@ if [ $? -eq 0 ]; then
   docker login -u rhchebot -p $RHCHEBOT_DOCKER_HUB_PASSWORD -e noreply@redhat.com
   docker push rhche/che-starter:nightly
 
-  docker tag rhche/che-starter:nightly registry.ci.centos.org:5000/almighty/che-starter:latest
-  docker push registry.ci.centos.org:5000/almighty/che-starter:latest
+  docker tag rhche/che-starter:nightly 8.43.84.245.xip.io/che/che-starter:nightly
+  docker push 8.43.84.245.xip.io/che/che-starter:nightly
 
 else
   echo 'Build Failed!'
