@@ -4,8 +4,8 @@ ARG VERSION=1.0-SNAPSHOT
 
 RUN yum update -y && \
     yum install -y \
-       java-1.8.0-openjdk \
-       java-1.8.0-openjdk-devel
+       java-1.8.0-openjdk-headless && \
+    yum clean all
 
 ENV JAVA_HOME /etc/alternatives/jre
 
