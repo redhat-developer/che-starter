@@ -74,6 +74,13 @@ Live preview
 
 2. http://che-starter.demo.almighty.io/
 
+Testing with Minishift
+----------------------
+che-starter can be tested locally against [Minishift](https://github.com/minishift/minishift). Just run che-starter and follow the [instructions](https://github.com/fabric8io/fabric8-online#minishift) for deploying che server via fabric8-online template. Once deployed, you can send requests against Minishift masterUrl. In order to obtain token use the following command:
+
+```bash
+    oc whoami -t
+````
 
 License
 -------
