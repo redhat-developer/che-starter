@@ -78,9 +78,9 @@ Testing with Minishift
 ----------------------
 che-starter can be tested locally against Minishift:
 
-- Get [https://github.com/minishift/minishift#installation](Minishift), create an OpenShift cluster (`minishift start`), open the web console (`minishift console`) and read the instructions to install the OpenShift CLI (help->Command Line Tools)
+- Get [Minishift](https://github.com/minishift/minishift#installation), create an OpenShift cluster (`minishift start`), open the web console (`minishift console`) and read the instructions to install the OpenShift CLI (help->Command Line Tools)
 
-- Install [https://github.com/fabric8io/gofabric8#gofabric8-installer](gofabric8)
+- Install [gofabric8](https://github.com/fabric8io/gofabric8#gofabric8-installer)
 
 - Run che-starter locally and follow the instructions for deploying che server via fabric8-online template:
 
