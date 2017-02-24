@@ -12,11 +12,28 @@
  */
 package io.fabric8.che.starter.util;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Component;
 
+import io.fabric8.che.starter.model.Workspace;
+
 @Component
-public final class Generator {
+public class WorkspaceHelper {
+    private static final String REPO_BRANCH_DELIMITER = "#";
+
+    public String getDescription(final String repo, final String branch) {
+        return repo + REPO_BRANCH_DELIMITER + branch;
+    }
+
+    public List<Workspace> filterByRepository(final List<Workspace> workspaces, final String repository) {
+        return workspaces.stream().filter(w -> {
+            String description = w.getDescription();
+            return description != null && description.split(REPO_BRANCH_DELIMITER)[0].equals(repository);
+        }).collect(Collectors.toList());
+    }
 
     /**
      * Che workspace id is used as OpenShift service / deployment config name

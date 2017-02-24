@@ -17,6 +17,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -29,6 +30,10 @@ public class ProjectHelper {
         String path = uri.getPath();
         String projectName = path.substring(path.lastIndexOf("/") + 1, path.lastIndexOf("."));
         return projectName;
+    }
+
+    public String generateName() {
+        return RandomStringUtils.random(8, true, true).toLowerCase();
     }
 
 }

@@ -26,7 +26,7 @@ public class Router {
 
     @Value("${che.openshift.project}")
     private String project;
-    
+
     @Value("${che.openshift.router}")
     private String router;
 

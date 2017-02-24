@@ -20,8 +20,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
-import io.fabric8.che.starter.util.Generator;
 import io.fabric8.che.starter.util.Reader;
+import io.fabric8.che.starter.util.WorkspaceHelper;
 
 @Component
 public class WorkspaceTemplate {
@@ -33,7 +33,7 @@ public class WorkspaceTemplate {
     private Resource resource;
 
     @Autowired
-    private Generator generator;
+    private WorkspaceHelper helper;
     
     @Autowired
     private Reader reader;
@@ -44,7 +44,7 @@ public class WorkspaceTemplate {
         private String description;
 
         protected WorkspaceCreateRequest(WorkspaceTemplate template) {
-            this.name = generator.generateName();
+            this.name = helper.generateName();
         }
 
         public WorkspaceCreateRequest setName(String name) {

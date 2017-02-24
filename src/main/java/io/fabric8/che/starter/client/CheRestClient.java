@@ -14,7 +14,6 @@ package io.fabric8.che.starter.client;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -37,6 +36,7 @@ import io.fabric8.che.starter.model.WorkspaceLink;
 import io.fabric8.che.starter.model.WorkspaceStatus;
 import io.fabric8.che.starter.template.ProjectTemplate;
 import io.fabric8.che.starter.template.WorkspaceTemplate;
+import io.fabric8.che.starter.util.WorkspaceHelper;
 
 @Service
 public class CheRestClient {
@@ -49,10 +49,13 @@ public class CheRestClient {
     public static final long WORKSPACE_START_TIMEOUT_MS = 60000;
 
     @Autowired
-    WorkspaceTemplate workspaceTemplate;
+    private WorkspaceTemplate workspaceTemplate;
 
     @Autowired
-    ProjectTemplate projectTemplate;
+    private WorkspaceHelper workspaceHelper;
+
+    @Autowired
+    private ProjectTemplate projectTemplate;
 
     public List<Workspace> listWorkspaces(String cheServerURL) {
         String url = generateURL(cheServerURL, CheRestEndpoints.LIST_WORKSPACES);
@@ -78,10 +81,7 @@ public class CheRestClient {
 
     public List<Workspace> listWorkspacesPerRepository(String cheServerURL, String repository) {
         List<Workspace> workspaces = listWorkspaces(cheServerURL);
-        return workspaces.stream().filter(w -> {
-            String description = w.getDescription();
-            return description != null && description.split("#")[0].equals(repository);
-        }).collect(Collectors.toList());
+        return workspaceHelper.filterByRepository(workspaces, repository);
     }
 
     public Workspace createWorkspace(String cheServerURL, String name, String stack, String repo, String branch)
@@ -92,7 +92,7 @@ public class CheRestClient {
         String jsonTemplate = workspaceTemplate.createRequest().
                                                 setName(name).
                                                 setStack(stack).
-                                                setDescription(workspaceLocatorKey(repo, branch)).
+                                                setDescription(workspaceHelper.getDescription(repo, branch)).
                                                 getJSON();
 
         RestTemplate template = new RestTemplate();
@@ -205,10 +205,6 @@ public class CheRestClient {
         template.delete(url);
     }
 
-    public void stopAllWorkspaces() {
-        throw new UnsupportedOperationException("'stopAllWorkspaces' is currently not supported");
-    }
-
     public List<Stack> listStacks(String cheServerURL) {
         String url = generateURL(cheServerURL, CheRestEndpoints.LIST_STACKS);
         RestTemplate template = new RestTemplate();
@@ -224,9 +220,5 @@ public class CheRestClient {
 
     private String generateURL(String cheServerURL, CheRestEndpoints endpoint, String id) {
         return cheServerURL + endpoint.toString().replace("{id}", id);
-    }
-
-    public String workspaceLocatorKey(String repo, String branch) {
-        return repo + "#" + branch;
     }
 }

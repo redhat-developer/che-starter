@@ -28,7 +28,7 @@ import org.springframework.beans.factory.annotation.Value;
 import io.fabric8.che.starter.TestConfig;
 import io.fabric8.che.starter.model.Stack;
 import io.fabric8.che.starter.model.Workspace;
-import io.fabric8.che.starter.util.Generator;
+import io.fabric8.che.starter.util.WorkspaceHelper;
 
 @Ignore("demo.che.ci.centos.org is down")
 public class CheRestClientTest extends TestConfig {
@@ -42,10 +42,10 @@ public class CheRestClientTest extends TestConfig {
     String cheServerURL;
 
     @Autowired
-    Generator generator; 
-
-    @Autowired
     private CheRestClient client;
+    
+    @Autowired
+    private WorkspaceHelper workspaceHelper;
 
     @Test
     public void listWorkspaces() {
@@ -56,7 +56,7 @@ public class CheRestClientTest extends TestConfig {
 
     @Test
     public void createAndDeleteWorkspace() throws IOException {
-        Workspace workspace = client.createWorkspace(cheServerURL, generator.generateName(), STACK_ID, GITHUB_REPO, BRANCH);
+        Workspace workspace = client.createWorkspace(cheServerURL, workspaceHelper.generateName(), STACK_ID, GITHUB_REPO, BRANCH);
         LOG.info("Workspace URL: {}",workspace.getWorkspaceIdeUrl());
         client.deleteWorkspace(cheServerURL, workspace.getId());
     }
@@ -77,11 +77,6 @@ public class CheRestClientTest extends TestConfig {
     public void listStacks() {
         List<Stack> stacks = client.listStacks(cheServerURL);
         assertTrue(!stacks.isEmpty());
-    }
-
-    @Test(expected = UnsupportedOperationException.class)
-    public void stopAllWorskpaces() {
-        client.stopAllWorkspaces();
     }
 
 }

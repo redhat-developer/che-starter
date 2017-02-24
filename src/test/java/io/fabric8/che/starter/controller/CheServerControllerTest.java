@@ -22,7 +22,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 
 import io.fabric8.che.starter.TestConfig;
-import io.fabric8.che.starter.util.Generator;
 import io.fabric8.che.starter.util.Reader;
 
 public class CheServerControllerTest extends TestConfig {
@@ -33,9 +32,6 @@ public class CheServerControllerTest extends TestConfig {
 
     @Autowired
     CheServerController controller;
-
-    @Autowired
-    Generator generator;
 
     @Autowired
     Reader reader;

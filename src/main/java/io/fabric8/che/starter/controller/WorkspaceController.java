@@ -34,8 +34,8 @@ import io.fabric8.che.starter.model.Workspace;
 import io.fabric8.che.starter.model.request.WorkspaceCreateParams;
 import io.fabric8.che.starter.openshift.Client;
 import io.fabric8.che.starter.openshift.Router;
-import io.fabric8.che.starter.util.Generator;
 import io.fabric8.che.starter.util.ProjectHelper;
+import io.fabric8.che.starter.util.WorkspaceHelper;
 import io.fabric8.openshift.client.OpenShiftClient;
 import io.swagger.annotations.ApiOperation;
 
@@ -53,12 +53,12 @@ public class WorkspaceController {
 
     @Autowired
     CheRestClient cheRestClient;
-    
+
     @Autowired
     ProjectHelper projectHelper;
 
     @Autowired
-    Generator generator;
+    WorkspaceHelper workspaceHelper;
 
     @ApiOperation(value = "Create and start a new workspace. Stop all other workspaces (only one workspace can be running at a time). If a workspace with the imported project already exists, just start it")
     @PostMapping
@@ -70,13 +70,13 @@ public class WorkspaceController {
 
         List<Workspace> workspaces = cheRestClient.listWorkspaces(cheServerUrl);
 
-        String workspaceLocator = cheRestClient.workspaceLocatorKey(params.getRepo(), params.getBranch());
+        String description = workspaceHelper.getDescription(params.getRepo(), params.getBranch());
 
         for (Workspace ws : workspaces) {
-            if (ws.getDescription().equals(workspaceLocator)) {
+            if (ws.getDescription().equals(description)) {
                 // Before we can create a project, we must start the new workspace.  First check it's not already running
                 if (!CheRestClient.WORKSPACE_STATUS_RUNNING.equals(ws.getStatus()) && 
-                        !CheRestClient.WORKSPACE_STATUS_STARTING.equals(ws.getStatus())) {               
+                        !CheRestClient.WORKSPACE_STATUS_STARTING.equals(ws.getStatus())) {
                     cheRestClient.startWorkspace(cheServerUrl, ws.getId());
                 }
                 
@@ -93,7 +93,7 @@ public class WorkspaceController {
         return workspaceInfo;
     }
 
-    @ApiOperation(value = "List workspaces")
+    @ApiOperation(value = "List workspaces per git repository. If repository is not specified return all workspaces")
     @GetMapping
     public List<Workspace> list(@RequestParam String masterUrl, @RequestParam(required = false) String repository,
             @RequestHeader("Authorization") String token) {
