@@ -13,7 +13,6 @@
 package io.fabric8.che.starter.client;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -62,27 +61,27 @@ public class CheRestClient {
                 new ParameterizedTypeReference<List<Workspace>>() {
                 });
 
-        List<Workspace> workspaces = new ArrayList<>();
-        for (Workspace workspace : response.getBody()) {
+        List<Workspace> workspaces = response.getBody();
+        for (Workspace workspace : workspaces) {
             workspace.setName(workspace.getConfig().getName());
             workspace.setDescription(workspace.getConfig().getDescription());
-            
+
             for (WorkspaceLink link : workspace.getLinks()) {
                 if (WORKSPACE_LINK_IDE_URL.equals(link.getRel())) {
                     workspace.setWorkspaceIdeUrl(link.getHref());
                     break;
                 }
-            }            
-            
-            workspaces.add(workspace);
+            }
         }
         return workspaces;
     }
 
     public List<Workspace> listWorkspacesPerRepository(String cheServerURL, String repository) {
         List<Workspace> workspaces = listWorkspaces(cheServerURL);
-        return workspaces.stream().filter(w -> w.getDescription().split("#")[0].equals(repository))
-                .collect(Collectors.toList());
+        return workspaces.stream().filter(w -> {
+            String description = w.getDescription();
+            return description != null && description.split("#")[0].equals(repository);
+        }).collect(Collectors.toList());
     }
 
     public Workspace createWorkspace(String cheServerURL, String name, String stack, String repo, String branch)
