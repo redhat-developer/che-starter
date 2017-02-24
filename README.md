@@ -76,7 +76,37 @@ Live preview
 
 Testing with Minishift
 ----------------------
-che-starter can be tested locally against [Minishift](https://github.com/minishift/minishift). Just run che-starter and follow the [instructions](https://github.com/fabric8io/fabric8-online#minishift) for deploying che server via fabric8-online template. Once deployed, you can send requests against Minishift masterUrl. In order to obtain token use the following command:
+che-starter can be tested locally against Minishift:
+
+- Get https://github.com/minishift/minishift#installation[minishift], create an OpenShift cluster (`minishift start`), open the web console (`minishift console`) and read the instructions to install the OpenShift CLI (help->Command Line Tools)
+
+- Install https://github.com/fabric8io/gofabric8#gofabric8-installer[gofabric8]
+
+- Run che-starter locally and follow the instructions for deploying che server via fabric8-online template:
+
+```bash
+    oc login -u openshift-dev -p devel
+    oc new-project che
+
+    oc login -u system:admin
+    oc adm policy add-scc-to-user privileged -z che
+    oc adm policy add-cluster-role-to-user cluster-admin system:serviceaccount:che:che
+
+    oc login -u openshift-dev -p devel
+    export ONLINE_VERSION=1.0.32
+    oc apply -f http://central.maven.org/maven2/io/fabric8/online/apps/che/$ONLINE_VERSION/che-$ONLINE_VERSION-openshift.yml
+    oc expose service che-host --hostname=che.$(minishift ip).nip.io
+
+    oc login -u system:admin
+    gofabric8 volumes
+````
+
+- Get the URL to access Che on:
+
+```bash
+    oc get route che-host
+````
+- Once deployed, you can send requests from che-starter against Minishift. In order to obtain token use the following command:
 
 ```bash
     oc whoami -t
