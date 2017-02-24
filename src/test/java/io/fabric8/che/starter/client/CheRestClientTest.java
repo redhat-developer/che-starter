@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 import io.fabric8.che.starter.TestConfig;
 import io.fabric8.che.starter.model.Stack;
-import io.fabric8.che.starter.model.response.WorkspaceInfo;
+import io.fabric8.che.starter.model.Workspace;
 import io.fabric8.che.starter.util.Generator;
 
 @Ignore("demo.che.ci.centos.org is down")
@@ -49,23 +49,23 @@ public class CheRestClientTest extends TestConfig {
 
     @Test
     public void listWorkspaces() {
-        List<WorkspaceInfo> workspaces = this.client.listWorkspaces(cheServerURL);
+        List<Workspace> workspaces = this.client.listWorkspaces(cheServerURL);
         LOG.info("Number of workspaces: {}", workspaces.size());
         workspaces.forEach(w -> LOG.info("workspace ID: {}", w.getId()));
     }
 
     @Test
     public void createAndDeleteWorkspace() throws IOException {
-        WorkspaceInfo workspace = client.createWorkspace(cheServerURL, generator.generateName(), STACK_ID, GITHUB_REPO, BRANCH);
+        Workspace workspace = client.createWorkspace(cheServerURL, generator.generateName(), STACK_ID, GITHUB_REPO, BRANCH);
         LOG.info("Workspace URL: {}",workspace.getWorkspaceIdeUrl());
         client.deleteWorkspace(cheServerURL, workspace.getId());
     }
 
     @Test
     public void stopWorskpace() {
-        List<WorkspaceInfo> workspaces = client.listWorkspaces(cheServerURL);
+        List<Workspace> workspaces = client.listWorkspaces(cheServerURL);
         if (!workspaces.isEmpty()) {
-            List<WorkspaceInfo> runningWorkspaces = workspaces.stream().filter(w -> w.getStatus().equals("RUNNING"))
+            List<Workspace> runningWorkspaces = workspaces.stream().filter(w -> w.getStatus().equals("RUNNING"))
                     .collect(Collectors.toList());
             if (!runningWorkspaces.isEmpty()) {
                 client.stopWorkspace(cheServerURL, runningWorkspaces.get(0).getId());

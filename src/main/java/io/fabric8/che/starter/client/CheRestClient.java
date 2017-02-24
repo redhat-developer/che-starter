@@ -36,7 +36,6 @@ import io.fabric8.che.starter.model.Stack;
 import io.fabric8.che.starter.model.Workspace;
 import io.fabric8.che.starter.model.WorkspaceLink;
 import io.fabric8.che.starter.model.WorkspaceStatus;
-import io.fabric8.che.starter.model.response.WorkspaceInfo;
 import io.fabric8.che.starter.template.ProjectTemplate;
 import io.fabric8.che.starter.template.WorkspaceTemplate;
 
@@ -56,16 +55,16 @@ public class CheRestClient {
     @Autowired
     ProjectTemplate projectTemplate;
 
-    public List<WorkspaceInfo> listWorkspaces(String cheServerURL) {
+    public List<Workspace> listWorkspaces(String cheServerURL) {
         String url = generateURL(cheServerURL, CheRestEndpoints.LIST_WORKSPACES);
         RestTemplate template = new RestTemplate();
         ResponseEntity<List<Workspace>> response = template.exchange(url, HttpMethod.GET, null,
                 new ParameterizedTypeReference<List<Workspace>>() {
                 });
 
-        List<WorkspaceInfo> workspaces = new ArrayList<>();
+        List<Workspace> workspaces = new ArrayList<>();
         for (Workspace workspace : response.getBody()) {
-            WorkspaceInfo workspaceInfo = new WorkspaceInfo();
+            Workspace workspaceInfo = new Workspace();
             workspaceInfo.setId(workspace.getId());
             workspaceInfo.setStatus(workspace.getStatus());
             workspaceInfo.setName(workspace.getConfig().getName());
@@ -83,13 +82,13 @@ public class CheRestClient {
         return workspaces;
     }
 
-    public List<WorkspaceInfo> listWorkspacesPerRepository(String cheServerURL, String repository) {
-        List<WorkspaceInfo> workspaces = listWorkspaces(cheServerURL);
+    public List<Workspace> listWorkspacesPerRepository(String cheServerURL, String repository) {
+        List<Workspace> workspaces = listWorkspaces(cheServerURL);
         return workspaces.stream().filter(w -> w.getDescription().split("#")[0].equals(repository))
                 .collect(Collectors.toList());
     }
 
-    public WorkspaceInfo createWorkspace(String cheServerURL, String name, String stack, String repo, String branch)
+    public Workspace createWorkspace(String cheServerURL, String name, String stack, String repo, String branch)
             throws IOException {
                
         // The first step is to create the workspace
@@ -110,7 +109,7 @@ public class CheRestClient {
 
         LOG.info("Workspace has been created: {}", workspace);
 
-        WorkspaceInfo workspaceInfo = new WorkspaceInfo();
+        Workspace workspaceInfo = new Workspace();
         workspaceInfo.setId(workspace.getId());
         workspaceInfo.setName(workspace.getConfig().getName());
         workspaceInfo.setDescription(workspace.getConfig().getDescription());
