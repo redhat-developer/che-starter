@@ -64,20 +64,17 @@ public class CheRestClient {
 
         List<Workspace> workspaces = new ArrayList<>();
         for (Workspace workspace : response.getBody()) {
-            Workspace workspaceInfo = new Workspace();
-            workspaceInfo.setId(workspace.getId());
-            workspaceInfo.setStatus(workspace.getStatus());
-            workspaceInfo.setName(workspace.getConfig().getName());
-            workspaceInfo.setDescription(workspace.getConfig().getDescription());
+            workspace.setName(workspace.getConfig().getName());
+            workspace.setDescription(workspace.getConfig().getDescription());
             
             for (WorkspaceLink link : workspace.getLinks()) {
                 if (WORKSPACE_LINK_IDE_URL.equals(link.getRel())) {
-                    workspaceInfo.setWorkspaceIdeUrl(link.getHref());
+                    workspace.setWorkspaceIdeUrl(link.getHref());
                     break;
                 }
             }            
             
-            workspaces.add(workspaceInfo);
+            workspaces.add(workspace);
         }
         return workspaces;
     }
@@ -109,19 +106,17 @@ public class CheRestClient {
 
         LOG.info("Workspace has been created: {}", workspace);
 
-        Workspace workspaceInfo = new Workspace();
-        workspaceInfo.setId(workspace.getId());
-        workspaceInfo.setName(workspace.getConfig().getName());
-        workspaceInfo.setDescription(workspace.getConfig().getDescription());
+        workspace.setName(workspace.getConfig().getName());
+        workspace.setDescription(workspace.getConfig().getDescription());
 
         for (WorkspaceLink link : workspace.getLinks()) {
             if (WORKSPACE_LINK_IDE_URL.equals(link.getRel())) {
-                workspaceInfo.setWorkspaceIdeUrl(link.getHref());
+                workspace.setWorkspaceIdeUrl(link.getHref());
                 break;
             }
         }
 
-        return workspaceInfo;
+        return workspace;
     }
 
     @Async
