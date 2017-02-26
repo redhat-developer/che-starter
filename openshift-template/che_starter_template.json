@@ -30,7 +30,7 @@
         {
             "description": "Name of the che-starter Docker image",
             "name": "CHE_STARTER_DOCKER_IMAGE",
-            "value": "rhche/che-starter:nightly",
+            "value": "ibuziuk/che-starter:nightly",
             "required": true
         },
         {
