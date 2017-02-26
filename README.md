@@ -82,6 +82,8 @@ che-starter can be tested locally against Minishift:
 
 - Install [gofabric8](https://github.com/fabric8io/gofabric8#gofabric8-installer)
 
+- Update `/etc/hosts` with a line that associates minishift IP address (`minishift ip`) and the hostname `che.openshift.mini`
+
 - Run che-starter locally and follow the instructions for deploying che server via fabric8-online template:
 
 ```bash
@@ -95,20 +97,18 @@ che-starter can be tested locally against Minishift:
     oc login -u openshift-dev -p devel
     export ONLINE_VERSION=1.0.32
     oc apply -f http://central.maven.org/maven2/io/fabric8/online/apps/che/$ONLINE_VERSION/che-$ONLINE_VERSION-openshift.yml
-    oc expose service che-host --hostname=che.$(minishift ip).nip.io
+    oc expose service che-host --hostname=che.openshift.mini
 
     oc login -u system:admin
     gofabric8 volumes
 ````
 
-- Get the URL to access Che on:
+- After deployment Che will be available on http://che.openshift.mini/
 
-```bash
-    oc get route che-host
-````
 - Once deployed, you can send requests from che-starter against Minishift. In order to obtain token use the following command:
 
 ```bash
+    oc login -u openshift-dev -p devel
     oc whoami -t
 ````
 
