@@ -33,12 +33,9 @@ public class CheServerControllerTest extends TestConfig {
     @Autowired
     CheServerController controller;
 
-    @Autowired
-    Reader reader;
-
     @Test
     public void readTemplate() throws IOException {
-        String template = reader.read(cheServerTemplate.getInputStream());
+        String template = Reader.read(cheServerTemplate.getInputStream());
         LOG.info("Che server template: {}", template);
     }
 

@@ -20,8 +20,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
+import io.fabric8.che.starter.util.ProjectHelper;
 import io.fabric8.che.starter.util.Reader;
-import io.fabric8.che.starter.util.WorkspaceHelper;
 
 @Component
 public class ProjectTemplate {
@@ -33,10 +33,7 @@ public class ProjectTemplate {
     private Resource resource;
 
     @Autowired
-    private WorkspaceHelper helper;
-    
-    @Autowired
-    private Reader reader;
+    private ProjectHelper helper;
 
     public class ProjectCreateRequest {
         private String name;
@@ -69,7 +66,7 @@ public class ProjectTemplate {
         }
 
         public String getJSON() throws IOException {
-            String json = reader.read(resource.getInputStream());
+            String json = Reader.read(resource.getInputStream());
             json = StringUtils.replace(json, PROJECT_NAME, name);
             json = StringUtils.replace(json, PROJECT_GIT_REPO, repo);
             json = StringUtils.replace(json, PROJECT_GIT_BRANCH, branch);

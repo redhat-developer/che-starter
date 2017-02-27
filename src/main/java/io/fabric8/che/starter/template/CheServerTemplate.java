@@ -18,7 +18,6 @@ import java.net.URL;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -33,12 +32,9 @@ public class CheServerTemplate {
     @Value("${che.server.template.url}")
     private String templateUrl;
 
-    @Autowired
-    private Reader reader;
-
     public String get() throws MalformedURLException, IOException {
         if (template == null) {
-            template = reader.read(new URL(templateUrl));
+            template = Reader.read(new URL(templateUrl));
             LOG.info("Che Server Template: {}", template);
         }
         return template;

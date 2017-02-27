@@ -34,9 +34,6 @@ public class WorkspaceTemplate {
 
     @Autowired
     private WorkspaceHelper helper;
-    
-    @Autowired
-    private Reader reader;
 
     public class WorkspaceCreateRequest {
         private String name;
@@ -75,7 +72,7 @@ public class WorkspaceTemplate {
         }
 
         public String getJSON() throws IOException {
-            String json = reader.read(resource.getInputStream());
+            String json = Reader.read(resource.getInputStream());
             json = StringUtils.replace(json, WORKSPACE_NAME, name);
             json = StringUtils.replace(json, WORKSPACE_STACK, stack);
             json = StringUtils.replace(json, WORKSPACE_DESCRIPTION, description);

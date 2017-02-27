@@ -20,18 +20,18 @@ import java.net.URL;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
-import org.springframework.stereotype.Component;
-
-@Component
 public final class Reader {
 
-    public String read(InputStream input) throws IOException {
+    private Reader() {
+    }
+
+    public static String read(InputStream input) throws IOException {
         try (BufferedReader buffer = new BufferedReader(new InputStreamReader(input))) {
             return buffer.lines().collect(Collectors.joining("\n"));
         }
     }
 
-    public String read(URL url) throws IOException {
+    public static String read(URL url) throws IOException {
         try (Scanner skanner = new Scanner(url.openStream(), "UTF-8")) {
             return skanner.useDelimiter("\\A").next();
         }

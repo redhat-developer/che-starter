@@ -18,7 +18,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Workspace {
-
     private String id;
     private String name;
     private String description;
@@ -127,4 +126,5 @@ public class Workspace {
     public void setRuntime(WorkspaceRuntime runtime) {
         this.runtime = runtime;
     }
+
 }
