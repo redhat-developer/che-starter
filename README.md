@@ -103,6 +103,13 @@ che-starter can be tested locally against Minishift:
     gofabric8 volumes
 ````
 
+- To start Che in debug mode set configmap `remote-debugging-enabled` to `true` (and optionally `log-level` to `false`) and expose remote debugger port:
+
+```bash
+    oc edit configmap che
+    oc expose dc che --name=che-host-debug --target-port=http-debug --port=8000 --type=NodePort
+```
+
 - After deployment Che will be available on http://che.openshift.mini/
 
 - Once deployed, you can send requests from che-starter against Minishift. In order to obtain token use the following command:
