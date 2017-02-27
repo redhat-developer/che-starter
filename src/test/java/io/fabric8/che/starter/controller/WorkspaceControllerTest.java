@@ -33,12 +33,9 @@ public class WorkspaceControllerTest extends TestConfig {
     @Autowired
     WorkspaceController controller;
 
-    @Autowired
-    Reader reader;
-
     @Test
     public void readTemplate() throws IOException {
-        String template = reader.read(workspaceTemplate.getInputStream());
+        String template = Reader.read(workspaceTemplate.getInputStream());
         LOG.info("Workspace template: {}", template);
     }
 

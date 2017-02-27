@@ -41,7 +41,7 @@ public class CheServerController {
     @Autowired
     Client client;
 
-    @ApiOperation(value = "Create a new Che server on OpenShift instance")
+    @ApiOperation(value = "Create Che server on OpenShift instance")
     @PostMapping
     public CheServerInfo startCheServer(@RequestParam String masterURL, @RequestHeader("Authorization") String token) throws Exception {
         LOG.info("OpenShift master URL: {}", masterURL);
