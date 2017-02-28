@@ -29,6 +29,14 @@ public enum CheRestEndpoints {
         this.endpoint = endpoint;
     }
 
+    public String generateUrl(String cheServerUrl) {
+        return cheServerUrl + endpoint;
+    }
+
+    public String generateUrl(String cheServerUrl, String id) {
+        return cheServerUrl + endpoint.replace("{id}", id);
+    }
+
     @Override
     public String toString() {
         return endpoint;

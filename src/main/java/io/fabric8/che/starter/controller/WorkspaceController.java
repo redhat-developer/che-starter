@@ -29,14 +29,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.fabric8.che.starter.client.CheRestClient;
+import io.fabric8.che.starter.client.WorkspaceClient;
 import io.fabric8.che.starter.model.Workspace;
 import io.fabric8.che.starter.model.request.WorkspaceCreateParams;
-import io.fabric8.che.starter.openshift.Client;
-import io.fabric8.che.starter.openshift.Router;
+import io.fabric8.che.starter.openshift.OpenShiftClientWrapper;
 import io.fabric8.che.starter.util.ProjectHelper;
 import io.fabric8.che.starter.util.WorkspaceHelper;
-import io.fabric8.openshift.client.OpenShiftClient;
 import io.swagger.annotations.ApiOperation;
 
 @CrossOrigin
@@ -46,13 +44,10 @@ public class WorkspaceController {
     private static final Logger LOG = LogManager.getLogger(WorkspaceController.class);
 
     @Autowired
-    Client client;
+    OpenShiftClientWrapper clientWrapper;
 
     @Autowired
-    Router router;
-
-    @Autowired
-    CheRestClient cheRestClient;
+    WorkspaceClient cheRestClient;
 
     @Autowired
     ProjectHelper projectHelper;
@@ -64,7 +59,7 @@ public class WorkspaceController {
     @PostMapping
     public Workspace create(@RequestParam String masterUrl, @RequestBody WorkspaceCreateParams params,
             @RequestHeader("Authorization") String token) throws IOException, URISyntaxException {
-        String cheServerUrl = getCheServerUrl(masterUrl, token);
+        String cheServerUrl = clientWrapper.getCheServerUrl(masterUrl, token);
 
         String projectName = projectHelper.getProjectNameFromGitRepository(params.getRepo());
 
@@ -75,8 +70,8 @@ public class WorkspaceController {
         for (Workspace ws : workspaces) {
             if (ws.getDescription().equals(description)) {
                 // Before we can create a project, we must start the new workspace.  First check it's not already running
-                if (!CheRestClient.WORKSPACE_STATUS_RUNNING.equals(ws.getStatus()) && 
-                        !CheRestClient.WORKSPACE_STATUS_STARTING.equals(ws.getStatus())) {
+                if (!WorkspaceClient.WORKSPACE_STATUS_RUNNING.equals(ws.getStatus()) && 
+                        !WorkspaceClient.WORKSPACE_STATUS_STARTING.equals(ws.getStatus())) {
                     cheRestClient.startWorkspace(cheServerUrl, ws.getId());
                 }
                 
@@ -97,17 +92,12 @@ public class WorkspaceController {
     @GetMapping
     public List<Workspace> list(@RequestParam String masterUrl, @RequestParam(required = false) String repository,
             @RequestHeader("Authorization") String token) {
-        String cheServerUrl = getCheServerUrl(masterUrl, token);
+        String cheServerUrl = clientWrapper.getCheServerUrl(masterUrl, token);
         if (!StringUtils.isEmpty(repository)) {
             LOG.info("Fetching workspaces for repositoriy: {}", repository);
             return cheRestClient.listWorkspacesPerRepository(cheServerUrl, repository);
         }
         return cheRestClient.listWorkspaces(cheServerUrl);
-    }
-
-    private String getCheServerUrl(String masterUrl, String token) {
-        OpenShiftClient openShiftClient = client.get(masterUrl, token);
-        return router.getUrl(openShiftClient);
     }
 
 }

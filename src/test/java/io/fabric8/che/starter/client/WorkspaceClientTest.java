@@ -12,8 +12,6 @@
  */
 package io.fabric8.che.starter.client;
 
-import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,13 +24,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import io.fabric8.che.starter.TestConfig;
-import io.fabric8.che.starter.model.Stack;
 import io.fabric8.che.starter.model.Workspace;
 import io.fabric8.che.starter.util.WorkspaceHelper;
 
 @Ignore("'demo.che.ci.centos.org' is down")
-public class CheRestClientTest extends TestConfig {
-    private static final Logger LOG = LogManager.getLogger(CheRestClientTest.class);
+public class WorkspaceClientTest extends TestConfig {
+    private static final Logger LOG = LogManager.getLogger(WorkspaceClientTest.class);
     private static final String GITHUB_REPO = "https://github.com/che-samples/console-java-simple";
     private static final String BRANCH = "master";
     private static final String STACK_ID = "java-default";
@@ -41,7 +38,7 @@ public class CheRestClientTest extends TestConfig {
     String cheServerURL;
 
     @Autowired
-    private CheRestClient client;
+    private WorkspaceClient client;
     
     @Autowired
     private WorkspaceHelper workspaceHelper;
@@ -70,12 +67,6 @@ public class CheRestClientTest extends TestConfig {
                 client.stopWorkspace(cheServerURL, runningWorkspaces.get(0).getId());
             }
         }
-    }
-
-    @Test
-    public void listStacks() {
-        List<Stack> stacks = client.listStacks(cheServerURL);
-        assertTrue(!stacks.isEmpty());
     }
 
 }

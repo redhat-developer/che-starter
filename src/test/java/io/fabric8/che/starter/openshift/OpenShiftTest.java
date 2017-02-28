@@ -48,7 +48,7 @@ public class OpenShiftTest extends TestConfig {
     private CheServerTemplate template;
     
     @Autowired
-    private Client client;
+    private OpenShiftClientWrapper client;
 
     @Value(value = "classpath:templates/che_server_template.json")
     private Resource cheServerTemplate;

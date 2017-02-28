@@ -21,17 +21,17 @@ import io.fabric8.openshift.api.model.Route;
 import io.fabric8.openshift.client.OpenShiftClient;
 
 @Component
-public class Router {
-    private static final Logger LOG = LogManager.getLogger(Router.class);
+final class CheServerRouter {
+    private static final Logger LOG = LogManager.getLogger(CheServerRouter.class);
 
     @Value("${che.openshift.project}")
     private String project;
 
-    @Value("${che.openshift.router}")
-    private String router;
+    @Value("${che.openshift.route}")
+    private String routeName;
 
     public String getUrl(OpenShiftClient client) {
-        Route route = client.routes().inNamespace(project).withName(router).get();
+        Route route = client.routes().inNamespace(project).withName(routeName).get();
         String host = route.getSpec().getHost();
         LOG.info("Router host {}: ", host);
         return  "http://" + host;
