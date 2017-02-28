@@ -30,7 +30,6 @@ import org.springframework.web.client.RestTemplate;
 
 import io.fabric8.che.starter.model.DevMachineServer;
 import io.fabric8.che.starter.model.Project;
-import io.fabric8.che.starter.model.Stack;
 import io.fabric8.che.starter.model.Workspace;
 import io.fabric8.che.starter.model.WorkspaceLink;
 import io.fabric8.che.starter.model.WorkspaceStatus;
@@ -39,8 +38,8 @@ import io.fabric8.che.starter.template.WorkspaceTemplate;
 import io.fabric8.che.starter.util.WorkspaceHelper;
 
 @Service
-public class CheRestClient {
-    private static final Logger LOG = LogManager.getLogger(CheRestClient.class);
+public class WorkspaceClient {
+    private static final Logger LOG = LogManager.getLogger(WorkspaceClient.class);
 
     public static final String WORKSPACE_LINK_IDE_URL = "ide url";
     public static final String WORKSPACE_LINK_START_WORKSPACE = "start workspace";
@@ -57,8 +56,8 @@ public class CheRestClient {
     @Autowired
     private ProjectTemplate projectTemplate;
 
-    public List<Workspace> listWorkspaces(String cheServerURL) {
-        String url = generateURL(cheServerURL, CheRestEndpoints.LIST_WORKSPACES);
+    public List<Workspace> listWorkspaces(String cheServerUrl) {
+        String url = CheRestEndpoints.LIST_WORKSPACES.generateUrl(cheServerUrl);
         RestTemplate template = new RestTemplate();
         ResponseEntity<List<Workspace>> response = template.exchange(url, HttpMethod.GET, null,
                 new ParameterizedTypeReference<List<Workspace>>() {
@@ -79,16 +78,15 @@ public class CheRestClient {
         return workspaces;
     }
 
-    public List<Workspace> listWorkspacesPerRepository(String cheServerURL, String repository) {
-        List<Workspace> workspaces = listWorkspaces(cheServerURL);
+    public List<Workspace> listWorkspacesPerRepository(String cheServerUrl, String repository) {
+        List<Workspace> workspaces = listWorkspaces(cheServerUrl);
         return workspaceHelper.filterByRepository(workspaces, repository);
     }
 
-    public Workspace createWorkspace(String cheServerURL, String name, String stack, String repo, String branch)
+    public Workspace createWorkspace(String cheServerUrl, String name, String stack, String repo, String branch)
             throws IOException {
-               
         // The first step is to create the workspace
-        String url = generateURL(cheServerURL, CheRestEndpoints.CREATE_WORKSPACE);
+        String url = CheRestEndpoints.CREATE_WORKSPACE.generateUrl(cheServerUrl);
         String jsonTemplate = workspaceTemplate.createRequest().
                                                 setName(name).
                                                 setStack(stack).
@@ -144,7 +142,7 @@ public class CheRestClient {
         DevMachineServer server = workspace.getRuntime().getDevMachine().getRuntime().getServers().get("4401/tcp");
 
         // Next we create a new project within the workspace
-        String url = generateURL(server.getUrl(), CheRestEndpoints.CREATE_PROJECT, workspaceId);
+        String url = CheRestEndpoints.CREATE_PROJECT.generateUrl(server.getUrl(), workspaceId);
         LOG.info("Creating project against workspace agent URL: {}", url);
 
         String jsonTemplate = projectTemplate.createRequest().setName(name).setRepo(repo).setBranch(branch).getJSON();
@@ -164,8 +162,8 @@ public class CheRestClient {
         }
     }
 
-    public Workspace getWorkspaceByKey(String cheServerURL, String workspaceId) {
-        String url = generateURL(cheServerURL, CheRestEndpoints.GET_WORKSPACE_BY_ID, workspaceId);
+    public Workspace getWorkspaceByKey(String cheServerUrl, String workspaceId) {
+        String url = CheRestEndpoints.GET_WORKSPACE_BY_ID.generateUrl(cheServerUrl, workspaceId);
 
         RestTemplate template = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -175,20 +173,20 @@ public class CheRestClient {
         return template.exchange(url, HttpMethod.GET, entity, Workspace.class).getBody();
     }
 
-    public void deleteWorkspace(String cheServerURL, String workspaceId) {
-        String url = generateURL(cheServerURL, CheRestEndpoints.DELETE_WORKSPACE, workspaceId);
+    public void deleteWorkspace(String cheServerUrl, String workspaceId) {
+        String url = CheRestEndpoints.DELETE_WORKSPACE.generateUrl(cheServerUrl, workspaceId);
         RestTemplate template = new RestTemplate();
         template.delete(url);
     }
 
-    public void startWorkspace(String cheServerURL, String workspaceId) {
-        String url = generateURL(cheServerURL, CheRestEndpoints.START_WORKSPACE, workspaceId);
+    public void startWorkspace(String cheServerUrl, String workspaceId) {
+        String url = CheRestEndpoints.START_WORKSPACE.generateUrl(cheServerUrl, workspaceId);
         RestTemplate template = new RestTemplate();
         template.postForLocation(url, null);
     }
 
-    public WorkspaceStatus checkWorkspace(String cheServerURL, String workspaceId) {
-        String url = generateURL(cheServerURL, CheRestEndpoints.CHECK_WORKSPACE, workspaceId);
+    public WorkspaceStatus checkWorkspace(String cheServerUrl, String workspaceId) {
+        String url = CheRestEndpoints.CHECK_WORKSPACE.generateUrl(cheServerUrl, workspaceId);
 
         RestTemplate template = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -199,26 +197,10 @@ public class CheRestClient {
         return status.getBody();
     }
 
-    public void stopWorkspace(String cheServerURL, String id) {
-        String url = generateURL(cheServerURL, CheRestEndpoints.STOP_WORKSPACE, id);
+    public void stopWorkspace(String cheServerUrl, String id) {
+        String url = CheRestEndpoints.STOP_WORKSPACE.generateUrl(cheServerUrl, id);
         RestTemplate template = new RestTemplate();
         template.delete(url);
     }
 
-    public List<Stack> listStacks(String cheServerURL) {
-        String url = generateURL(cheServerURL, CheRestEndpoints.LIST_STACKS);
-        RestTemplate template = new RestTemplate();
-        ResponseEntity<List<Stack>> response = template.exchange(url, HttpMethod.GET, null,
-                new ParameterizedTypeReference<List<Stack>>() {
-                });
-        return response.getBody();
-    }
-
-    private String generateURL(String cheServerURL, CheRestEndpoints endpoint) {
-        return cheServerURL + endpoint.toString();
-    }
-
-    private String generateURL(String cheServerURL, CheRestEndpoints endpoint, String id) {
-        return cheServerURL + endpoint.toString().replace("{id}", id);
-    }
 }

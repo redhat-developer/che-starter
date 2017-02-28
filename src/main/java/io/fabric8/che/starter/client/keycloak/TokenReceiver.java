@@ -10,7 +10,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package io.fabric8.che.starter.keycloak;
+package io.fabric8.che.starter.client.keycloak;
 
 public interface TokenReceiver {
 

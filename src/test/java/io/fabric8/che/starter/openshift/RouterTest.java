@@ -23,10 +23,10 @@ import io.fabric8.openshift.client.OpenShiftClient;
 public class RouterTest extends TestConfig {
 
     @Autowired
-    Router router;
+    CheServerRouter router;
 
     @Autowired
-    Client client;
+    OpenShiftClientWrapper client;
 
     @Value("${che.openshift.username}")
     private String username;
