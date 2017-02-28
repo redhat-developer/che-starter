@@ -20,10 +20,11 @@ import org.springframework.beans.factory.annotation.Value;
 import io.fabric8.che.starter.TestConfig;
 import io.fabric8.openshift.client.OpenShiftClient;
 
-public class RouterTest extends TestConfig {
+@Ignore("Test is run against local minishift cluster and requires additional setup")
+public class RouteTest extends TestConfig {
 
     @Autowired
-    CheServerRouter router;
+    CheServerRoute route;
 
     @Autowired
     OpenShiftClientWrapper client;
@@ -37,11 +38,10 @@ public class RouterTest extends TestConfig {
     @Value("${che.openshift.endpoint}")
     private String endpoint;
 
-    @Ignore("Test is run against local minishift cluster and requires additional setup")
     @Test
     public void testRouteURL() {
         OpenShiftClient openShiftClient = client.get(endpoint, username, password);
-        router.getUrl(openShiftClient);
+        route.getUrl(openShiftClient);
     }
 
 }

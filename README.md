@@ -70,9 +70,7 @@ On success, the second job will push the che-starter image to [Docker Hub](https
 Live preview
 ------------
 
-1. http://che-starter.os.ci.centos.org/
-
-2. http://che-starter.demo.almighty.io/
+- http://che-starter.prod-preview.openshift.io/
 
 Testing with Minishift
 ----------------------

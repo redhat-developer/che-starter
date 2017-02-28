@@ -24,7 +24,7 @@ import io.fabric8.openshift.client.OpenShiftClient;
 public class OpenShiftClientWrapper {
 
     @Autowired
-    CheServerRouter router;
+    CheServerRoute route;
 
     @Autowired
     CheServerPod pod;
@@ -42,7 +42,7 @@ public class OpenShiftClientWrapper {
     public String getCheServerUrl(String masterUrl, String token) {
         OpenShiftClient openShiftClient = this.get(masterUrl, token);
         pod.startPodIfNeeded(openShiftClient);
-        return router.getUrl(openShiftClient);
+        return route.getUrl(openShiftClient);
     }
 
 }

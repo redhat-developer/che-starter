@@ -88,7 +88,7 @@ public class WorkspaceController {
         return workspaceInfo;
     }
 
-    @ApiOperation(value = "List workspaces per git repository. If repository is not specified return all workspaces")
+    @ApiOperation(value = "List workspaces per git repository. If repository parameter is not specified return all workspaces")
     @GetMapping
     public List<Workspace> list(@RequestParam String masterUrl, @RequestParam(required = false) String repository,
             @RequestHeader("Authorization") String token) {

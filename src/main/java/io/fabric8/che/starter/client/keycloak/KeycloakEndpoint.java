@@ -13,8 +13,13 @@
 package io.fabric8.che.starter.client.keycloak;
 
 enum KeycloakEndpoint {
-    GET_OPENSHIFT_TOKEN ("http://sso.demo.almighty.io/auth/realms/demo/broker/openshift/token"),
-    GET_GITHUB_TOKEN    ("http://sso.demo.almighty.io/auth/realms/demo/broker/github/token");
+    // jwt.io - decode token / json token 
+    // http://prod-preview.openshift.io/home
+    // http://sso.prod-preview.openshift.io/auth/realms/fabric8/account
+    // authorization: Bearer <ACCESS_TOKEN> 
+    // http://sso.prod-preview.openshift.io/auth/realms/fabric8/account/identity
+    GET_OPENSHIFT_TOKEN ("http://sso.prod-preview.openshift.io/auth/realms/fabric8/broker/openshift/token"),
+    GET_GITHUB_TOKEN    ("http://sso.prod-preview.openshift.io/auth/realms/fabric8/broker/github/token");
 
     private final String endpoint;
 

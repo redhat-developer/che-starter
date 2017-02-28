@@ -25,7 +25,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import io.fabric8.che.starter.model.DevMachineServer;
@@ -37,7 +37,7 @@ import io.fabric8.che.starter.template.ProjectTemplate;
 import io.fabric8.che.starter.template.WorkspaceTemplate;
 import io.fabric8.che.starter.util.WorkspaceHelper;
 
-@Service
+@Component
 public class WorkspaceClient {
     private static final Logger LOG = LogManager.getLogger(WorkspaceClient.class);
 
