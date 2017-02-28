@@ -38,7 +38,7 @@ public class GlobalExceptionHandler {
         return e.getMessage();
     }
 
-    @ResponseStatus(value = HttpStatus.FORBIDDEN)
+    @ResponseStatus(value = HttpStatus.UNAUTHORIZED, reason = "Access is denied due to invalid credentials")
     @ExceptionHandler(KubernetesClientException.class)
     public String handleKubernetesClientException(KubernetesClientException e) {
         return e.getMessage();

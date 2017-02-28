@@ -21,8 +21,8 @@ import io.fabric8.openshift.api.model.Route;
 import io.fabric8.openshift.client.OpenShiftClient;
 
 @Component
-final class CheServerRouter {
-    private static final Logger LOG = LogManager.getLogger(CheServerRouter.class);
+final class CheServerRoute {
+    private static final Logger LOG = LogManager.getLogger(CheServerRoute.class);
 
     @Value("${che.openshift.project}")
     private String project;
