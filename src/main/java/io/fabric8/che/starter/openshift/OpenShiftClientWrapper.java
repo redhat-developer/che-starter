@@ -41,7 +41,7 @@ public class OpenShiftClientWrapper {
 
     public String getCheServerUrl(String masterUrl, String token) {
         OpenShiftClient openShiftClient = this.get(masterUrl, token);
-        pod.startPodIfNeeded(openShiftClient);
+//        pod.startPodIfNeeded(openShiftClient);
         return route.getUrl(openShiftClient);
     }
 
