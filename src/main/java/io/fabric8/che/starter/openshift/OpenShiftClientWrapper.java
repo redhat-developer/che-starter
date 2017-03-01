@@ -27,7 +27,7 @@ public class OpenShiftClientWrapper {
     CheServerRoute route;
 
     @Autowired
-    CheServerPod pod;
+    CheDeploymentConfig dc;
 
     public OpenShiftClient get(String masterUrl, String username, String password) {
         Config config = new ConfigBuilder().withMasterUrl(masterUrl).withUsername(username).withPassword(password).build();
@@ -41,7 +41,7 @@ public class OpenShiftClientWrapper {
 
     public String getCheServerUrl(String masterUrl, String token) {
         OpenShiftClient openShiftClient = this.get(masterUrl, token);
-//        pod.startPodIfNeeded(openShiftClient);
+        dc.startPodIfNeeded(openShiftClient);
         return route.getUrl(openShiftClient);
     }
 
