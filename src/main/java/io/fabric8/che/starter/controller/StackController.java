@@ -37,7 +37,7 @@ public class StackController {
 
     @Autowired
     private StackClient stackClient;
-
+    
     @Autowired
     private OpenShiftClientWrapper clientWrapper;
 
@@ -46,6 +46,7 @@ public class StackController {
     public List<Stack> list(@RequestParam String masterUrl, @RequestHeader("Authorization") String token) {
         LOG.info("Getting stacks from {}", masterUrl);
         String cheServerUrl = clientWrapper.getCheServerUrl(masterUrl, token);
+        
         return stackClient.listStacks(cheServerUrl);
     }
 
