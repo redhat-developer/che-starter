@@ -26,7 +26,6 @@ import org.springframework.beans.factory.annotation.Value;
 import io.fabric8.che.starter.TestConfig;
 import io.fabric8.che.starter.model.Stack;
 
-@Ignore("'demo.che.ci.centos.org' is down")
 public class StackClientTest extends TestConfig {
     private static final Logger LOG = LogManager.getLogger(StackClientTest.class);
 

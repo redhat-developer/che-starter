@@ -27,7 +27,6 @@ import io.fabric8.che.starter.TestConfig;
 import io.fabric8.che.starter.model.Workspace;
 import io.fabric8.che.starter.util.WorkspaceHelper;
 
-@Ignore("'demo.che.ci.centos.org' is down")
 public class WorkspaceClientTest extends TestConfig {
     private static final Logger LOG = LogManager.getLogger(WorkspaceClientTest.class);
     private static final String GITHUB_REPO = "https://github.com/che-samples/console-java-simple";
@@ -50,6 +49,7 @@ public class WorkspaceClientTest extends TestConfig {
         workspaces.forEach(w -> LOG.info("workspace ID: {}", w.getId()));
     }
 
+    @Ignore("Workspace create / delete API is not supported on 'demo.che.ci.centos.org'")
     @Test
     public void createAndDeleteWorkspace() throws IOException {
         Workspace workspace = client.createWorkspace(cheServerURL, workspaceHelper.generateName(), STACK_ID, GITHUB_REPO, BRANCH);
@@ -57,6 +57,7 @@ public class WorkspaceClientTest extends TestConfig {
         client.deleteWorkspace(cheServerURL, workspace.getId());
     }
 
+    @Ignore("Workspace stop API is not supported on 'demo.che.ci.centos.org'")
     @Test
     public void stopWorskpace() {
         List<Workspace> workspaces = client.listWorkspaces(cheServerURL);
