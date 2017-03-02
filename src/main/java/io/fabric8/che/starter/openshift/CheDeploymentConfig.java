@@ -12,6 +12,7 @@
  */
 package io.fabric8.che.starter.openshift;
 
+import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executors;
@@ -22,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import io.fabric8.kubernetes.client.utils.Utils;
+import io.fabric8.openshift.api.model.DeploymentCondition;
 import io.fabric8.openshift.api.model.DeploymentConfig;
 import io.fabric8.openshift.api.model.DoneableDeploymentConfig;
 import io.fabric8.openshift.client.OpenShiftClient;
@@ -30,7 +31,7 @@ import io.fabric8.openshift.client.dsl.ClientDeployableScalableResource;
 
 @Component
 final class CheDeploymentConfig {
-
+	 
 	@Value("${che.openshift.project}")
 	private String project;
 
@@ -40,14 +41,13 @@ final class CheDeploymentConfig {
 	@Value("${che.openshift.start.timeout}")
 	private String startTimeout;
 
-	public void startPodIfNeeded(OpenShiftClient client) {
+	public void deployCheIfSuspended(OpenShiftClient client) {
 		final ClientDeployableScalableResource<DeploymentConfig, DoneableDeploymentConfig> deploymentConfig = client
 				.deploymentConfigs().inNamespace(project).withName(deploymentConfigName);
-		if (deploymentConfig.get().getSpec().getReplicas().intValue() != 1) {
-			deploymentConfig.scale(1, true);
-			waitUntilDeploymentConfigIsScaled(client);
+		if (!isDeploymentAvailable(client)) {
+			deploymentConfig.scale(1, false);
+			waitUntilDeploymentConfigIsAvailable(client);
 		}
-		// TODO Process exception
 	}
 
 	private ClientDeployableScalableResource<DeploymentConfig, DoneableDeploymentConfig> getDeploymentConfig(
@@ -55,34 +55,69 @@ final class CheDeploymentConfig {
 		return client.deploymentConfigs().inNamespace(project).withName(deploymentConfigName);
 	}
 
-	private void waitUntilDeploymentConfigIsScaled(final OpenShiftClient client) {
+	private void waitUntilDeploymentConfigIsAvailable(final OpenShiftClient client) {
 		final BlockingQueue<Object> queue = new ArrayBlockingQueue<Object>(1);
 
-		final Runnable deploymentPoller = new Runnable() {
+		final Runnable readinessPoller = new Runnable() {
 			public void run() {
 				try {
-					DeploymentConfig deploymentConfig = getDeploymentConfig(client).get();
-					if (deploymentConfig != null) {
-						if (deploymentConfig.getStatus().getReadyReplicas().intValue() != 1) {
-							queue.put(true);
-						}
-					} else {
+					if (isDeploymentAvailable(client)) {
 						queue.put(true);
+						return;
+					} else {
+						queue.put(false);
+						return;
 					}
 				} catch (Throwable t) {
-					return;
+					try {
+						if (queue.isEmpty()) {
+							queue.put(false);
+						}
+						return;
+					} catch (InterruptedException e) {
+					}
 				}
-
 			}
 		};
 
 		ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-		ScheduledFuture poller = executor.scheduleWithFixedDelay(deploymentPoller, 0, 1000, TimeUnit.MILLISECONDS);
+		ScheduledFuture poller = executor.scheduleWithFixedDelay(readinessPoller, 0, 500, TimeUnit.MILLISECONDS);
 		try {
-			Utils.waitUntilReady(queue, Integer.valueOf(startTimeout) * 1000, TimeUnit.MILLISECONDS);
+			while(!waitUntilReady(queue)) {
+			}
 		} finally {
-			poller.cancel(true);
+			if (!poller.isDone()) {
+				poller.cancel(true);
+			}
 			executor.shutdown();
+		}
+	}
+	
+	private boolean isDeploymentAvailable(OpenShiftClient client) {
+		DeploymentConfig deploymentConfig = getDeploymentConfig(client).get();
+		if (deploymentConfig == null) {
+			return false;
+		}
+		List<DeploymentCondition> conditions = deploymentConfig.getStatus().getConditions();
+		if (!conditions.isEmpty()) {
+			for (DeploymentCondition condition: conditions) {
+				if (condition.getType().equals("Available") && condition.getStatus().equals("True")) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	private boolean waitUntilReady(BlockingQueue<Object> queue) {
+		try {
+			Object obj = queue.poll(Integer.valueOf(startTimeout) * 1000, TimeUnit.MILLISECONDS);
+			if (obj instanceof Boolean) {
+				return (Boolean) obj;
+			}
+			return false;
+		} catch (Throwable t) {
+			return false;
 		}
 	}
 }

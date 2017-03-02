@@ -41,7 +41,7 @@ public class OpenShiftClientWrapper {
 
     public String getCheServerUrl(String masterUrl, String token) {
         OpenShiftClient openShiftClient = this.get(masterUrl, token);
-        dc.startPodIfNeeded(openShiftClient);
+        dc.deployCheIfSuspended(openShiftClient);
         return route.getUrl(openShiftClient);
     }
 
