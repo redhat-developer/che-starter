@@ -45,6 +45,7 @@ public class WorkspaceClient {
     public static final String WORKSPACE_LINK_START_WORKSPACE = "start workspace";
     public static final String WORKSPACE_STATUS_RUNNING = "RUNNING";
     public static final String WORKSPACE_STATUS_STARTING = "STARTING";
+    public static final String WORKSPACE_STATUS_STOPPED = "STOPPED";
     public static final long WORKSPACE_START_TIMEOUT_MS = 60000;
 
     @Autowired
@@ -180,6 +181,15 @@ public class WorkspaceClient {
     }
 
     public void startWorkspace(String cheServerUrl, String workspaceId) {
+        // Before starting a workspace, we must first stop all other running workspaces
+        List<Workspace> workspaces = listWorkspaces(cheServerUrl);
+        
+        for (Workspace workspace : workspaces) {
+            if (!WORKSPACE_STATUS_STOPPED.equals(workspace.getStatus())) {
+                stopWorkspace(cheServerUrl, workspace.getId());
+            }
+        }
+        
         String url = CheRestEndpoints.START_WORKSPACE.generateUrl(cheServerUrl, workspaceId);
         RestTemplate template = new RestTemplate();
         template.postForLocation(url, null);
