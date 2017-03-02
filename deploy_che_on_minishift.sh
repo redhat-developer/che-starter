@@ -14,8 +14,8 @@
 ###
 
 # Default OpenShift credentials
-DEFAULT_CHE_OPENSHIFT_USERNAME="openshift-dev"
-DEFAULT_CHE_OPENSHIFT_PASSWORD="devel"
+DEFAULT_CHE_OPENSHIFT_USERNAME="developer"
+DEFAULT_CHE_OPENSHIFT_PASSWORD="developer"
 
 # Default fabric8-online che template version. All template versions can be found on http://central.maven.org/maven2/io/fabric8/online/apps/che/
 DEFAULT_CHE_TEMPLATE_VERSION=1.0.53
