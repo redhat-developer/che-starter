@@ -35,10 +35,9 @@ oc new-project che
 oc login -u system:admin
 oc adm policy add-scc-to-user privileged -z che
 
-# Apply fabric8-online che template and create route by exposing 'che-host' service
+# Apply fabric8-online che template 
 oc login -u ${CHE_OPENSHIFT_USERNAME} -p ${CHE_OPENSHIFT_PASSWORD}
 oc apply -f http://central.maven.org/maven2/io/fabric8/online/apps/che/$CHE_TEMPLATE_VERSION/che-$CHE_TEMPLATE_VERSION-openshift.yml
-oc expose service che-host --hostname=che.openshift.mini
 
 # 'gofabric8 volumes' is only needed for minishift and minikube. 
 #  PVC (persistent volume claims) on a normal openshift or kubernetes cluster would be automatically bond to a real persistent volumes
@@ -46,4 +45,5 @@ oc login -u system:admin
 gofabric8 volumes
 
 # Reminder for updating /etc/hosts file with a line that associates minishift IP address and the hostname che.openshift.mini
-echo "$(tput setaf 3)NOTE: update /etc/hosts file - $(tput setaf 2) $(minishift ip) che.openshift.mini $(tput sgr0)"
+echo "$(tput setaf 2)Once deployment is finished, Che will be available on the following host:"
+echo "$(oc get route che) $(tput sgr0)"
