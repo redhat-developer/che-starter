@@ -42,8 +42,8 @@ final class CheDeploymentConfig {
 	private String startTimeout;
 
 	public void deployCheIfSuspended(OpenShiftClient client) {
-		final ClientDeployableScalableResource<DeploymentConfig, DoneableDeploymentConfig> deploymentConfig = client
-				.deploymentConfigs().inNamespace(project).withName(deploymentConfigName);
+		final ClientDeployableScalableResource<DeploymentConfig, DoneableDeploymentConfig> deploymentConfig = 
+				getDeploymentConfig(client);
 		if (!isDeploymentAvailable(client)) {
 			deploymentConfig.scale(1, false);
 			waitUntilDeploymentConfigIsAvailable(client);
