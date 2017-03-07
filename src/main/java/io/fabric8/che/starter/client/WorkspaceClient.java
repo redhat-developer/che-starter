@@ -184,15 +184,24 @@ public class WorkspaceClient {
         // Before starting a workspace, we must first stop all other running workspaces
         List<Workspace> workspaces = listWorkspaces(cheServerUrl);
         
+        boolean alreadyStarted = false;
+        
         for (Workspace workspace : workspaces) {
-            if (!WORKSPACE_STATUS_STOPPED.equals(workspace.getStatus())) {
+            if (workspace.getId().equals(workspaceId)) {
+                if (WORKSPACE_STATUS_RUNNING.equals(workspace.getStatus()) ||
+                    WORKSPACE_STATUS_STARTING.equals(workspace.getStatus())) {
+                    alreadyStarted = true;
+                }
+            } else if (!WORKSPACE_STATUS_STOPPED.equals(workspace.getStatus())) {
                 stopWorkspace(cheServerUrl, workspace.getId());
             }
         }
         
-        String url = CheRestEndpoints.START_WORKSPACE.generateUrl(cheServerUrl, workspaceId);
-        RestTemplate template = new RestTemplate();
-        template.postForLocation(url, null);
+        if (!alreadyStarted) {
+            String url = CheRestEndpoints.START_WORKSPACE.generateUrl(cheServerUrl, workspaceId);
+            RestTemplate template = new RestTemplate();
+            template.postForLocation(url, null);
+        }
     }
 
     public WorkspaceStatus checkWorkspace(String cheServerUrl, String workspaceId) {
