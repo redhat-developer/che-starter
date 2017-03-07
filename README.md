@@ -89,7 +89,19 @@ che-starter can be tested locally against Minishift:
     oc expose dc che --name=che-host-debug --target-port=http-debug --port=8000 --type=NodePort
 ```
 
-- Once deployed, you can send requests from che-starter against Minishift. In order to obtain token use the following command:
+Executing Requests
+------------------
+Many of the services available via the Swagger interface require setting both a masterUrl, and Authorization token.
+
+- The masterUrl value is the Openshift REST API endpoint. If running against Minishift, execute the following to open the minishift console:
+
+```bash
+    minishift console
+````
+
+- Copy the URL excluding the path component, this will be used as the masterUrl.  For example, a console address of https://192.168.42.64:8443/console/ would mean the masterUrl value is https://192.168.42.64:8443/.
+
+- In order to obtain the Authorization token use the following command:
 
 ```bash
     oc login -u openshift-dev -p devel
