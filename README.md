@@ -46,7 +46,6 @@ There are two available profiles, local and test. To select which profile to use
     $ java -Dspring.profiles.active=local -jar target/che-starter-1.0-SNAPSHOT.jar
 ````
 
-
 Debugging
 ---------
 There are several ways for debugging the project:
@@ -117,3 +116,5 @@ EPL 1.0, See [LICENSE](LICENSE.txt) file.
 ```bash
     $ mvn license:update-file-header
 ````
+
+
