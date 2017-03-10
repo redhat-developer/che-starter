@@ -82,6 +82,13 @@ final class CheDeploymentConfig {
 
 		ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 		ScheduledFuture poller = executor.scheduleWithFixedDelay(readinessPoller, 0, 500, TimeUnit.MILLISECONDS);
+		executor.schedule(new Runnable() {
+			
+			@Override
+			public void run() {
+				poller.cancel(true);
+			}
+		}, Integer.valueOf(startTimeout), TimeUnit.SECONDS);
 		try {
 			while(!waitUntilReady(queue)) {
 			}
@@ -111,13 +118,16 @@ final class CheDeploymentConfig {
 	
 	private boolean waitUntilReady(BlockingQueue<Object> queue) {
 		try {
-			Object obj = queue.poll(Integer.valueOf(startTimeout) * 1000, TimeUnit.MILLISECONDS);
+			Object obj = queue.poll(2, TimeUnit.SECONDS);
+			if (obj == null) {
+				return true;
+			}
 			if (obj instanceof Boolean) {
 				return (Boolean) obj;
 			}
 			return false;
-		} catch (Throwable t) {
-			return false;
+		} catch (InterruptedException ex) {
+			return true;
 		}
 	}
 }
