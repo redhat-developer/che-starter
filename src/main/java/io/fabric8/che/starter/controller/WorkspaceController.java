@@ -79,9 +79,11 @@ public class WorkspaceController {
             }
         }
 
+        // Create the workspace
         Workspace workspaceInfo = cheRestClient.createWorkspace(cheServerUrl, params.getName(), params.getStack(),
                 params.getRepo(), params.getBranch());
 
+        // Create the project - this is an async call
         cheRestClient.createProject(cheServerUrl, workspaceInfo.getId(), projectName, params.getRepo(),
                 params.getBranch());
         

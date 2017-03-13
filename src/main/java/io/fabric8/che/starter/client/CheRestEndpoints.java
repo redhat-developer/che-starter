@@ -21,12 +21,17 @@ public enum CheRestEndpoints {
     LIST_WORKSPACES     ("/api/workspace"),
     STOP_WORKSPACE      ("/api/workspace/{id}/runtime"),
     LIST_STACKS         ("/api/stack?maxItems=1000"),
-    CREATE_PROJECT      ("/project/batch");
+    CREATE_PROJECT      ("/project/batch"),
+    SET_OAUTH_TOKEN     ("/oauth/token/{provider}");
 
     private final String endpoint;
 
     private CheRestEndpoints(final String endpoint) {
         this.endpoint = endpoint;
+    }
+    
+    public String getEndpoint() {
+        return endpoint;
     }
 
     public String generateUrl(String cheServerUrl) {

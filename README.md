@@ -107,6 +107,8 @@ Many of the services available via the Swagger interface require setting both a 
     oc whoami -t
 ````
 
+The output of this command (a seemingly random string of characters and numbers) is the authorization token.
+
 License
 -------
 EPL 1.0, See [LICENSE](LICENSE.txt) file.

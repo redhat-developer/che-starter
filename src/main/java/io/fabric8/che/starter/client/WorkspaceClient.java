@@ -28,6 +28,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import io.fabric8.che.starter.client.keycloak.KeycloakClient;
 import io.fabric8.che.starter.model.DevMachineServer;
 import io.fabric8.che.starter.model.Project;
 import io.fabric8.che.starter.model.Workspace;
@@ -56,6 +57,9 @@ public class WorkspaceClient {
 
     @Autowired
     private ProjectTemplate projectTemplate;
+    
+    @Autowired
+    private KeycloakClient keycloakClient;
 
     public List<Workspace> listWorkspaces(String cheServerUrl) {
         String url = CheRestEndpoints.LIST_WORKSPACES.generateUrl(cheServerUrl);
@@ -141,17 +145,32 @@ public class WorkspaceClient {
         Workspace workspace = getWorkspaceByKey(cheServerURL, workspaceId);
 
         DevMachineServer server = workspace.getRuntime().getDevMachine().getRuntime().getServers().get("4401/tcp");
+        
+        // Upload the Github oAuth token to the workspace so that the developer can send push requests
+        String url = server.getUrl() + CheRestEndpoints.SET_OAUTH_TOKEN.getEndpoint().replace("{provider}", "github");
+        LOG.info("Setting oAuth token for workspace");
+        
+        // TODO which parameter do we need to pass here?
+        String token = keycloakClient.getGitHubToken(null);
+        
+        RestTemplate template = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.TEXT_PLAIN);
+        HttpEntity<String> entity = new HttpEntity<String>(token, headers);
+        
+        //TODO uncomment this line when the oAuth service is ready
+        //template.postForLocation(url, entity);        
 
         // Next we create a new project within the workspace
-        String url = CheRestEndpoints.CREATE_PROJECT.generateUrl(server.getUrl(), workspaceId);
+        url = CheRestEndpoints.CREATE_PROJECT.generateUrl(server.getUrl(), workspaceId);
         LOG.info("Creating project against workspace agent URL: {}", url);
 
         String jsonTemplate = projectTemplate.createRequest().setName(name).setRepo(repo).setBranch(branch).getJSON();
 
-        RestTemplate template = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
+        template = new RestTemplate();
+        headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> entity = new HttpEntity<String>(jsonTemplate, headers);
+        entity = new HttpEntity<String>(jsonTemplate, headers);
 
         ResponseEntity<Project[]> response = template.exchange(url, HttpMethod.POST, entity, Project[].class);
 
