@@ -73,20 +73,7 @@ Live preview
 
 Testing with Minishift
 ----------------------
-che-starter can be tested locally against Minishift:
-
-- Get [Minishift](https://github.com/minishift/minishift#installation), create an OpenShift cluster (`minishift start`), open the web console (`minishift console`) and read the instructions to install the OpenShift CLI (help->Command Line Tools)
-
-- Install [gofabric8](https://github.com/fabric8io/gofabric8#gofabric8-installer)
-
-- Use the following script for automatic deployment Che to Minishift `./deploy_che_on_minishift.sh`
-
-- To start Che in debug mode set configmap `remote-debugging-enabled` to `true` (and optionally `log-level` to `false`) and expose remote debugger port:
-
-```bash
-    oc edit configmap che
-    oc expose dc che --name=che-host-debug --target-port=http-debug --port=8000 --type=NodePort
-```
+che-starter can be tested locally against Minishift. The instructions for running Minishift can be found in the [How to run Che on OpenShift](https://github.com/redhat-developer/rh-che#how-to-run-che-on-openshift) document.
 
 Executing Requests
 ------------------
