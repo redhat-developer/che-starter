@@ -57,9 +57,9 @@ public class WorkspaceController {
 
     @ApiOperation(value = "Create and start a new workspace. Stop all other workspaces (only one workspace can be running at a time). If a workspace with the imported project already exists, just start it")
     @PostMapping
-    public Workspace create(@RequestParam String masterUrl, @RequestBody WorkspaceCreateParams params,
+    public Workspace create(@RequestParam String masterUrl, @RequestParam String namespace, @RequestBody WorkspaceCreateParams params,
             @RequestHeader("Authorization") String token) throws IOException, URISyntaxException {
-        String cheServerUrl = clientWrapper.getCheServerUrl(masterUrl, token);
+        String cheServerUrl = clientWrapper.getCheServerUrl(masterUrl, namespace, token);
 
         String projectName = projectHelper.getProjectNameFromGitRepository(params.getRepo());
 
@@ -92,9 +92,9 @@ public class WorkspaceController {
 
     @ApiOperation(value = "List workspaces per git repository. If repository parameter is not specified return all workspaces")
     @GetMapping
-    public List<Workspace> list(@RequestParam String masterUrl, @RequestParam(required = false) String repository,
+    public List<Workspace> list(@RequestParam String masterUrl, @RequestParam String namespace, @RequestParam(required = false) String repository,
             @RequestHeader("Authorization") String token) {
-        String cheServerUrl = clientWrapper.getCheServerUrl(masterUrl, token);
+        String cheServerUrl = clientWrapper.getCheServerUrl(masterUrl, namespace, token);
         if (!StringUtils.isEmpty(repository)) {
             LOG.info("Fetching workspaces for repositoriy: {}", repository);
             return cheRestClient.listWorkspacesPerRepository(cheServerUrl, repository);

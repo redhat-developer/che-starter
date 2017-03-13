@@ -24,14 +24,11 @@ import io.fabric8.openshift.client.OpenShiftClient;
 final class CheServerRoute {
     private static final Logger LOG = LogManager.getLogger(CheServerRoute.class);
 
-    @Value("${che.openshift.project}")
-    private String project;
-
     @Value("${che.openshift.route}")
     private String routeName;
 
-    public String getUrl(OpenShiftClient client) {
-        Route route = client.routes().inNamespace(project).withName(routeName).get();
+    public String getUrl(OpenShiftClient client, String namespace) {
+        Route route = client.routes().inNamespace(namespace).withName(routeName).get();
         String host = route.getSpec().getHost();
         LOG.info("Router host {}: ", host);
         return  "http://" + host;

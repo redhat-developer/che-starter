@@ -43,8 +43,9 @@ public class CheServerController {
 
     @ApiOperation(value = "Create Che server on OpenShift instance")
     @PostMapping
-    public CheServerInfo startCheServer(@RequestParam String masterUrl, @RequestHeader("Authorization") String token) throws Exception {
+    public CheServerInfo startCheServer(@RequestParam String masterUrl, @RequestParam String namespace, @RequestHeader("Authorization") String token) throws Exception {
         LOG.info("OpenShift master URL: {}", masterUrl);
+        LOG.info("OpenShift namespace {}", namespace);
         OpenShiftClient openShiftClient = clientWrapper.get(masterUrl, token);
         Controller controller = new Controller(openShiftClient);
         controller.applyJson(template.get());

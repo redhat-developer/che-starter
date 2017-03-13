@@ -43,9 +43,11 @@ public class StackController {
 
     @ApiOperation(value = "List the available stacks")
     @GetMapping
-    public List<Stack> list(@RequestParam String masterUrl, @RequestHeader("Authorization") String token) {
-        LOG.info("Getting stacks from {}", masterUrl);
-        String cheServerUrl = clientWrapper.getCheServerUrl(masterUrl, token);
+    public List<Stack> list(@RequestParam String masterUrl, @RequestParam String namespace, @RequestHeader("Authorization") String token) {
+        LOG.info("Getting stacks from masterUrl {}", masterUrl);
+        LOG.info("Getting stacks from namespace {}", namespace);
+
+        String cheServerUrl = clientWrapper.getCheServerUrl(masterUrl, namespace, token);
         
         return stackClient.listStacks(cheServerUrl);
     }

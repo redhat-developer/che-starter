@@ -31,103 +31,99 @@ import io.fabric8.openshift.client.dsl.ClientDeployableScalableResource;
 
 @Component
 final class CheDeploymentConfig {
-	 
-	@Value("${che.openshift.project}")
-	private String project;
 
-	@Value("${che.openshift.deploymentconfig}")
-	private String deploymentConfigName;
+    @Value("${che.openshift.deploymentconfig}")
+    private String deploymentConfigName;
 
-	@Value("${che.openshift.start.timeout}")
-	private String startTimeout;
+    @Value("${che.openshift.start.timeout}")
+    private String startTimeout;
 
-	public void deployCheIfSuspended(OpenShiftClient client) {
-		final ClientDeployableScalableResource<DeploymentConfig, DoneableDeploymentConfig> deploymentConfig = 
-				getDeploymentConfig(client);
-		if (!isDeploymentAvailable(client)) {
-			deploymentConfig.scale(1, false);
-			waitUntilDeploymentConfigIsAvailable(client);
-		}
-	}
+    public void deployCheIfSuspended(OpenShiftClient client, String namespace) {
+        final ClientDeployableScalableResource<DeploymentConfig, DoneableDeploymentConfig> deploymentConfig = getDeploymentConfig(client, namespace);
+        if (!isDeploymentAvailable(client, namespace)) {
+            deploymentConfig.scale(1, false);
+            waitUntilDeploymentConfigIsAvailable(client, namespace);
+        }
+    }
 
-	private ClientDeployableScalableResource<DeploymentConfig, DoneableDeploymentConfig> getDeploymentConfig(
-			OpenShiftClient client) {
-		return client.deploymentConfigs().inNamespace(project).withName(deploymentConfigName);
-	}
+    private ClientDeployableScalableResource<DeploymentConfig, DoneableDeploymentConfig> getDeploymentConfig(
+            OpenShiftClient client, String namespace) {
+        return client.deploymentConfigs().inNamespace(namespace).withName(deploymentConfigName);
+    }
 
-	private void waitUntilDeploymentConfigIsAvailable(final OpenShiftClient client) {
-		final BlockingQueue<Object> queue = new ArrayBlockingQueue<Object>(1);
+    private void waitUntilDeploymentConfigIsAvailable(final OpenShiftClient client, String namespace) {
+        final BlockingQueue<Object> queue = new ArrayBlockingQueue<Object>(1);
 
-		final Runnable readinessPoller = new Runnable() {
-			public void run() {
-				try {
-					if (isDeploymentAvailable(client)) {
-						queue.put(true);
-						return;
-					} else {
-						queue.put(false);
-						return;
-					}
-				} catch (Throwable t) {
-					try {
-						if (queue.isEmpty()) {
-							queue.put(false);
-						}
-						return;
-					} catch (InterruptedException e) {
-					}
-				}
-			}
-		};
+        final Runnable readinessPoller = new Runnable() {
+            public void run() {
+                try {
+                    if (isDeploymentAvailable(client, namespace)) {
+                        queue.put(true);
+                        return;
+                    } else {
+                        queue.put(false);
+                        return;
+                    }
+                } catch (Throwable t) {
+                    try {
+                        if (queue.isEmpty()) {
+                            queue.put(false);
+                        }
+                        return;
+                    } catch (InterruptedException e) {
+                    }
+                }
+            }
+        };
 
-		ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-		ScheduledFuture poller = executor.scheduleWithFixedDelay(readinessPoller, 0, 500, TimeUnit.MILLISECONDS);
-		executor.schedule(new Runnable() {
-			
-			@Override
-			public void run() {
-				poller.cancel(true);
-			}
-		}, Integer.valueOf(startTimeout), TimeUnit.SECONDS);
-		try {
-			while(!waitUntilReady(queue)) {
-			}
-		} finally {
-			if (!poller.isDone()) {
-				poller.cancel(true);
-			}
-			executor.shutdown();
-		}
-	}
-	
-	private boolean isDeploymentAvailable(OpenShiftClient client) {
-		DeploymentConfig deploymentConfig = getDeploymentConfig(client).get();
-		if (deploymentConfig == null) {
-			return false;
-		}
-		List<DeploymentCondition> conditions = deploymentConfig.getStatus().getConditions();
-		if (!conditions.isEmpty()) {
-			for (DeploymentCondition condition: conditions) {
-				if (condition.getType().equals("Available") && condition.getStatus().equals("True")) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-	
-	private boolean waitUntilReady(BlockingQueue<Object> queue) {
-		try {
-			Object obj = queue.poll(2, TimeUnit.SECONDS);
-			if (obj == null) {
-				return true;
-			}
-			if (obj instanceof Boolean) {
-				return (Boolean) obj;
-			}
-			return false;
-		} catch (InterruptedException ex) {
-			return true;
-		}
-	}
+        ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+        ScheduledFuture poller = executor.scheduleWithFixedDelay(readinessPoller, 0, 500, TimeUnit.MILLISECONDS);
+        executor.schedule(new Runnable() {
+
+            @Override
+            public void run() {
+                poller.cancel(true);
+            }
+        }, Integer.valueOf(startTimeout), TimeUnit.SECONDS);
+        try {
+            while (!waitUntilReady(queue)) {
+            }
+        } finally {
+            if (!poller.isDone()) {
+                poller.cancel(true);
+            }
+            executor.shutdown();
+        }
+    }
+
+    private boolean isDeploymentAvailable(OpenShiftClient client, String namespace) {
+        DeploymentConfig deploymentConfig = getDeploymentConfig(client, namespace).get();
+        if (deploymentConfig == null) {
+            return false;
+        }
+        List<DeploymentCondition> conditions = deploymentConfig.getStatus().getConditions();
+        if (!conditions.isEmpty()) {
+            for (DeploymentCondition condition : conditions) {
+                if (condition.getType().equals("Available") && condition.getStatus().equals("True")) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean waitUntilReady(BlockingQueue<Object> queue) {
+        try {
+            Object obj = queue.poll(2, TimeUnit.SECONDS);
+            if (obj == null) {
+                return true;
+            }
+            if (obj instanceof Boolean) {
+                return (Boolean) obj;
+            }
+            return false;
+        } catch (InterruptedException ex) {
+            return true;
+        }
+    }
 }
