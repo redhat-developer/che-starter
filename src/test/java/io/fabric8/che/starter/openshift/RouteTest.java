@@ -37,11 +37,14 @@ public class RouteTest extends TestConfig {
 
     @Value("${che.openshift.endpoint}")
     private String endpoint;
+    
+    @Value("${che.openshift.namespace}")
+    private String namespace;
 
     @Test
     public void testRouteURL() {
         OpenShiftClient openShiftClient = client.get(endpoint, username, password);
-        route.getUrl(openShiftClient);
+        route.getUrl(openShiftClient, namespace);
     }
 
 }

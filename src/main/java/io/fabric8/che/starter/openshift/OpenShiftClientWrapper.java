@@ -39,10 +39,10 @@ public class OpenShiftClientWrapper {
         return new DefaultOpenShiftClient(config);
     }
 
-    public String getCheServerUrl(String masterUrl, String token) {
+    public String getCheServerUrl(String masterUrl, String namespace, String token) {
         OpenShiftClient openShiftClient = this.get(masterUrl, token);
-        dc.deployCheIfSuspended(openShiftClient);
-        return route.getUrl(openShiftClient);
+        dc.deployCheIfSuspended(openShiftClient, namespace);
+        return route.getUrl(openShiftClient, namespace);
     }
 
 }
