@@ -90,7 +90,7 @@ Many of the services available via the Swagger interface require setting both a 
 - In order to obtain the Authorization token use the following command:
 
 ```bash
-    oc login -u openshift-dev -p devel
+    oc login -u developer -p developer
     oc whoami -t
 ````
 
