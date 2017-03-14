@@ -23,8 +23,10 @@ import java.net.URISyntaxException;
 import org.junit.Test;
 
 public class ProjectHelperTest extends TestConfig {
-
     private static final String REPOSITORY_URL = "https://github.com/spring-projects/spring-boot.git";
+    private static final String BARE_REPOSITORY_URL = "https://github.com/spring-projects/spring-boot";
+    private static final String BARE_REPOSITORY_SSH_URL = "git@github.com:spring-projects/spring-boot.git";
+    private static final String BARE_REPOSITORY_URL_WITH_SLASH = "https://github.com/spring-projects/spring-boot/";
     private static final String INVALID_REPOSITORY_URL = "htps:/github.com/spring-projects/spring-boot.git";
     private static final String PROJECT_NAME = "spring-boot";
 
@@ -34,6 +36,24 @@ public class ProjectHelperTest extends TestConfig {
     @Test
     public void getProjectName() throws URISyntaxException, MalformedURLException {
         String projectName = projectHelper.getProjectNameFromGitRepository(REPOSITORY_URL);
+        assertEquals(projectName, PROJECT_NAME);
+    }
+
+    @Test
+    public void getProjectNameFromBareRepo() throws MalformedURLException, URISyntaxException {
+        String projectName = projectHelper.getProjectNameFromGitRepository(BARE_REPOSITORY_URL);
+        assertEquals(projectName, PROJECT_NAME);
+    }
+
+    @Test
+    public void getProjectNameFromBareRepoWithSlash() throws MalformedURLException, URISyntaxException {
+        String projectName = projectHelper.getProjectNameFromGitRepository(BARE_REPOSITORY_URL_WITH_SLASH);
+        assertEquals(projectName, PROJECT_NAME);
+    }
+
+    @Test
+    public void getProjectNameFromSshRepo() throws MalformedURLException, URISyntaxException {
+        String projectName = projectHelper.getProjectNameFromGitRepository(BARE_REPOSITORY_SSH_URL);
         assertEquals(projectName, PROJECT_NAME);
     }
 
