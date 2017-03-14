@@ -44,4 +44,10 @@ public class GlobalExceptionHandler {
         return e.getMessage();
     }
 
+    @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Route not found")
+    @ExceptionHandler(RouteNotFoundException.class)
+    public String handleRouteNotFoundException(RouteNotFoundException e) {
+        return e.getMessage();
+    }
+
 }

@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.fabric8.che.starter.client.WorkspaceClient;
+import io.fabric8.che.starter.exception.RouteNotFoundException;
 import io.fabric8.che.starter.model.Workspace;
 import io.fabric8.che.starter.model.request.WorkspaceCreateParams;
 import io.fabric8.che.starter.openshift.OpenShiftClientWrapper;
@@ -47,7 +48,7 @@ public class WorkspaceController {
     OpenShiftClientWrapper clientWrapper;
 
     @Autowired
-    WorkspaceClient cheRestClient;
+    WorkspaceClient workspaceClient;
 
     @Autowired
     ProjectHelper projectHelper;
@@ -58,33 +59,33 @@ public class WorkspaceController {
     @ApiOperation(value = "Create and start a new workspace. Stop all other workspaces (only one workspace can be running at a time). If a workspace with the imported project already exists, just start it")
     @PostMapping
     public Workspace create(@RequestParam String masterUrl, @RequestParam String namespace, @RequestBody WorkspaceCreateParams params,
-            @RequestHeader("Authorization") String token) throws IOException, URISyntaxException {
+            @RequestHeader("Authorization") String token) throws IOException, URISyntaxException, RouteNotFoundException {
         String cheServerUrl = clientWrapper.getCheServerUrl(masterUrl, namespace, token);
 
         String projectName = projectHelper.getProjectNameFromGitRepository(params.getRepo());
 
-        List<Workspace> workspaces = cheRestClient.listWorkspaces(cheServerUrl);
+        List<Workspace> workspaces = workspaceClient.listWorkspaces(cheServerUrl);
 
         String description = workspaceHelper.getDescription(params.getRepo(), params.getBranch());
 
         for (Workspace ws : workspaces) {
-            if (ws.getDescription().equals(description)) {
+            String wsDescription = ws.getDescription();
+            if (wsDescription != null && wsDescription.equals(description)) {
                 // Before we can create a project, we must start the new workspace.  First check it's not already running
                 if (!WorkspaceClient.WORKSPACE_STATUS_RUNNING.equals(ws.getStatus()) && 
                         !WorkspaceClient.WORKSPACE_STATUS_STARTING.equals(ws.getStatus())) {
-                    cheRestClient.startWorkspace(cheServerUrl, ws.getId());
+                    workspaceClient.startWorkspace(cheServerUrl, ws.getId());
                 }
-                
                 return ws;
             }
         }
 
         // Create the workspace
-        Workspace workspaceInfo = cheRestClient.createWorkspace(cheServerUrl, params.getName(), params.getStack(),
+        Workspace workspaceInfo = workspaceClient.createWorkspace(cheServerUrl, params.getName(), params.getStack(),
                 params.getRepo(), params.getBranch());
 
         // Create the project - this is an async call
-        cheRestClient.createProject(cheServerUrl, workspaceInfo.getId(), projectName, params.getRepo(),
+        workspaceClient.createProject(cheServerUrl, workspaceInfo.getId(), projectName, params.getRepo(),
                 params.getBranch());
         
         return workspaceInfo;
@@ -93,13 +94,13 @@ public class WorkspaceController {
     @ApiOperation(value = "List workspaces per git repository. If repository parameter is not specified return all workspaces")
     @GetMapping
     public List<Workspace> list(@RequestParam String masterUrl, @RequestParam String namespace, @RequestParam(required = false) String repository,
-            @RequestHeader("Authorization") String token) {
+            @RequestHeader("Authorization") String token) throws RouteNotFoundException {
         String cheServerUrl = clientWrapper.getCheServerUrl(masterUrl, namespace, token);
         if (!StringUtils.isEmpty(repository)) {
             LOG.info("Fetching workspaces for repositoriy: {}", repository);
-            return cheRestClient.listWorkspacesPerRepository(cheServerUrl, repository);
+            return workspaceClient.listWorkspacesPerRepository(cheServerUrl, repository);
         }
-        return cheRestClient.listWorkspaces(cheServerUrl);
+        return workspaceClient.listWorkspaces(cheServerUrl);
     }
 
 }

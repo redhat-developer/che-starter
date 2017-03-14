@@ -28,7 +28,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import io.fabric8.che.starter.client.keycloak.KeycloakClient;
 import io.fabric8.che.starter.model.DevMachineServer;
 import io.fabric8.che.starter.model.Project;
 import io.fabric8.che.starter.model.Workspace;
@@ -49,6 +48,8 @@ public class WorkspaceClient {
     public static final String WORKSPACE_STATUS_STOPPED = "STOPPED";
     public static final long WORKSPACE_START_TIMEOUT_MS = 60000;
 
+    private static final String DUMMY_GITHUB_TOKEN = "DUMMY_GITHUB_TOKEN";
+
     @Autowired
     private WorkspaceTemplate workspaceTemplate;
 
@@ -57,9 +58,6 @@ public class WorkspaceClient {
 
     @Autowired
     private ProjectTemplate projectTemplate;
-    
-    @Autowired
-    private KeycloakClient keycloakClient;
 
     public List<Workspace> listWorkspaces(String cheServerUrl) {
         String url = CheRestEndpoints.LIST_WORKSPACES.generateUrl(cheServerUrl);
@@ -150,8 +148,9 @@ public class WorkspaceClient {
         String url = server.getUrl() + CheRestEndpoints.SET_OAUTH_TOKEN.getEndpoint().replace("{provider}", "github");
         LOG.info("Setting oAuth token for workspace");
         
-        // TODO which parameter do we need to pass here?
-        String token = keycloakClient.getGitHubToken(null);
+        // TODO which parameter do we need to pass here? 
+        // ^ it should keycloak authorization token that is passed to che-strarter from Platform in header
+        String token = DUMMY_GITHUB_TOKEN;
         
         RestTemplate template = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
