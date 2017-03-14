@@ -17,6 +17,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import io.fabric8.che.starter.exception.RouteNotFoundException;
 import io.fabric8.openshift.api.model.Route;
 import io.fabric8.openshift.client.OpenShiftClient;
 
@@ -27,11 +28,14 @@ final class CheServerRoute {
     @Value("${che.openshift.route}")
     private String routeName;
 
-    public String getUrl(OpenShiftClient client, String namespace) {
+    public String getUrl(OpenShiftClient client, String namespace) throws RouteNotFoundException {
         Route route = client.routes().inNamespace(namespace).withName(routeName).get();
-        String host = route.getSpec().getHost();
-        LOG.info("Router host {}: ", host);
-        return  "http://" + host;
+        if (route != null) {
+            String host = route.getSpec().getHost();
+            LOG.info("Router host {}: ", host);
+            return  "http://" + host;
+        }
+        throw new RouteNotFoundException("Route '" + routeName +"' is not found in '" + namespace + "' namespace");
     }
 
 }

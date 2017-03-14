@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import io.fabric8.che.starter.TestConfig;
+import io.fabric8.che.starter.exception.RouteNotFoundException;
 import io.fabric8.openshift.client.OpenShiftClient;
 
 @Ignore("Test is run against local minishift cluster and requires additional setup")
@@ -42,7 +43,7 @@ public class RouteTest extends TestConfig {
     private String namespace;
 
     @Test
-    public void testRouteURL() {
+    public void testRouteURL() throws RouteNotFoundException {
         OpenShiftClient openShiftClient = client.get(endpoint, username, password);
         route.getUrl(openShiftClient, namespace);
     }

@@ -77,7 +77,7 @@ final class CheDeploymentConfig {
         };
 
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-        ScheduledFuture poller = executor.scheduleWithFixedDelay(readinessPoller, 0, 500, TimeUnit.MILLISECONDS);
+        ScheduledFuture<?> poller = executor.scheduleWithFixedDelay(readinessPoller, 0, 500, TimeUnit.MILLISECONDS);
         executor.schedule(new Runnable() {
 
             @Override

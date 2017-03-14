@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.fabric8.che.starter.client.StackClient;
+import io.fabric8.che.starter.exception.RouteNotFoundException;
 import io.fabric8.che.starter.model.Stack;
 import io.fabric8.che.starter.openshift.OpenShiftClientWrapper;
 import io.swagger.annotations.ApiOperation;
@@ -39,16 +40,14 @@ public class StackController {
     private StackClient stackClient;
     
     @Autowired
-    private OpenShiftClientWrapper clientWrapper;
+    private OpenShiftClientWrapper openShiftclientWrapper;
 
     @ApiOperation(value = "List the available stacks")
     @GetMapping
-    public List<Stack> list(@RequestParam String masterUrl, @RequestParam String namespace, @RequestHeader("Authorization") String token) {
+    public List<Stack> list(@RequestParam String masterUrl, @RequestParam String namespace, @RequestHeader("Authorization") String token) throws RouteNotFoundException {
         LOG.info("Getting stacks from masterUrl {}", masterUrl);
         LOG.info("Getting stacks from namespace {}", namespace);
-
-        String cheServerUrl = clientWrapper.getCheServerUrl(masterUrl, namespace, token);
-        
+        String cheServerUrl = openShiftclientWrapper.getCheServerUrl(masterUrl, namespace, token);
         return stackClient.listStacks(cheServerUrl);
     }
 

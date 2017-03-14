@@ -15,6 +15,7 @@ package io.fabric8.che.starter.openshift;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import io.fabric8.che.starter.exception.RouteNotFoundException;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.ConfigBuilder;
 import io.fabric8.openshift.client.DefaultOpenShiftClient;
@@ -39,7 +40,7 @@ public class OpenShiftClientWrapper {
         return new DefaultOpenShiftClient(config);
     }
 
-    public String getCheServerUrl(String masterUrl, String namespace, String token) {
+    public String getCheServerUrl(String masterUrl, String namespace, String token) throws RouteNotFoundException {
         OpenShiftClient openShiftClient = this.get(masterUrl, token);
         dc.deployCheIfSuspended(openShiftClient, namespace);
         return route.getUrl(openShiftClient, namespace);
