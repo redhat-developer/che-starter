@@ -18,22 +18,48 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ProjectHelper {
+    private static final String GIT_EXTENSION = ".git";
+    private static final String GIT_PROTOCOL = "git@";
+    private static final String HTTPS_PROTOCOL = "https://";
 
-    public String getProjectNameFromGitRepository(String repositoryUrl)
+    public String getProjectNameFromGitRepository(final String repositoryUrl)
             throws URISyntaxException, MalformedURLException {
-        URL url = new URL(repositoryUrl);
+        String httpsRepositoryUrl = changeProtocolToHttpsIfNeeded(repositoryUrl);
+        URL url = new URL(httpsRepositoryUrl);
         URI uri = url.toURI();
         String path = uri.getPath();
-        String projectName = path.substring(path.lastIndexOf("/") + 1, path.lastIndexOf("."));
-        return projectName;
+        return getProjectNameFromPath(path);
     }
 
     public String generateName() {
         return RandomStringUtils.random(8, true, true).toLowerCase();
+    }
+
+    private String changeProtocolToHttpsIfNeeded(final String repositoryUrl) {
+        if (repositoryUrl.startsWith(GIT_PROTOCOL)) {
+            return StringUtils.replaceOnce(repositoryUrl.replace(":", "/"), GIT_PROTOCOL, HTTPS_PROTOCOL);
+        }
+        return repositoryUrl;
+    }
+
+    private String getProjectNameFromPath(final String path) {
+        String projectName;
+        String normalizedPath = removeTrailingSlash(path);
+        if (path.endsWith(GIT_EXTENSION)) {
+            projectName = normalizedPath.substring(normalizedPath.lastIndexOf("/") + 1, normalizedPath.lastIndexOf(GIT_EXTENSION));
+         } else {
+            projectName = normalizedPath.substring(normalizedPath.lastIndexOf("/") + 1, normalizedPath.length());
+         }
+         return projectName;
+    }
+
+    private String removeTrailingSlash(final String path) {
+        return path.endsWith("/") ? path.substring(0, path.length() - 1) : path;
     }
 
 }
