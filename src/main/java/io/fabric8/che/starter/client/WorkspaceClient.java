@@ -140,7 +140,7 @@ public class WorkspaceClient {
             status = checkWorkspace(cheServerURL, workspaceId);
         }
 
-        Workspace workspace = getWorkspaceByKey(cheServerURL, workspaceId);
+        Workspace workspace = getWorkspaceById(cheServerURL, workspaceId);
 
         DevMachineServer server = workspace.getRuntime().getDevMachine().getRuntime().getServers().get("4401/tcp");
         
@@ -181,7 +181,7 @@ public class WorkspaceClient {
         }
     }
 
-    public Workspace getWorkspaceByKey(String cheServerUrl, String workspaceId) {
+    public Workspace getWorkspaceById(String cheServerUrl, String workspaceId) {
         String url = CheRestEndpoints.GET_WORKSPACE_BY_ID.generateUrl(cheServerUrl, workspaceId);
 
         RestTemplate template = new RestTemplate();
