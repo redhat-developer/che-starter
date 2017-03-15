@@ -49,6 +49,7 @@ public class CheServerController {
         OpenShiftClient openShiftClient = clientWrapper.get(masterUrl, token);
         Controller controller = new Controller(openShiftClient);
         controller.applyJson(template.get());
+        openShiftClient.close();
         return new CheServerInfo();
     }
 
