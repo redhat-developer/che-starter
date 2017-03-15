@@ -30,20 +30,45 @@ public class OpenShiftClientWrapper {
     @Autowired
     CheDeploymentConfig dc;
 
+    /**
+     * Gets OpenShift client. When using, you are responsible for closing it.
+     * 
+     * @param masterUrl URL of OpenShift master
+     * @param username user name of OpenShift user
+     * @param password user's password
+     * @return OpenShift client
+     */
     public OpenShiftClient get(String masterUrl, String username, String password) {
         Config config = new ConfigBuilder().withMasterUrl(masterUrl).withUsername(username).withPassword(password).build();
         return new DefaultOpenShiftClient(config);
     }
 
+    /**
+     * Gets OpenShift client. When using, you are responsible for closing it.
+     * @param masterUrl URL of OpenShift master
+     * @param token authorization token
+     * @return OpenShift client
+     */
     public OpenShiftClient get(String masterUrl, String token) {
         Config config = new ConfigBuilder().withMasterUrl(masterUrl).withOauthToken(token).build();
         return new DefaultOpenShiftClient(config);
     }
 
+    /**
+     * Gets URL of Che server running in user's namespace on OpenShift.
+     * 
+     * @param masterUrl URL of OpenShift master
+     * @param namespace user's namespace
+     * @param token authorization token
+     * @return URL of Che server 
+     * @throws RouteNotFoundException 
+     */
     public String getCheServerUrl(String masterUrl, String namespace, String token) throws RouteNotFoundException {
         OpenShiftClient openShiftClient = this.get(masterUrl, token);
         dc.deployCheIfSuspended(openShiftClient, namespace);
-        return route.getUrl(openShiftClient, namespace);
+        String routeURL = route.getUrl(openShiftClient, namespace);
+        openShiftClient.close();
+        return routeURL;
     }
 
 }

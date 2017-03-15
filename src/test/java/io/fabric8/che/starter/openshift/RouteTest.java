@@ -46,6 +46,7 @@ public class RouteTest extends TestConfig {
     public void testRouteURL() throws RouteNotFoundException {
         OpenShiftClient openShiftClient = client.get(endpoint, username, password);
         route.getUrl(openShiftClient, namespace);
+        openShiftClient.close();
     }
 
 }
