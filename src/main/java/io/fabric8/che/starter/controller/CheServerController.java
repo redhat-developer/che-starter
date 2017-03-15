@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.fabric8.che.starter.client.keycloak.KeycloakClient;
 import io.fabric8.che.starter.model.response.CheServerInfo;
 import io.fabric8.che.starter.openshift.OpenShiftClientWrapper;
 import io.fabric8.che.starter.template.CheServerTemplate;
@@ -39,14 +40,20 @@ public class CheServerController {
     CheServerTemplate template;
 
     @Autowired
-    OpenShiftClientWrapper clientWrapper;
+    OpenShiftClientWrapper openShiftClientWrapper;
+
+    @Autowired
+    KeycloakClient keycloakClient;
 
     @ApiOperation(value = "Create Che server on OpenShift instance")
     @PostMapping
-    public CheServerInfo startCheServer(@RequestParam String masterUrl, @RequestParam String namespace, @RequestHeader("Authorization") String token) throws Exception {
-        LOG.info("OpenShift master URL: {}", masterUrl);
+    public CheServerInfo startCheServer(@RequestParam String masterUrl, @RequestParam String namespace, @RequestHeader("Authorization") String keycloakToken) throws Exception {
+        LOG.info("OpenShift master Url: {}", masterUrl);
         LOG.info("OpenShift namespace {}", namespace);
-        OpenShiftClient openShiftClient = clientWrapper.get(masterUrl, token);
+
+        String openShiftToken = keycloakClient.getOpenShiftToken(keycloakToken);
+        OpenShiftClient openShiftClient = openShiftClientWrapper.get(masterUrl, openShiftToken);
+
         Controller controller = new Controller(openShiftClient);
         controller.applyJson(template.get());
         openShiftClient.close();

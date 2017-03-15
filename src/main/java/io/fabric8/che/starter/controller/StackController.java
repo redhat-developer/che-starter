@@ -12,6 +12,7 @@
  */
 package io.fabric8.che.starter.controller;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -24,7 +25,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import io.fabric8.che.starter.client.StackClient;
+import io.fabric8.che.starter.client.keycloak.KeycloakClient;
 import io.fabric8.che.starter.exception.RouteNotFoundException;
 import io.fabric8.che.starter.model.Stack;
 import io.fabric8.che.starter.openshift.OpenShiftClientWrapper;
@@ -40,14 +44,20 @@ public class StackController {
     private StackClient stackClient;
     
     @Autowired
-    private OpenShiftClientWrapper openShiftclientWrapper;
+    private OpenShiftClientWrapper openShiftClientWrapper;
+
+    @Autowired
+    KeycloakClient keycloakClient;
 
     @ApiOperation(value = "List the available stacks")
     @GetMapping
-    public List<Stack> list(@RequestParam String masterUrl, @RequestParam String namespace, @RequestHeader("Authorization") String token) throws RouteNotFoundException {
+    public List<Stack> list(@RequestParam String masterUrl, @RequestParam String namespace, @RequestHeader("Authorization") String keycloakToken) throws RouteNotFoundException, JsonProcessingException, IOException {
         LOG.info("Getting stacks from masterUrl {}", masterUrl);
         LOG.info("Getting stacks from namespace {}", namespace);
-        String cheServerUrl = openShiftclientWrapper.getCheServerUrl(masterUrl, namespace, token);
+
+        String openShiftToken = keycloakClient.getOpenShiftToken(keycloakToken);
+        String cheServerUrl = openShiftClientWrapper.getCheServerUrl(masterUrl, namespace, openShiftToken);
+
         return stackClient.listStacks(cheServerUrl);
     }
 

@@ -12,11 +12,15 @@
  */
 package io.fabric8.che.starter.client.keycloak;
 
+import java.io.IOException;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import io.fabric8.che.starter.TestConfig;
 
@@ -35,7 +39,7 @@ public class KeycloakTest extends TestConfig {
     }
 
     @Test
-    public void getOpenShiftToken() {
+    public void getOpenShiftToken() throws JsonProcessingException, IOException {
         String openShiftToken = keycloakClient.getOpenShiftToken(AUTH_HEADER);
         LOG.info("OpenShift Token: {}", openShiftToken);
     }
