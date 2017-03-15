@@ -12,6 +12,7 @@
  */
 package io.fabric8.che.starter.client.keycloak;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -25,6 +26,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import io.fabric8.che.starter.util.UrlHelper;
 
 @Component
@@ -34,18 +39,19 @@ public class KeycloakClient implements TokenReceiver {
     private static final String SCOPE = "scope";
 
     @Override
-    public String getOpenShiftToken(String authHeader) {
-        return getToken(KeycloakEndpoint.GET_OPENSHIFT_TOKEN, authHeader);
+    public String getOpenShiftToken(String authHeader) throws JsonProcessingException, IOException {
+        // {"access_token":"token","expires_in":86400,"scope":"user:full","token_type":"Bearer"}
+        String responseBody = getResponseBody(KeycloakEndpoint.GET_OPENSHIFT_TOKEN, authHeader);
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode json = mapper.readTree(responseBody);
+        JsonNode accessToken = json.get(ACCESS_TOKEN);
+        return accessToken.asText();
     }
 
     @Override
     public String getGitHubToken(String authHeader) {
-        return getToken(KeycloakEndpoint.GET_GITHUB_TOKEN, authHeader);
-    }
-
-    private String getToken(KeycloakEndpoint endpoint, String authHeader) {
         // access_token=token&scope=scope
-        String responseBody = getResponseBody(endpoint, authHeader);
+        String responseBody = getResponseBody(KeycloakEndpoint.GET_GITHUB_TOKEN, authHeader);
         Map<String, String> parameter = UrlHelper.splitQuery(responseBody);
         String token = parameter.get(ACCESS_TOKEN);
         LOG.info("Token: {}", token);

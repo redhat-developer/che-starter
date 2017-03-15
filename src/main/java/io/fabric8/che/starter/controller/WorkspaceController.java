@@ -29,7 +29,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import io.fabric8.che.starter.client.WorkspaceClient;
+import io.fabric8.che.starter.client.keycloak.KeycloakClient;
 import io.fabric8.che.starter.exception.RouteNotFoundException;
 import io.fabric8.che.starter.model.Workspace;
 import io.fabric8.che.starter.model.request.WorkspaceCreateParams;
@@ -45,7 +48,7 @@ public class WorkspaceController {
     private static final Logger LOG = LogManager.getLogger(WorkspaceController.class);
 
     @Autowired
-    OpenShiftClientWrapper clientWrapper;
+    OpenShiftClientWrapper openShiftClientWrapper;
 
     @Autowired
     WorkspaceClient workspaceClient;
@@ -56,11 +59,15 @@ public class WorkspaceController {
     @Autowired
     WorkspaceHelper workspaceHelper;
 
+    @Autowired
+    KeycloakClient keycloakClient;
+
     @ApiOperation(value = "Create and start a new workspace. Stop all other workspaces (only one workspace can be running at a time). If a workspace with the imported project already exists, just start it")
     @PostMapping
     public Workspace create(@RequestParam String masterUrl, @RequestParam String namespace, @RequestBody WorkspaceCreateParams params,
-            @RequestHeader("Authorization") String token) throws IOException, URISyntaxException, RouteNotFoundException {
-        String cheServerUrl = clientWrapper.getCheServerUrl(masterUrl, namespace, token);
+            @RequestHeader("Authorization") String keycloakToken) throws IOException, URISyntaxException, RouteNotFoundException {
+        String openShiftToken = keycloakClient.getOpenShiftToken(keycloakToken);
+        String cheServerUrl = openShiftClientWrapper.getCheServerUrl(masterUrl, namespace, openShiftToken);
 
         String projectName = projectHelper.getProjectNameFromGitRepository(params.getRepo());
 
@@ -94,8 +101,9 @@ public class WorkspaceController {
     @ApiOperation(value = "List workspaces per git repository. If repository parameter is not specified return all workspaces")
     @GetMapping
     public List<Workspace> list(@RequestParam String masterUrl, @RequestParam String namespace, @RequestParam(required = false) String repository,
-            @RequestHeader("Authorization") String token) throws RouteNotFoundException {
-        String cheServerUrl = clientWrapper.getCheServerUrl(masterUrl, namespace, token);
+            @RequestHeader("Authorization") String keycloakToken) throws RouteNotFoundException, JsonProcessingException, IOException {
+        String openShiftToken = keycloakClient.getOpenShiftToken(keycloakToken);
+        String cheServerUrl = openShiftClientWrapper.getCheServerUrl(masterUrl, namespace, openShiftToken);
         if (!StringUtils.isEmpty(repository)) {
             LOG.info("Fetching workspaces for repositoriy: {}", repository);
             return workspaceClient.listWorkspacesPerRepository(cheServerUrl, repository);
