@@ -26,7 +26,7 @@ import io.fabric8.che.starter.util.WorkspaceHelper;
 @Component
 public class WorkspaceTemplate {
     private final static String WORKSPACE_NAME = "${workspace.name}";
-    private final static String WORKSPACE_STACK = "${workspace.stack}";
+    private final static String WORKSPACE_STACK_IMAGE = "${workspace.stack.image}";
     private final static String WORKSPACE_DESCRIPTION = "${workspace.description}";
 
     @Value(value = "classpath:templates/workspace_template.json")
@@ -37,7 +37,7 @@ public class WorkspaceTemplate {
 
     public class WorkspaceCreateRequest {
         private String name;
-        private String stack;
+        private String stackImage;
         private String description;
 
         protected WorkspaceCreateRequest(WorkspaceTemplate template) {
@@ -49,8 +49,8 @@ public class WorkspaceTemplate {
             return this;
         }
 
-        public WorkspaceCreateRequest setStack(String stack) {
-            this.stack = stack;
+        public WorkspaceCreateRequest setStackImage(String stackImage) {
+            this.stackImage = stackImage;
             return this;
         }
 
@@ -63,8 +63,8 @@ public class WorkspaceTemplate {
             return name;
         }
 
-        public String getStack() {
-            return stack;
+        public String getStackImage() {
+            return stackImage;
         }
 
         public String getDescription() {
@@ -74,7 +74,7 @@ public class WorkspaceTemplate {
         public String getJSON() throws IOException {
             String json = Reader.read(resource.getInputStream());
             json = StringUtils.replace(json, WORKSPACE_NAME, name);
-            json = StringUtils.replace(json, WORKSPACE_STACK, stack);
+            json = StringUtils.replace(json, WORKSPACE_STACK_IMAGE, stackImage);
             json = StringUtils.replace(json, WORKSPACE_DESCRIPTION, description);
             return json;
         }
