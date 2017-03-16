@@ -49,5 +49,13 @@ public class GlobalExceptionHandler {
     public String handleRouteNotFoundException(RouteNotFoundException e) {
         return e.getMessage();
     }
+    
+
+    @SuppressWarnings("restriction")
+    @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "Unable to find valid certification path to requested target")
+    @ExceptionHandler(sun.security.provider.certpath.SunCertPathBuilderException.class)
+    public String handleSunCertPathBuilderException(RouteNotFoundException e) {
+        return e.getMessage();
+    }
 
 }
