@@ -30,6 +30,7 @@ import org.springframework.web.client.RestTemplate;
 
 import io.fabric8.che.starter.model.DevMachineServer;
 import io.fabric8.che.starter.model.Project;
+import io.fabric8.che.starter.model.Stack;
 import io.fabric8.che.starter.model.Workspace;
 import io.fabric8.che.starter.model.WorkspaceLink;
 import io.fabric8.che.starter.model.WorkspaceStatus;
@@ -56,6 +57,9 @@ public class WorkspaceClient {
     @Autowired
     private WorkspaceHelper workspaceHelper;
 
+    @Autowired
+    private StackClient stackClient;
+    
     @Autowired
     private ProjectTemplate projectTemplate;
 
@@ -86,13 +90,16 @@ public class WorkspaceClient {
         return workspaceHelper.filterByRepository(workspaces, repository);
     }
 
-    public Workspace createWorkspace(String cheServerUrl, String name, String stack, String repo, String branch)
+    public Workspace createWorkspace(String cheServerUrl, String name, String stackId, String repo, String branch)
             throws IOException {
         // The first step is to create the workspace
         String url = CheRestEndpoints.CREATE_WORKSPACE.generateUrl(cheServerUrl);
+        
+        String stackImage = getStackImage(cheServerUrl, stackId);
+        
         String jsonTemplate = workspaceTemplate.createRequest().
                                                 setName(name).
-                                                setStack(stack).
+                                                setStackImage(stackImage).
                                                 setDescription(workspaceHelper.getDescription(repo, branch)).
                                                 getJSON();
 
@@ -119,6 +126,29 @@ public class WorkspaceClient {
         return workspace;
     }
 
+    /**
+     * Gets image for specified stack ID. Throws IOException if there is no such stack
+     * on the Che server.
+     * 
+     * @param cheServerUrl URL of Che server
+     * @param stackId stack ID
+     * @return image name for stack
+     * @throws IOException if no image name exists for such stack ID or call to Che server was not successful
+     */
+    private String getStackImage(String cheServerUrl, String stackId) throws IOException {
+    	 List<Stack> stacks = stackClient.listStacks(cheServerUrl);
+         if (stacks != null) {
+         	for (Stack stack: stacks) {
+         		if (stack.getId().equals(stackId)) {
+         			return stack.getSource().getOrigin();
+         		}
+         	}
+         	throw new IOException("No stack with id " + stackId + " was found.");
+         } else {
+         	throw new IOException("No list of stacks was returned by Che server");
+         }
+    }
+    
     @Async
     public void createProject(String cheServerURL, String workspaceId, String name, String repo, String branch)
             throws IOException {

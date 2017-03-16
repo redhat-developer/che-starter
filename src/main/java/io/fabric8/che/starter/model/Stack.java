@@ -19,6 +19,7 @@ public class Stack {
     private String id;
     private String name;
     private String description;
+    private StackSource source;
 
     public String getId() {
         return id;
@@ -44,4 +45,11 @@ public class Stack {
         this.description = description;
     }
 
+    public StackSource getSource() {
+    	return source;
+    }
+    
+    public void setSource(StackSource source) {
+    	this.source = source;
+    }
 }
