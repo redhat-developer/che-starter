@@ -52,11 +52,17 @@ public class CheServerController {
         LOG.info("OpenShift namespace {}", namespace);
 
         String openShiftToken = keycloakClient.getOpenShiftToken(keycloakToken);
-        OpenShiftClient openShiftClient = openShiftClientWrapper.get(masterUrl, openShiftToken);
+        OpenShiftClient openShiftClient = null;
+        try {
+        	openShiftClient = openShiftClientWrapper.get(masterUrl, openShiftToken);
+        	Controller controller = new Controller(openShiftClient);
+            controller.applyJson(template.get());
+        } finally {
+        	if (openShiftClient != null) {
+        		openShiftClient.close();
+        	}
+        }
 
-        Controller controller = new Controller(openShiftClient);
-        controller.applyJson(template.get());
-        openShiftClient.close();
         return new CheServerInfo();
     }
 
