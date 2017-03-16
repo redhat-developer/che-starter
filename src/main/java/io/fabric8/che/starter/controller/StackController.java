@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,10 +32,10 @@ import io.fabric8.che.starter.exception.RouteNotFoundException;
 import io.fabric8.che.starter.model.Stack;
 import io.fabric8.che.starter.openshift.OpenShiftClientWrapper;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/stack")
 public class StackController {
     private static final Logger LOG = LogManager.getLogger(StackController.class);
 
@@ -50,15 +49,27 @@ public class StackController {
     KeycloakClient keycloakClient;
 
     @ApiOperation(value = "List the available stacks")
-    @GetMapping
-    public List<Stack> list(@RequestParam String masterUrl, @RequestParam String namespace, @RequestHeader("Authorization") String keycloakToken) throws RouteNotFoundException, JsonProcessingException, IOException {
+    @GetMapping("/stack")
+    public List<Stack> list(@RequestParam String masterUrl, @RequestParam String namespace, @ApiParam("keycloak token") @RequestHeader("Authorization") String keycloakToken) throws RouteNotFoundException, JsonProcessingException, IOException {
         LOG.info("Getting stacks from masterUrl {}", masterUrl);
         LOG.info("Getting stacks from namespace {}", namespace);
 
         String openShiftToken = keycloakClient.getOpenShiftToken(keycloakToken);
-        String cheServerUrl = openShiftClientWrapper.getCheServerUrl(masterUrl, namespace, openShiftToken);
-
-        return stackClient.listStacks(cheServerUrl);
+        return getStacks(masterUrl, namespace, openShiftToken);
     }
 
+    @ApiOperation(value = "List the available stacks")
+    @GetMapping("/stack/oso")
+    public List<Stack> listOnOpenShift(@RequestParam String masterUrl, @RequestParam String namespace, @ApiParam("OpenShift token") @RequestHeader("Authorization") String openShiftToken) throws RouteNotFoundException, JsonProcessingException, IOException {
+        LOG.info("Getting stacks from masterUrl {}", masterUrl);
+        LOG.info("Getting stacks from namespace {}", namespace);
+
+        return getStacks(masterUrl, namespace, openShiftToken);
+    }
+    
+    private List<Stack> getStacks(String masterUrl, String namespace, String openShiftToken) throws RouteNotFoundException {
+    	String cheServerUrl = openShiftClientWrapper.getCheServerUrl(masterUrl, namespace, openShiftToken);
+        return stackClient.listStacks(cheServerUrl);
+    }
+    
 }
