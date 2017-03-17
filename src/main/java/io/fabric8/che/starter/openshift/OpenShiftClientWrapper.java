@@ -50,8 +50,8 @@ public class OpenShiftClientWrapper {
      * @return OpenShift client
      */
     public OpenShiftClient get(String masterUrl, String token) {
-        Config config = new ConfigBuilder().withMasterUrl(masterUrl).withOauthToken(token).build();
-        return new DefaultOpenShiftClient(config);
+//        Config config = new ConfigBuilder().withMasterUrl(masterUrl).withOauthToken(token).build();
+        return new DefaultOpenShiftClient();
     }
 
     /**
