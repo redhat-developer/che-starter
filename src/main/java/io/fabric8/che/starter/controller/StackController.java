@@ -66,9 +66,9 @@ public class StackController {
 
         return getStacks(masterUrl, namespace, openShiftToken);
     }
-    
+
     private List<Stack> getStacks(String masterUrl, String namespace, String openShiftToken) throws RouteNotFoundException {
-    	String cheServerUrl = openShiftClientWrapper.getCheServerUrl(masterUrl, namespace, openShiftToken);
+        String cheServerUrl = openShiftClientWrapper.getCheServerUrl(masterUrl, namespace, openShiftToken);
         return stackClient.listStacks(cheServerUrl);
     }
     

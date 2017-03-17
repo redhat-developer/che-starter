@@ -21,12 +21,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import io.fabric8.kubernetes.client.KubernetesClientException;
-
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "URL is not valid")
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Url is not valid")
     @ExceptionHandler({ URISyntaxException.class, MalformedURLException.class })
     public String handleURLException(Exception e) {
         return e.getMessage();
@@ -38,18 +36,11 @@ public class GlobalExceptionHandler {
         return e.getMessage();
     }
 
-    @ResponseStatus(value = HttpStatus.UNAUTHORIZED, reason = "Access is denied due to invalid credentials")
-    @ExceptionHandler(KubernetesClientException.class)
-    public String handleKubernetesClientException(KubernetesClientException e) {
-        return e.getMessage();
-    }
-
     @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Route not found")
     @ExceptionHandler(RouteNotFoundException.class)
     public String handleRouteNotFoundException(RouteNotFoundException e) {
         return e.getMessage();
     }
-    
 
     @SuppressWarnings("restriction")
     @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "Unable to find valid certification path to requested target")
