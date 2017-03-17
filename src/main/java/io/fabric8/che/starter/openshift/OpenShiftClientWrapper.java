@@ -12,7 +12,11 @@
  */
 package io.fabric8.che.starter.openshift;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import io.fabric8.che.starter.exception.RouteNotFoundException;
@@ -23,12 +27,16 @@ import io.fabric8.openshift.client.OpenShiftClient;
 
 @Component
 public class OpenShiftClientWrapper {
+    private static final Logger LOG = LogManager.getLogger(OpenShiftClientWrapper.class);
 
     @Autowired
-    CheServerRoute route;
+    private CheServerRoute route;
 
     @Autowired
-    CheDeploymentConfig dc;
+    private CheDeploymentConfig dc;
+
+    @Value("${KUBERNETES_CERTS_CA_FILE:#{null}}")
+    private String caCertFile;
 
     /**
      * Gets OpenShift client. When using, you are responsible for closing it.
@@ -50,7 +58,10 @@ public class OpenShiftClientWrapper {
      * @return OpenShift client
      */
     public OpenShiftClient get(String masterUrl, String token) {
-        Config config = new ConfigBuilder().withMasterUrl(masterUrl).withOauthToken(token).build();
+        LOG.info("Certificate file: {}", caCertFile);
+        Config config = (StringUtils.isBlank(caCertFile))
+                ? new ConfigBuilder().withMasterUrl(masterUrl).withOauthToken(token).build()
+                : new ConfigBuilder().withMasterUrl(masterUrl).withOauthToken(token).withCaCertFile(caCertFile).build();
         return new DefaultOpenShiftClient(config);
     }
 

@@ -12,6 +12,7 @@ ENV JAVA_HOME /etc/alternatives/jre
 ENV OSO_ADDRESS tsrv.devshift.net:8443
 ENV OSO_DOMAIN_NAME tsrv.devshift.net
 ENV JBOSS_HOME /opt/jboss/keycloak
+ENV KUBERNETES_CERTS_CA_FILE /opt/jboss/keycloak/InstallCert/tsrv.devshift.net.cer
 
 RUN mkdir -p $JBOSS_HOME
 
