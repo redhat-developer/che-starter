@@ -35,6 +35,7 @@ import io.fabric8.che.starter.model.Workspace;
 import io.fabric8.che.starter.model.WorkspaceLink;
 import io.fabric8.che.starter.model.WorkspaceStatus;
 import io.fabric8.che.starter.template.ProjectTemplate;
+import io.fabric8.che.starter.template.TokenTemplate;
 import io.fabric8.che.starter.template.WorkspaceTemplate;
 import io.fabric8.che.starter.util.WorkspaceHelper;
 
@@ -49,8 +50,6 @@ public class WorkspaceClient {
     public static final String WORKSPACE_STATUS_STOPPED = "STOPPED";
     public static final long WORKSPACE_START_TIMEOUT_MS = 60000;
 
-    private static final String DUMMY_GITHUB_TOKEN = "DUMMY_GITHUB_TOKEN";
-
     @Autowired
     private WorkspaceTemplate workspaceTemplate;
 
@@ -62,6 +61,9 @@ public class WorkspaceClient {
     
     @Autowired
     private ProjectTemplate projectTemplate;
+    
+    @Autowired
+    private TokenTemplate tokenTemplate;
 
     public List<Workspace> listWorkspaces(String cheServerUrl) {
         String url = CheRestEndpoints.LIST_WORKSPACES.generateUrl(cheServerUrl);
@@ -149,6 +151,28 @@ public class WorkspaceClient {
          }
     }
     
+
+    /**
+     * Uploads the Github oAuth token to the workspace so that the developer can send push requests
+     *  
+     * @param cheServerURL
+     * @param token
+     * @throws IOException
+     */
+    public void setGitHubOAuthToken(String cheServerURL, String token) 
+            throws IOException {
+        String url = cheServerURL + CheRestEndpoints.SET_OAUTH_TOKEN.getEndpoint().replace("{provider}", "github");
+        
+        String jsonTemplate = tokenTemplate.createRequest().setToken(token).getJSON();
+               
+        RestTemplate template = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.TEXT_PLAIN);
+        HttpEntity<String> entity = new HttpEntity<String>(jsonTemplate, headers);
+        
+        template.postForLocation(url, entity);        
+    }
+
     @Async
     public void createProject(String cheServerURL, String workspaceId, String name, String repo, String branch)
             throws IOException {
@@ -174,32 +198,17 @@ public class WorkspaceClient {
 
         DevMachineServer server = workspace.getRuntime().getDevMachine().getRuntime().getServers().get("4401/tcp");
         
-        // Upload the Github oAuth token to the workspace so that the developer can send push requests
-        String url = server.getUrl() + CheRestEndpoints.SET_OAUTH_TOKEN.getEndpoint().replace("{provider}", "github");
-        LOG.info("Setting oAuth token for workspace");
-        
-        // TODO which parameter do we need to pass here? 
-        // ^ it should keycloak authorization token that is passed to che-strarter from Platform in header
-        String token = DUMMY_GITHUB_TOKEN;
-        
-        RestTemplate template = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.TEXT_PLAIN);
-        HttpEntity<String> entity = new HttpEntity<String>(token, headers);
-        
-        //TODO uncomment this line when the oAuth service is ready
-        //template.postForLocation(url, entity);        
 
         // Next we create a new project within the workspace
-        url = CheRestEndpoints.CREATE_PROJECT.generateUrl(server.getUrl(), workspaceId);
+        String url = CheRestEndpoints.CREATE_PROJECT.generateUrl(server.getUrl(), workspaceId);
         LOG.info("Creating project against workspace agent URL: {}", url);
 
         String jsonTemplate = projectTemplate.createRequest().setName(name).setRepo(repo).setBranch(branch).getJSON();
 
-        template = new RestTemplate();
-        headers = new HttpHeaders();
+        RestTemplate template = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        entity = new HttpEntity<String>(jsonTemplate, headers);
+        HttpEntity<String> entity = new HttpEntity<String>(jsonTemplate, headers);
 
         ResponseEntity<Project[]> response = template.exchange(url, HttpMethod.POST, entity, Project[].class);
 

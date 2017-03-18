@@ -34,6 +34,7 @@ import io.fabric8.che.starter.client.WorkspaceClient;
 import io.fabric8.che.starter.client.keycloak.KeycloakClient;
 import io.fabric8.che.starter.exception.RouteNotFoundException;
 import io.fabric8.che.starter.model.Workspace;
+import io.fabric8.che.starter.model.request.TokenCreateParams;
 import io.fabric8.che.starter.model.request.WorkspaceCreateParams;
 import io.fabric8.che.starter.openshift.OpenShiftClientWrapper;
 import io.fabric8.che.starter.util.ProjectHelper;
@@ -46,6 +47,8 @@ import io.swagger.annotations.ApiParam;
 public class WorkspaceController {
     private static final Logger LOG = LogManager.getLogger(WorkspaceController.class);
 
+    private static final String DUMMY_GITHUB_TOKEN = "DUMMY_GITHUB_TOKEN";
+    
     @Autowired
     OpenShiftClientWrapper openShiftClientWrapper;
 
@@ -66,17 +69,19 @@ public class WorkspaceController {
     public Workspace create(@RequestParam String masterUrl, @RequestParam String namespace, @RequestBody WorkspaceCreateParams params,
     		@ApiParam("keycloak token") @RequestHeader("Authorization") String keycloakToken) throws IOException, URISyntaxException, RouteNotFoundException {
         String openShiftToken = keycloakClient.getOpenShiftToken(keycloakToken);
-        return createWorkspace(masterUrl, namespace, openShiftToken, params);
+        String oAuthToken = keycloakClient.getGitHubToken(keycloakToken);                        
+        return createWorkspace(masterUrl, namespace, openShiftToken, oAuthToken, params);
     }
     
     @ApiOperation(value = "Create and start a new workspace. Stop all other workspaces (only one workspace can be running at a time). If a workspace with the imported project already exists, just start it")
     @PostMapping("/workspace/oso")
     public Workspace createOnOpenShift(@RequestParam String masterUrl, @RequestParam String namespace, @RequestBody WorkspaceCreateParams params,
     		@ApiParam("OpenShift token") @RequestHeader("Authorization") String openShiftToken) throws IOException, URISyntaxException, RouteNotFoundException {
-        return createWorkspace(masterUrl, namespace, openShiftToken, params);    
+        return createWorkspace(masterUrl, namespace, openShiftToken, null, params);    
     }
     
-    public Workspace createWorkspace(String masterUrl, String namespace, String openShiftToken, WorkspaceCreateParams params) throws RouteNotFoundException, URISyntaxException, IOException {
+    public Workspace createWorkspace(String masterUrl, String namespace, String openShiftToken, String oAuthToken, WorkspaceCreateParams params) 
+            throws RouteNotFoundException, URISyntaxException, IOException {
         String cheServerUrl = openShiftClientWrapper.getCheServerUrl(masterUrl, namespace, openShiftToken);
 
         String projectName = projectHelper.getProjectNameFromGitRepository(params.getRepo());
@@ -100,14 +105,19 @@ public class WorkspaceController {
         // Create the workspace
         Workspace workspaceInfo = workspaceClient.createWorkspace(cheServerUrl, params.getName(), params.getStack(),
                 params.getRepo(), params.getBranch());
-
+        
+        // Set the GitHub oAuth token if it is available
+        if (oAuthToken != null && !"".equals(oAuthToken)) {
+            workspaceClient.setGitHubOAuthToken(cheServerUrl, oAuthToken);
+        }
+        
         // Create the project - this is an async call
         workspaceClient.createProject(cheServerUrl, workspaceInfo.getId(), projectName, params.getRepo(),
                 params.getBranch());
         
         return workspaceInfo;
     }
-
+    
     @ApiOperation(value = "List workspaces per git repository. If repository parameter is not specified return all workspaces")
     @GetMapping("/workspace")
     public List<Workspace> list(@RequestParam String masterUrl, @RequestParam String namespace, @RequestParam(required = false) String repository,

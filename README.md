@@ -29,6 +29,12 @@ There are several ways for running the project:
     $ java -jar target/che-starter-1.0-SNAPSHOT.jar
 ````
 
+To tell it which application properties file to use (located in the src/main/resources directory) specify the spring.profiles.active parameter, like so:
+
+```bash
+    $ java -Dspring.profiles.active=local -jar target/che-starter-1.0-SNAPSHOT.jar 
+````
+
 Once the service is running, it would be available with [Swagger](http://swagger.io/) documentation on [http://localhost:10000/](http://localhost:10000/)
 
 * Docker container:
@@ -77,15 +83,16 @@ che-starter can be tested locally against Minishift. The instructions for runnin
 
 Executing Requests
 ------------------
-Many of the services available via the Swagger interface require setting both a masterUrl, and Authorization token.
+Many of the services available via the Swagger interface require setting masterUrl, namespace and Authorization token.
 
 - The masterUrl value is the Openshift REST API endpoint. If running against Minishift, execute the following to open the minishift console:
 
 ```bash
     minishift console
 ````
-
 - Copy the URL excluding the path component, this will be used as the masterUrl.  For example, a console address of https://192.168.42.64:8443/console/ would mean the masterUrl value is https://192.168.42.64:8443/.
+
+- The namespace is the project name in Openshift in which the Che server is deployed (usually "eclipse-che").  Logging in as the developer user (described next) will list the user's projects.
 
 - In order to obtain the Authorization token use the following command:
 
@@ -94,7 +101,7 @@ Many of the services available via the Swagger interface require setting both a 
     oc whoami -t
 ````
 
-The output of this command (a seemingly random string of characters and numbers) is the authorization token.
+The output of this command (which looks like a random string of characters and numbers) is the authorization token.
 
 License
 -------

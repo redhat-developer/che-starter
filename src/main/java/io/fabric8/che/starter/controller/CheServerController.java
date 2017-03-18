@@ -80,5 +80,4 @@ public class CheServerController {
 
 		return new CheServerInfo();
 	}
-
 }

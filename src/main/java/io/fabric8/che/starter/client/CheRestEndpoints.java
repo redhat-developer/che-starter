@@ -22,7 +22,7 @@ public enum CheRestEndpoints {
     STOP_WORKSPACE      ("/api/workspace/{id}/runtime"),
     LIST_STACKS         ("/api/stack?maxItems=1000"),
     CREATE_PROJECT      ("/project/batch"),
-    SET_OAUTH_TOKEN     ("/oauth/token/{provider}");
+    SET_OAUTH_TOKEN     ("/wsmaster/api/oauth/token?oauth_provider={provider}");
 
     private final String endpoint;
 
