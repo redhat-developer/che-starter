@@ -77,15 +77,15 @@ public class OpenShiftClientWrapper {
     public String getCheServerUrl(String masterUrl, String namespace, String token) throws RouteNotFoundException {
         String routeURL;
         OpenShiftClient openShiftClient = null;
-    	try {
-        	openShiftClient = this.get(masterUrl, token);
-			dc.deployCheIfSuspended(openShiftClient, namespace);
-			routeURL = route.getUrl(openShiftClient, namespace);
-    	} finally {
-    		if (openShiftClient != null) {
-    			openShiftClient.close();
-    		}
-    	}
+        try {
+            openShiftClient = this.get(masterUrl, token);
+            dc.deployCheIfSuspended(openShiftClient, namespace);
+            routeURL = route.getUrl(openShiftClient, namespace);
+        } finally {
+            if (openShiftClient != null) {
+                openShiftClient.close();
+            }
+        }
         return routeURL;
     }
 
