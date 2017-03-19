@@ -26,16 +26,28 @@ final class CheServerRoute {
     private static final Logger LOG = LogManager.getLogger(CheServerRoute.class);
 
     @Value("${che.openshift.route}")
-    private String routeName;
+    private String cheRoute;
 
-    public String getUrl(OpenShiftClient client, String namespace) throws RouteNotFoundException {
-        Route route = client.routes().inNamespace(namespace).withName(routeName).get();
+    @Value("${che-host.openshift.route}")
+    private String cheHostRoute;
+
+    public String getUrl(final OpenShiftClient client, final String namespace) throws RouteNotFoundException {
+        Route route = getRouteByName(client, namespace, cheRoute);
+        if (route == null) {
+            LOG.warn("Route '" + cheRoute + "' not found. Trying to get '" + cheHostRoute + "' route");
+            route = getRouteByName(client, namespace, cheHostRoute);
+        }
         if (route != null) {
             String host = route.getSpec().getHost();
-            LOG.info("Router host {}: ", host);
-            return  "http://" + host;
+            LOG.info("Host '{}' has been found", host);
+            return "http://" + host;
         }
-        throw new RouteNotFoundException("Route '" + routeName +"' is not found in '" + namespace + "' namespace");
+        throw new RouteNotFoundException(
+                "Routes '" + cheRoute + "'/'" + cheHostRoute + "' not found in '" + namespace + "' namespace");
+    }
+
+    private Route getRouteByName(final OpenShiftClient client, final String namespace, final String routeName) {
+        return client.routes().inNamespace(namespace).withName(routeName).get();
     }
 
 }
