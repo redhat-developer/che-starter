@@ -20,6 +20,8 @@ WORKDIR $CHE_STARTER_HOME
 RUN git clone https://github.com/almighty/InstallCert.git && \
      javac $CHE_STARTER_HOME/InstallCert/InstallCert.java
 
+RUN chown -R 1000:0 ${CHE_STARTER_HOME} && chmod -R ug+rw ${CHE_STARTER_HOME}
+
 ADD docker-entrypoint.sh $CHE_STARTER_HOME
 
 VOLUME /tmp
