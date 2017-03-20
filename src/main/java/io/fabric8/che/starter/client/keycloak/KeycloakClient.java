@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -38,10 +39,16 @@ public class KeycloakClient implements TokenReceiver {
     private static final String ACCESS_TOKEN = "access_token";
     private static final String SCOPE = "scope";
 
+    @Value("${OPENSHIFT_TOKEN_URL:http://sso.prod-preview.openshift.io/auth/realms/fabric8/broker/openshift-v3/token}")
+    private String openShiftTokenUrl;
+
+    @Value("${GITHUB_TOKEN_URL:http://sso.prod-preview.openshift.io/auth/realms/fabric8/broker/github/token}")
+    private String gitHubTokenUrl;
+
     @Override
     public String getOpenShiftToken(String authHeader) throws JsonProcessingException, IOException {
         // {"access_token":"token","expires_in":86400,"scope":"user:full","token_type":"Bearer"}
-        String responseBody = getResponseBody(KeycloakEndpoint.OPENSHIFT_TOKEN_URL, authHeader);
+        String responseBody = getResponseBody(openShiftTokenUrl, authHeader);
         ObjectMapper mapper = new ObjectMapper();
         JsonNode json = mapper.readTree(responseBody);
         JsonNode accessToken = json.get(ACCESS_TOKEN);
@@ -51,7 +58,7 @@ public class KeycloakClient implements TokenReceiver {
     @Override
     public String getGitHubToken(String authHeader) {
         // access_token=token&scope=scope
-        String responseBody = getResponseBody(KeycloakEndpoint.GITHUB_TOKEN_URL, authHeader);
+        String responseBody = getResponseBody(gitHubTokenUrl, authHeader);
         Map<String, String> parameter = UrlHelper.splitQuery(responseBody);
         String token = parameter.get(ACCESS_TOKEN);
         LOG.info("Token: {}", token);
@@ -60,7 +67,7 @@ public class KeycloakClient implements TokenReceiver {
         return token;
     }
 
-    private String getResponseBody(KeycloakEndpoint endpoint, String authHeader) {
+    private String getResponseBody(String endpoint, String authHeader) {
         RestTemplate template = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
