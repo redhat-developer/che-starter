@@ -2,29 +2,30 @@ FROM centos:7
 
 ARG VERSION=1.0-SNAPSHOT
 
+ENV JAVA_HOME /etc/alternatives/jre
+ENV CHE_STARTER_HOME /opt/che-starter
+
+## Default ENV variable values
+ENV OSO_ADDRESS tsrv.devshift.net:8443
+ENV OSO_DOMAIN_NAME tsrv.devshift.net
+ENV KUBERNETES_CERTS_CA_FILE tsrv.devshift.net.cer
+
 RUN yum update -y && \
     yum install -y \
        java-1.8.0-openjdk java-1.8.0-openjdk-devel git && \
     yum clean all
 
-ENV JAVA_HOME /etc/alternatives/jre
+WORKDIR $CHE_STARTER_HOME
 
-ENV OSO_ADDRESS tsrv.devshift.net:8443
-ENV OSO_DOMAIN_NAME tsrv.devshift.net
-ENV JBOSS_HOME /opt/jboss/keycloak
-ENV KUBERNETES_CERTS_CA_FILE /opt/jboss/keycloak/InstallCert/tsrv.devshift.net.cer
+RUN git clone https://github.com/almighty/InstallCert.git && \
+     javac $CHE_STARTER_HOME/InstallCert/InstallCert.java
 
-RUN mkdir -p $JBOSS_HOME
-
-WORKDIR $JBOSS_HOME
-
-ADD install_certificate.sh /opt/jboss/keycloak/
-RUN /opt/jboss/keycloak/install_certificate.sh
-
-EXPOSE 10000
+ADD docker-entrypoint.sh $CHE_STARTER_HOME
 
 VOLUME /tmp
 
-ADD target/che-starter-$VERSION.jar app.jar
-RUN bash -c 'touch /app.jar'
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/opt/jboss/keycloak/app.jar"]
+ADD target/che-starter-$VERSION.jar $CHE_STARTER_HOME/app.jar
+
+EXPOSE 10000
+
+ENTRYPOINT ["$CHE_STARTER_HOME/docker-entrypoint.sh"]

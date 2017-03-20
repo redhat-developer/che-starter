@@ -41,7 +41,7 @@ public class KeycloakClient implements TokenReceiver {
     @Override
     public String getOpenShiftToken(String authHeader) throws JsonProcessingException, IOException {
         // {"access_token":"token","expires_in":86400,"scope":"user:full","token_type":"Bearer"}
-        String responseBody = getResponseBody(KeycloakEndpoint.GET_OPENSHIFT_TOKEN, authHeader);
+        String responseBody = getResponseBody(KeycloakEndpoint.OPENSHIFT_TOKEN_URL, authHeader);
         ObjectMapper mapper = new ObjectMapper();
         JsonNode json = mapper.readTree(responseBody);
         JsonNode accessToken = json.get(ACCESS_TOKEN);
@@ -51,7 +51,7 @@ public class KeycloakClient implements TokenReceiver {
     @Override
     public String getGitHubToken(String authHeader) {
         // access_token=token&scope=scope
-        String responseBody = getResponseBody(KeycloakEndpoint.GET_GITHUB_TOKEN, authHeader);
+        String responseBody = getResponseBody(KeycloakEndpoint.GITHUB_TOKEN_URL, authHeader);
         Map<String, String> parameter = UrlHelper.splitQuery(responseBody);
         String token = parameter.get(ACCESS_TOKEN);
         LOG.info("Token: {}", token);
