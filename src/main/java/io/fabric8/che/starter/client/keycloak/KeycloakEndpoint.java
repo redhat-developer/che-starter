@@ -37,8 +37,8 @@ package io.fabric8.che.starter.client.keycloak;
  */
 public final class KeycloakEndpoint {
 
-    private static final String OPENSHIFT_TOKEN_URL = System.getenv("OPENSHIFT_TOKEN_URL");
-    private static final String GITHUB_TOKEN_URL = System.getenv("GITHUB_TOKEN_URL");
+    public static final String OPENSHIFT_TOKEN_URL = System.getenv("OPENSHIFT_TOKEN_URL");
+    public static final String GITHUB_TOKEN_URL = System.getenv("GITHUB_TOKEN_URL");
 
     private KeycloakEndpoint(){}
 }
