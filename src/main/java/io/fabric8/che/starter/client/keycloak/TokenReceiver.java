@@ -14,7 +14,7 @@ package io.fabric8.che.starter.client.keycloak;
 
 public interface TokenReceiver {
 
-    String getOpenShiftToken(String authHeader) throws Exception;
+    String getOpenShiftToken(String keycloakToken) throws Exception;
 
-    String getGitHubToken(String authHeader);
+    String getGitHubToken(String keycloakToken);
 }

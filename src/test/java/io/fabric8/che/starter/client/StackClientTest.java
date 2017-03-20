@@ -38,7 +38,7 @@ public class StackClientTest extends TestConfig {
 
     @Test
     public void listStacks() {
-        List<Stack> stacks = client.listStacks(cheServerURL);
+        List<Stack> stacks = client.listStacks(cheServerURL, null);
         LOG.info("Number of stacks: {}", stacks.size());
         assertTrue(!stacks.isEmpty());
     }

@@ -33,51 +33,47 @@ import io.swagger.annotations.ApiParam;
 @CrossOrigin
 @RestController
 public class CheServerController {
-	private static final Logger LOG = LogManager.getLogger(CheServerController.class);
+    private static final Logger LOG = LogManager.getLogger(CheServerController.class);
 
-	@Autowired
-	CheServerTemplate template;
+    @Autowired
+    CheServerTemplate template;
 
-	@Autowired
-	OpenShiftClientWrapper openShiftClientWrapper;
+    @Autowired
+    OpenShiftClientWrapper openShiftClientWrapper;
 
-	@Autowired
-	KeycloakClient keycloakClient;
+    @Autowired
+    KeycloakClient keycloakClient;
 
-	@ApiOperation(value = "Create Che server on OpenShift instance")
-	@PostMapping("/server")
-	public CheServerInfo startCheServer(@RequestParam String masterUrl, @RequestParam String namespace,
-			@ApiParam("keycloak token") @RequestHeader("Authorization") String keycloakToken) throws Exception {
-		LOG.info("OpenShift master Url: {}", masterUrl);
-		LOG.info("OpenShift namespace {}", namespace);
+    @ApiOperation(value = "Create Che server on OpenShift instance")
+    @PostMapping("/server")
+    public CheServerInfo startCheServer(@RequestParam String masterUrl, @RequestParam String namespace,
+            @ApiParam("keycloak token") @RequestHeader("Authorization") String keycloakToken) throws Exception {
+        String openShiftToken = keycloakClient.getOpenShiftToken(keycloakToken);
+        return getCheServerInfo(masterUrl, namespace, openShiftToken);
+    }
 
-		String openShiftToken = keycloakClient.getOpenShiftToken(keycloakToken);
-		return getCheServerInfo(masterUrl, namespace, openShiftToken);
-	}
+    @ApiOperation(value = "Create Che server on OpenShift instance ")
+    @PostMapping(path = "/server/oso")
+    public CheServerInfo startCheServerOnOpenShift(@RequestParam String masterUrl, @RequestParam String namespace,
+            @ApiParam("OpenShift token") @RequestHeader("Authorization") String openShiftToken) throws Exception {
+        return getCheServerInfo(masterUrl, namespace, openShiftToken);
+    }
 
-	@ApiOperation(value = "Create Che server on OpenShift instance ")
-	@PostMapping(path="/server/oso")
-	public CheServerInfo startCheServerOnOpenShift(@RequestParam String masterUrl, @RequestParam String namespace,
-			@ApiParam("OpenShift token") @RequestHeader("Authorization") String openShiftToken) throws Exception {
-		LOG.info("OpenShift master Url: {}", masterUrl);
-		LOG.info("OpenShift namespace {}", namespace);
+    private CheServerInfo getCheServerInfo(String masterUrl, String namespace, String openShiftToken) throws Exception {
+        LOG.info("OpenShift master Url: {}", masterUrl);
+        LOG.info("OpenShift namespace {}", namespace);
 
-		return getCheServerInfo(masterUrl, namespace, openShiftToken);
-	}
+        OpenShiftClient openShiftClient = null;
+        try {
+            openShiftClient = openShiftClientWrapper.get(masterUrl, openShiftToken);
+            Controller controller = new Controller(openShiftClient);
+            controller.applyJson(template.get());
+        } finally {
+            if (openShiftClient != null) {
+                openShiftClient.close();
+            }
+        }
 
-	private CheServerInfo getCheServerInfo(String masterUrl, String namespace, String openShiftToken) throws Exception {
-
-		OpenShiftClient openShiftClient = null;
-		try {
-			openShiftClient = openShiftClientWrapper.get(masterUrl, openShiftToken);
-			Controller controller = new Controller(openShiftClient);
-			controller.applyJson(template.get());
-		} finally {
-			if (openShiftClient != null) {
-				openShiftClient.close();
-			}
-		}
-
-		return new CheServerInfo();
-	}
+        return new CheServerInfo();
+    }
 }
