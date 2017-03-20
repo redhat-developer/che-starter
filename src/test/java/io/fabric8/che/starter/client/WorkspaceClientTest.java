@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import io.fabric8.che.starter.TestConfig;
+import io.fabric8.che.starter.exception.StackNotFoundException;
 import io.fabric8.che.starter.model.Workspace;
 import io.fabric8.che.starter.util.WorkspaceHelper;
 
@@ -52,7 +53,7 @@ public class WorkspaceClientTest extends TestConfig {
 
     
     @Test
-    public void createAndDeleteWorkspace() throws IOException {
+    public void createAndDeleteWorkspace() throws IOException, StackNotFoundException {
         Workspace workspace = client.createWorkspace(cheServerURL, workspaceHelper.generateName(), STACK_ID, GITHUB_REPO, BRANCH);
         LOG.info("Workspace URL: {}",workspace.getWorkspaceIdeUrl());
         client.deleteWorkspace(cheServerURL, workspace.getId());

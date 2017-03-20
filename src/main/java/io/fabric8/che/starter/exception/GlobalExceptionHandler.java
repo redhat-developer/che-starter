@@ -42,10 +42,9 @@ public class GlobalExceptionHandler {
         return e.getMessage();
     }
 
-    @SuppressWarnings("restriction")
-    @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "Unable to find valid certification path to requested target")
-    @ExceptionHandler(sun.security.provider.certpath.SunCertPathBuilderException.class)
-    public String handleSunCertPathBuilderException(RouteNotFoundException e) {
+    @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Stack not found")
+    @ExceptionHandler(StackNotFoundException.class)
+    public String handleStackNotFoundException(StackNotFoundException e) {
         return e.getMessage();
     }
 

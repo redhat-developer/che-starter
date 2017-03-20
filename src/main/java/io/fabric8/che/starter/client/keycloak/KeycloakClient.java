@@ -13,16 +13,11 @@
 package io.fabric8.che.starter.client.keycloak;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -35,9 +30,7 @@ import io.fabric8.che.starter.util.UrlHelper;
 
 @Component
 public class KeycloakClient implements TokenReceiver {
-    private static final Logger LOG = LogManager.getLogger(KeycloakClient.class);
     private static final String ACCESS_TOKEN = "access_token";
-    private static final String SCOPE = "scope";
 
     @Value("${OPENSHIFT_TOKEN_URL:http://sso.prod-preview.openshift.io/auth/realms/fabric8/broker/openshift-v3/token}")
     private String openShiftTokenUrl;
@@ -46,9 +39,9 @@ public class KeycloakClient implements TokenReceiver {
     private String gitHubTokenUrl;
 
     @Override
-    public String getOpenShiftToken(String authHeader) throws JsonProcessingException, IOException {
+    public String getOpenShiftToken(String keycloakToken) throws JsonProcessingException, IOException {
         // {"access_token":"token","expires_in":86400,"scope":"user:full","token_type":"Bearer"}
-        String responseBody = getResponseBody(openShiftTokenUrl, authHeader);
+        String responseBody = getResponseBody(openShiftTokenUrl, keycloakToken);
         ObjectMapper mapper = new ObjectMapper();
         JsonNode json = mapper.readTree(responseBody);
         JsonNode accessToken = json.get(ACCESS_TOKEN);
@@ -56,24 +49,18 @@ public class KeycloakClient implements TokenReceiver {
     }
 
     @Override
-    public String getGitHubToken(String authHeader) {
+    public String getGitHubToken(String keycloakToken) {
         // access_token=token&scope=scope
-        String responseBody = getResponseBody(gitHubTokenUrl, authHeader);
+        String responseBody = getResponseBody(gitHubTokenUrl, keycloakToken);
         Map<String, String> parameter = UrlHelper.splitQuery(responseBody);
         String token = parameter.get(ACCESS_TOKEN);
-        LOG.info("Token: {}", token);
-        String skope = parameter.get(SCOPE);
-        LOG.info("Skope: {}", skope);
         return token;
     }
 
-    private String getResponseBody(String endpoint, String authHeader) {
+    private String getResponseBody(String endpoint, String keycloakToken) {
         RestTemplate template = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-        headers.add("Authorization", authHeader);
-        HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
-        ResponseEntity<String> response = template.exchange(endpoint.toString(), HttpMethod.GET, entity, String.class);
+        template.setInterceptors(Collections.singletonList(new KeycloakInterceptor(keycloakToken)));
+        ResponseEntity<String> response = template.exchange(endpoint.toString(), HttpMethod.GET, null, String.class);
         return response.getBody();
     }
 
