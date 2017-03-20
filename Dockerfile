@@ -28,4 +28,4 @@ ADD target/che-starter-$VERSION.jar $CHE_STARTER_HOME/app.jar
 
 EXPOSE 10000
 
-ENTRYPOINT ["$CHE_STARTER_HOME/docker-entrypoint.sh"]
+ENTRYPOINT ["/opt/che-starter/docker-entrypoint.sh"]
