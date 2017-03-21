@@ -24,36 +24,36 @@ import io.fabric8.openshift.client.OpenShiftClient;
 @Ignore("Test is run against local minishift cluster and requires additional setup")
 public class RouteTest extends TestConfig {
 
-	@Autowired
-	CheServerRoute route;
+    @Autowired
+    CheServerRoute route;
 
-	@Autowired
-	OpenShiftClientWrapper client;
+    @Autowired
+    OpenShiftClientWrapper client;
 
-	@Value("${che.openshift.username}")
-	private String username;
+    @Value("${che.openshift.username}")
+    private String username;
 
-	@Value("${che.openshift.password}")
-	private String password;
+    @Value("${che.openshift.password}")
+    private String password;
 
-	@Value("${che.openshift.endpoint}")
-	private String endpoint;
+    @Value("${che.openshift.endpoint}")
+    private String endpoint;
 
-	@Value("${che.openshift.namespace}")
-	private String namespace;
+    @Value("${che.openshift.namespace}")
+    private String namespace;
 
-	@Test
-	public void testRouteURL() throws RouteNotFoundException {
-		OpenShiftClient openShiftClient = null;
-		try {
-			openShiftClient = client.get(endpoint, username, password);
-			route.getUrl(openShiftClient, namespace);
-			openShiftClient.close();
-		} finally {
-			if (openShiftClient != null) {
-				openShiftClient.close();
-			}
-		}
-	}
+    @Test
+    public void testRouteURL() throws RouteNotFoundException {
+        OpenShiftClient openShiftClient = null;
+        try {
+            openShiftClient = client.get(endpoint, username, password);
+            route.getUrl(openShiftClient, namespace);
+            openShiftClient.close();
+        } finally {
+            if (openShiftClient != null) {
+                openShiftClient.close();
+            }
+        }
+    }
 
 }

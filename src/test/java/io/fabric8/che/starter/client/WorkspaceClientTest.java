@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,7 +27,6 @@ import io.fabric8.che.starter.exception.StackNotFoundException;
 import io.fabric8.che.starter.model.Workspace;
 import io.fabric8.che.starter.util.WorkspaceHelper;
 
-@Ignore("'demo.che.ci.centos.org' is down")
 public class WorkspaceClientTest extends TestConfig {
     private static final Logger LOG = LogManager.getLogger(WorkspaceClientTest.class);
     private static final String GITHUB_REPO = "https://github.com/che-samples/console-java-simple";

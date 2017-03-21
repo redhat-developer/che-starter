@@ -18,7 +18,6 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,7 +25,6 @@ import org.springframework.beans.factory.annotation.Value;
 import io.fabric8.che.starter.TestConfig;
 import io.fabric8.che.starter.model.Stack;
 
-@Ignore("'demo.che.ci.centos.org' is down")
 public class StackClientTest extends TestConfig {
     private static final Logger LOG = LogManager.getLogger(StackClientTest.class);
 
