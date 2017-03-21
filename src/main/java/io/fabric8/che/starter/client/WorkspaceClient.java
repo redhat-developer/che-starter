@@ -142,7 +142,7 @@ public class WorkspaceClient {
                
         RestTemplate template = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.TEXT_PLAIN);
+        headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<String>(jsonTemplate, headers);
         
         template.postForLocation(url, entity);        
