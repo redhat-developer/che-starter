@@ -27,9 +27,9 @@ public class CheRestEndpointTest extends TestConfig {
     @Test
     public void generateUrlsFromEndpoints() {
         String createWorkspceUrl = CheRestEndpoints.CREATE_WORKSPACE.generateUrl(cheServerUrl);
-        assertEquals(createWorkspceUrl, "http://demo.che.ci.centos.org/api/workspace");
+        assertEquals(createWorkspceUrl, cheServerUrl + "/api/workspace");
         String deleteWorkspaceUrl = CheRestEndpoints.DELETE_WORKSPACE.generateUrl(cheServerUrl, WORKSPACE_ID);
-        assertEquals(deleteWorkspaceUrl, "http://demo.che.ci.centos.org/api/workspace/" + WORKSPACE_ID);
+        assertEquals(deleteWorkspaceUrl, cheServerUrl + "/api/workspace/" + WORKSPACE_ID);
     }
 
 }
