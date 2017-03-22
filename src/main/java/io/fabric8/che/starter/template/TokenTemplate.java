@@ -14,6 +14,8 @@ package io.fabric8.che.starter.template;
 
 import java.io.IOException;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -27,6 +29,13 @@ public class TokenTemplate {
 
     @Value(value = "classpath:templates/token_template.json")
     private Resource resource;
+    
+    String templateCache;
+    
+    @PostConstruct
+    public void initCache() throws IOException {
+        templateCache = Reader.read(resource.getInputStream());
+    }    
 
     public class TokenCreateRequest {
         private String token;
@@ -38,8 +47,8 @@ public class TokenTemplate {
             return this;
         }
 
-        public String getJSON() throws IOException {
-            String json = Reader.read(resource.getInputStream());
+        public String getJSON() {
+            String json = templateCache;
             json = StringUtils.replace(json, TOKEN_VALUE, token);
             return json;
         }

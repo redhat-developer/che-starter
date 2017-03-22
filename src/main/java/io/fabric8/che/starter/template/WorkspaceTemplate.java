@@ -14,6 +14,8 @@ package io.fabric8.che.starter.template;
 
 import java.io.IOException;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,6 +33,13 @@ public class WorkspaceTemplate {
 
     @Value(value = "classpath:templates/workspace_template.json")
     private Resource resource;
+    
+    String templateCache;
+    
+    @PostConstruct
+    public void initCache() throws IOException {
+        templateCache = Reader.read(resource.getInputStream());
+    }
 
     @Autowired
     private WorkspaceHelper helper;
@@ -71,8 +80,8 @@ public class WorkspaceTemplate {
             return description;
         }
 
-        public String getJSON() throws IOException {
-            String json = Reader.read(resource.getInputStream());
+        public String getJSON() { 
+            String json = templateCache;
             json = StringUtils.replace(json, WORKSPACE_NAME, name);
             json = StringUtils.replace(json, WORKSPACE_STACK_IMAGE, stackImage);
             json = StringUtils.replace(json, WORKSPACE_DESCRIPTION, description);

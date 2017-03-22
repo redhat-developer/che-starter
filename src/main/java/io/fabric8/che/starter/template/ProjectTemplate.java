@@ -14,6 +14,8 @@ package io.fabric8.che.starter.template;
 
 import java.io.IOException;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,6 +36,13 @@ public class ProjectTemplate {
 
     @Autowired
     private ProjectHelper helper;
+    
+    String templateCache;
+    
+    @PostConstruct
+    public void initCache() throws IOException {
+        templateCache = Reader.read(resource.getInputStream());
+    }    
 
     public class ProjectCreateRequest {
         private String name;
@@ -65,8 +74,8 @@ public class ProjectTemplate {
             return this;
         }
 
-        public String getJSON() throws IOException {
-            String json = Reader.read(resource.getInputStream());
+        public String getJSON() {
+            String json = templateCache;
             json = StringUtils.replace(json, PROJECT_NAME, name);
             json = StringUtils.replace(json, PROJECT_GIT_REPO, repo);
             json = StringUtils.replace(json, PROJECT_GIT_BRANCH, branch);
