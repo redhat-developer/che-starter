@@ -145,7 +145,11 @@ public class WorkspaceClient {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<String>(jsonTemplate, headers);
         
-        template.postForLocation(url, entity);        
+        try {
+            template.postForLocation(url, entity);
+        } catch (Exception ex) {
+            LOG.error("Error setting GitHub oAuth token on Che Server", ex);
+        }
     }
 
     @Async
