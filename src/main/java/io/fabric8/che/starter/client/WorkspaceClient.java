@@ -25,17 +25,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import io.fabric8.che.starter.exception.StackNotFoundException;
-import io.fabric8.che.starter.model.DevMachineServer;
-import io.fabric8.che.starter.model.Project;
 import io.fabric8.che.starter.model.Workspace;
 import io.fabric8.che.starter.model.WorkspaceLink;
 import io.fabric8.che.starter.model.WorkspaceStatus;
-import io.fabric8.che.starter.template.ProjectTemplate;
 import io.fabric8.che.starter.template.WorkspaceTemplate;
 import io.fabric8.che.starter.util.WorkspaceHelper;
 
@@ -48,7 +44,6 @@ public class WorkspaceClient {
     public static final String WORKSPACE_STATUS_RUNNING = "RUNNING";
     public static final String WORKSPACE_STATUS_STARTING = "STARTING";
     public static final String WORKSPACE_STATUS_STOPPED = "STOPPED";
-    public static final long WORKSPACE_START_TIMEOUT_MS = 60000;
 
     @Autowired
     private WorkspaceTemplate workspaceTemplate;
@@ -58,9 +53,6 @@ public class WorkspaceClient {
 
     @Autowired
     private StackClient stackClient;
-
-    @Autowired
-    private ProjectTemplate projectTemplate;
 
     public List<Workspace> listWorkspaces(String cheServerUrl) {
         String url = CheRestEndpoints.LIST_WORKSPACES.generateUrl(cheServerUrl);
@@ -124,52 +116,6 @@ public class WorkspaceClient {
         }
 
         return workspace;
-    }
-
-    @Async
-    public void createProject(String cheServerURL, String workspaceId, String name, String repo, String branch)
-            throws IOException {
-
-        // Before we can create a project, we must start the new workspace
-        startWorkspace(cheServerURL, workspaceId);
-
-        // Poll until the workspace is started
-        WorkspaceStatus status = getWorkspaceStatus(cheServerURL, workspaceId);
-        long currentTime = System.currentTimeMillis();
-        while (!WORKSPACE_STATUS_RUNNING.equals(status.getWorkspaceStatus())
-                && System.currentTimeMillis() < (currentTime + WORKSPACE_START_TIMEOUT_MS)) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                LOG.error("Error while polling for workspace status", e);
-                break;
-            }
-            status = getWorkspaceStatus(cheServerURL, workspaceId);
-        }
-
-        Workspace workspace = getWorkspace(cheServerURL, workspaceId);
-
-        DevMachineServer server = workspace.getRuntime().getDevMachine().getRuntime().getServers().get("4401/tcp");
-
-        // Next we create a new project within the workspace
-        String url = CheRestEndpoints.CREATE_PROJECT.generateUrl(server.getUrl(), workspaceId);
-        LOG.info("Creating project against workspace agent URL: {}", url);
-
-        String jsonTemplate = projectTemplate.createRequest().setName(name).setRepo(repo).setBranch(branch).getJSON();
-
-        RestTemplate template = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> entity = new HttpEntity<String>(jsonTemplate, headers);
-
-        ResponseEntity<Project[]> response = template.exchange(url, HttpMethod.POST, entity, Project[].class);
-
-        if (response.getBody().length > 0) {
-            Project p = response.getBody()[0];
-            LOG.info("Successfully created project {}", p.getName());
-        } else {
-            LOG.info("There seems to have been a problem creating project {}", name);
-        }
     }
 
     public Workspace getWorkspace(String cheServerUrl, String workspaceId) {

@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import io.fabric8.che.starter.client.ProjectClient;
 import io.fabric8.che.starter.client.TokenClient;
 import io.fabric8.che.starter.client.WorkspaceClient;
 import io.fabric8.che.starter.client.keycloak.KeycloakClient;
@@ -56,8 +57,11 @@ public class WorkspaceController {
     WorkspaceClient workspaceClient;
 
     @Autowired
+    ProjectClient projectClient;
+
+    @Autowired
     KeycloakClient keycloakClient;
-    
+
     @Autowired
     TokenClient tokenClient;
 
@@ -142,7 +146,7 @@ public class WorkspaceController {
         }
 
         // Create the project - this is an async call
-        workspaceClient.createProject(cheServerUrl, workspaceInfo.getId(), projectName, params.getRepo(),
+        projectClient.createProject(cheServerUrl, workspaceInfo.getId(), projectName, params.getRepo(),
                 params.getBranch());
 
         return workspaceInfo;
