@@ -134,7 +134,7 @@ public class WorkspaceClient {
         startWorkspace(cheServerURL, workspaceId);
 
         // Poll until the workspace is started
-        WorkspaceStatus status = checkWorkspace(cheServerURL, workspaceId);
+        WorkspaceStatus status = getWorkspaceStatus(cheServerURL, workspaceId);
         long currentTime = System.currentTimeMillis();
         while (!WORKSPACE_STATUS_RUNNING.equals(status.getWorkspaceStatus())
                 && System.currentTimeMillis() < (currentTime + WORKSPACE_START_TIMEOUT_MS)) {
@@ -144,13 +144,12 @@ public class WorkspaceClient {
                 LOG.error("Error while polling for workspace status", e);
                 break;
             }
-            status = checkWorkspace(cheServerURL, workspaceId);
+            status = getWorkspaceStatus(cheServerURL, workspaceId);
         }
 
-        Workspace workspace = getWorkspaceById(cheServerURL, workspaceId);
+        Workspace workspace = getWorkspace(cheServerURL, workspaceId);
 
         DevMachineServer server = workspace.getRuntime().getDevMachine().getRuntime().getServers().get("4401/tcp");
-        
 
         // Next we create a new project within the workspace
         String url = CheRestEndpoints.CREATE_PROJECT.generateUrl(server.getUrl(), workspaceId);
@@ -173,7 +172,7 @@ public class WorkspaceClient {
         }
     }
 
-    public Workspace getWorkspaceById(String cheServerUrl, String workspaceId) {
+    public Workspace getWorkspace(String cheServerUrl, String workspaceId) {
         String url = CheRestEndpoints.GET_WORKSPACE_BY_ID.generateUrl(cheServerUrl, workspaceId);
 
         RestTemplate template = new RestTemplate();
@@ -193,9 +192,9 @@ public class WorkspaceClient {
     public void startWorkspace(String cheServerUrl, String workspaceId) {
         // Before starting a workspace, we must first stop all other running workspaces
         List<Workspace> workspaces = listWorkspaces(cheServerUrl);
-        
+
         boolean alreadyStarted = false;
-        
+
         for (Workspace workspace : workspaces) {
             if (workspace.getId().equals(workspaceId)) {
                 if (WORKSPACE_STATUS_RUNNING.equals(workspace.getStatus()) ||
@@ -206,7 +205,7 @@ public class WorkspaceClient {
                 stopWorkspace(cheServerUrl, workspace.getId());
             }
         }
-        
+
         if (!alreadyStarted) {
             String url = CheRestEndpoints.START_WORKSPACE.generateUrl(cheServerUrl, workspaceId);
             RestTemplate template = new RestTemplate();
@@ -214,7 +213,7 @@ public class WorkspaceClient {
         }
     }
 
-    public WorkspaceStatus checkWorkspace(String cheServerUrl, String workspaceId) {
+    public WorkspaceStatus getWorkspaceStatus(String cheServerUrl, String workspaceId) {
         String url = CheRestEndpoints.CHECK_WORKSPACE.generateUrl(cheServerUrl, workspaceId);
 
         RestTemplate template = new RestTemplate();

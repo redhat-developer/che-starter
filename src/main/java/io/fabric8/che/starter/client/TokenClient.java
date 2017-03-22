@@ -50,7 +50,7 @@ public class TokenClient {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<String>(jsonTemplate, headers);
-        
+
         try {
             template.postForLocation(url, entity);
         } catch (Exception e) {
