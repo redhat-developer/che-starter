@@ -14,6 +14,7 @@ package io.fabric8.che.starter.client;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -52,18 +53,17 @@ public class StackClient {
      * @return image name for stack
      * @throws StackNotFoundException if no image name exists for such stack ID or call to Che server was not successful
      */
-    public String getStackImage(String cheServerUrl, String stackId, String keycloakToken)
-            throws StackNotFoundException {
+    public String getStackImage(String cheServerUrl, String stackId, String keycloakToken) throws StackNotFoundException {
         List<Stack> stacks = listStacks(cheServerUrl, keycloakToken);
-        if (stacks != null) {
-            for (Stack stack : stacks) {
-                if (stack.getId().equals(stackId)) {
-                    return stack.getSource().getOrigin();
-                }
+        if (!stacks.isEmpty()) {
+            try {
+                Stack stack = stacks.stream().filter(s -> stackId.equals(s.getId())).findFirst().get();
+                return stack.getSource().getOrigin();
+            } catch (NoSuchElementException e) {
+                throw new StackNotFoundException("Stack with id " + stackId + " was not found");
             }
-            throw new StackNotFoundException("No stack with id " + stackId + " was found.");
         } else {
-            throw new StackNotFoundException("No list of stacks was returned by Che server");
+            throw new StackNotFoundException("No stacks were returned from Che server");
         }
     }
 
