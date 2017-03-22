@@ -140,11 +140,11 @@ public class WorkspaceController {
         if (oAuthToken != null && !"".equals(oAuthToken)) {
             tokenClient.setGitHubOAuthToken(cheServerUrl, oAuthToken);
         }
-        
+
         // Create the project - this is an async call
         workspaceClient.createProject(cheServerUrl, workspaceInfo.getId(), projectName, params.getRepo(),
                 params.getBranch());
-        
+
         return workspaceInfo;
     }
 

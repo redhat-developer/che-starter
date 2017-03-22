@@ -92,7 +92,7 @@ public class WorkspaceClient {
     public Workspace createWorkspace(String cheServerUrl, String name, String stackId, String repo, String branch) throws StackNotFoundException, IOException {
         // The first step is to create the workspace
         String url = CheRestEndpoints.CREATE_WORKSPACE.generateUrl(cheServerUrl);
-        
+
         name = StringUtils.isBlank(name) ? workspaceHelper.generateName() : name;
 
         String stackImage = stackClient.getStackImage(cheServerUrl, stackId, null);
