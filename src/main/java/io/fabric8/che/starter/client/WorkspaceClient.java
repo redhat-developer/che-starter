@@ -35,7 +35,6 @@ import io.fabric8.che.starter.model.Workspace;
 import io.fabric8.che.starter.model.WorkspaceLink;
 import io.fabric8.che.starter.model.WorkspaceStatus;
 import io.fabric8.che.starter.template.ProjectTemplate;
-import io.fabric8.che.starter.template.TokenTemplate;
 import io.fabric8.che.starter.template.WorkspaceTemplate;
 import io.fabric8.che.starter.util.WorkspaceHelper;
 
@@ -58,12 +57,9 @@ public class WorkspaceClient {
 
     @Autowired
     private StackClient stackClient;
-    
+
     @Autowired
     private ProjectTemplate projectTemplate;
-    
-    @Autowired
-    private TokenTemplate tokenTemplate;
 
     public List<Workspace> listWorkspaces(String cheServerUrl) {
         String url = CheRestEndpoints.LIST_WORKSPACES.generateUrl(cheServerUrl);
@@ -125,31 +121,6 @@ public class WorkspaceClient {
         }
 
         return workspace;
-    }
-
-    /**
-     * Uploads the Github oAuth token to the workspace so that the developer can send push requests
-     *  
-     * @param cheServerURL
-     * @param token
-     * @throws IOException
-     */
-    public void setGitHubOAuthToken(String cheServerURL, String token) 
-            throws IOException {
-        String url = cheServerURL + CheRestEndpoints.SET_OAUTH_TOKEN.getEndpoint().replace("{provider}", "github");
-        
-        String jsonTemplate = tokenTemplate.createRequest().setToken(token).getJSON();
-               
-        RestTemplate template = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> entity = new HttpEntity<String>(jsonTemplate, headers);
-        
-        try {
-            template.postForLocation(url, entity);
-        } catch (Exception ex) {
-            LOG.error("Error setting GitHub oAuth token on Che Server", ex);
-        }
     }
 
     @Async
