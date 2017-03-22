@@ -43,7 +43,7 @@ public class StackClient {
     }
 
     /**
-     * Gets image for specified stack ID. Throws IOException if there is no such stack
+     * Gets image for specified stack ID. Throws StackNotFoundException if there is no such stack
      * on the Che server.
      * 
      * @param cheServerUrl URL of Che server
