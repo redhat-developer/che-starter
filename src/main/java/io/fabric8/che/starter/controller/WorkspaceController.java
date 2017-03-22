@@ -62,22 +62,49 @@ public class WorkspaceController {
     @Autowired
     KeycloakClient keycloakClient;
 
+    @ApiOperation(value = "List workspaces per git repository. If repository parameter is not specified return all workspaces")
+    @GetMapping("/workspace")
+    public List<Workspace> list(@RequestParam String masterUrl, @RequestParam String namespace,
+            @RequestParam(required = false) String repository,
+            @ApiParam(value = "Keycloak token", required = true) @RequestHeader("Authorization") String keycloakToken)
+            throws RouteNotFoundException, JsonProcessingException, IOException {
+
+        String openShiftToken = keycloakClient.getOpenShiftToken(keycloakToken);
+        return listWorkspaces(masterUrl, namespace, openShiftToken, repository);
+    }
+
+    @ApiOperation(value = "List workspaces per git repository. If repository parameter is not specified return all workspaces")
+    @GetMapping("/workspace/oso")
+    public List<Workspace> listOnOpenShift(@RequestParam String masterUrl, @RequestParam String namespace,
+            @RequestParam(required = false) String repository,
+            @ApiParam(value = "OpenShift token", required = true) @RequestHeader("Authorization") String openShiftToken)
+            throws RouteNotFoundException, JsonProcessingException, IOException {
+
+        return listWorkspaces(masterUrl, namespace, openShiftToken, repository);
+    }
+
     @ApiOperation(value = "Create and start a new workspace. Stop all other workspaces (only one workspace can be running at a time). If a workspace with the imported project already exists, just start it")
     @PostMapping("/workspace")
-    public Workspace create(@RequestParam String masterUrl, @RequestParam String namespace, @RequestBody WorkspaceCreateParams params,
-    		@ApiParam("keycloak token") @RequestHeader("Authorization") String keycloakToken) throws IOException, URISyntaxException, RouteNotFoundException, StackNotFoundException {
+    public Workspace create(@RequestParam String masterUrl, @RequestParam String namespace,
+            @RequestBody WorkspaceCreateParams params,
+            @ApiParam(value = "Keycloak token", required = true) @RequestHeader("Authorization") String keycloakToken)
+            throws IOException, URISyntaxException, RouteNotFoundException, StackNotFoundException {
+
         String openShiftToken = keycloakClient.getOpenShiftToken(keycloakToken);
-        String oAuthToken = keycloakClient.getGitHubToken(keycloakToken);                        
+        String oAuthToken = keycloakClient.getGitHubToken(keycloakToken);
         return createWorkspace(masterUrl, namespace, openShiftToken, oAuthToken, params);
     }
-    
+
     @ApiOperation(value = "Create and start a new workspace. Stop all other workspaces (only one workspace can be running at a time). If a workspace with the imported project already exists, just start it")
     @PostMapping("/workspace/oso")
-    public Workspace createOnOpenShift(@RequestParam String masterUrl, @RequestParam String namespace, @RequestBody WorkspaceCreateParams params,
-    		@ApiParam("OpenShift token") @RequestHeader("Authorization") String openShiftToken) throws IOException, URISyntaxException, RouteNotFoundException, StackNotFoundException {
+    public Workspace createOnOpenShift(@RequestParam String masterUrl, @RequestParam String namespace,
+            @RequestBody WorkspaceCreateParams params,
+            @ApiParam(value = "OpenShift token", required = true) @RequestHeader("Authorization") String openShiftToken)
+            throws IOException, URISyntaxException, RouteNotFoundException, StackNotFoundException {
+
         return createWorkspace(masterUrl, namespace, openShiftToken, null, params);
     }
-    
+
     public Workspace createWorkspace(String masterUrl, String namespace, String openShiftToken, String oAuthToken, WorkspaceCreateParams params) 
             throws RouteNotFoundException, URISyntaxException, IOException, StackNotFoundException {
         String cheServerUrl = openShiftClientWrapper.getCheServerUrl(masterUrl, namespace, openShiftToken);
@@ -115,24 +142,10 @@ public class WorkspaceController {
         
         return workspaceInfo;
     }
-    
-    @ApiOperation(value = "List workspaces per git repository. If repository parameter is not specified return all workspaces")
-    @GetMapping("/workspace")
-    public List<Workspace> list(@RequestParam String masterUrl, @RequestParam String namespace, @RequestParam(required = false) String repository,
-    		@ApiParam("keycloak token") @RequestHeader("Authorization") String keycloakToken) throws RouteNotFoundException, JsonProcessingException, IOException {
-        String openShiftToken = keycloakClient.getOpenShiftToken(keycloakToken);
-        return listWorkspaces(masterUrl, namespace, openShiftToken, repository);
-    }
-    
-    @ApiOperation(value = "List workspaces per git repository. If repository parameter is not specified return all workspaces")
-    @GetMapping("/workspace/oso")
-    public List<Workspace> listOnOpenShift(@RequestParam String masterUrl, @RequestParam String namespace, @RequestParam(required = false) String repository,
-    		@ApiParam("OpenShift token") @RequestHeader("Authorization") String openShiftToken) throws RouteNotFoundException, JsonProcessingException, IOException {
-        return listWorkspaces(masterUrl, namespace, openShiftToken, repository);
-    }
-    
-    public List<Workspace> listWorkspaces(String masterUrl, String namespace, String openShiftToken, String repository) throws RouteNotFoundException {
-    	String cheServerUrl = openShiftClientWrapper.getCheServerUrl(masterUrl, namespace, openShiftToken);
+
+    public List<Workspace> listWorkspaces(String masterUrl, String namespace, String openShiftToken, String repository)
+            throws RouteNotFoundException {
+        String cheServerUrl = openShiftClientWrapper.getCheServerUrl(masterUrl, namespace, openShiftToken);
         if (!StringUtils.isEmpty(repository)) {
             LOG.info("Fetching workspaces for repositoriy: {}", repository);
             return workspaceClient.listWorkspacesPerRepository(cheServerUrl, repository);

@@ -47,7 +47,7 @@ public class CheServerController {
     @ApiOperation(value = "Create Che server on OpenShift instance")
     @PostMapping("/server")
     public CheServerInfo startCheServer(@RequestParam String masterUrl, @RequestParam String namespace,
-            @ApiParam("keycloak token") @RequestHeader("Authorization") String keycloakToken) throws Exception {
+            @ApiParam(value = "Keycloak token", required = true) @RequestHeader("Authorization") String keycloakToken) throws Exception {
         String openShiftToken = keycloakClient.getOpenShiftToken(keycloakToken);
         return getCheServerInfo(masterUrl, namespace, openShiftToken);
     }
@@ -55,7 +55,7 @@ public class CheServerController {
     @ApiOperation(value = "Create Che server on OpenShift instance ")
     @PostMapping(path = "/server/oso")
     public CheServerInfo startCheServerOnOpenShift(@RequestParam String masterUrl, @RequestParam String namespace,
-            @ApiParam("OpenShift token") @RequestHeader("Authorization") String openShiftToken) throws Exception {
+            @ApiParam(value = "OpenShift token", required = true) @RequestHeader("Authorization") String openShiftToken) throws Exception {
         return getCheServerInfo(masterUrl, namespace, openShiftToken);
     }
 
