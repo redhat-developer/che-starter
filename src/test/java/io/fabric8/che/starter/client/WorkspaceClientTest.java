@@ -38,7 +38,7 @@ public class WorkspaceClientTest extends TestConfig {
 
     @Autowired
     private WorkspaceClient client;
-    
+
     @Autowired
     private WorkspaceHelper workspaceHelper;
 

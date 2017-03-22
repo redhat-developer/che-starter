@@ -48,4 +48,10 @@ public class GlobalExceptionHandler {
         return e.getMessage();
     }
 
+    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR, reason = "Error setting GitHub oAuth token on Che Server")
+    @ExceptionHandler(GitHubOAthTokenException.class)
+    public String handleGitHubOAthTokenException(GitHubOAthTokenException e) {
+        return e.getMessage();
+    }
+
 }
