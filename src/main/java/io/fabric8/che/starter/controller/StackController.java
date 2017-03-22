@@ -41,7 +41,7 @@ public class StackController {
 
     @Autowired
     private StackClient stackClient;
-    
+
     @Autowired
     private OpenShiftClientWrapper openShiftClientWrapper;
 
@@ -50,14 +50,16 @@ public class StackController {
 
     @ApiOperation(value = "List the available stacks")
     @GetMapping("/stack")
-    public List<Stack> list(@RequestParam String masterUrl, @RequestParam String namespace, @ApiParam("Keycloak token") @RequestHeader("Authorization") String keycloakToken) throws RouteNotFoundException, JsonProcessingException, IOException {
+    public List<Stack> list(@RequestParam String masterUrl, @RequestParam String namespace, @ApiParam(value = "Keycloak token", required = true) @RequestHeader("Authorization") String keycloakToken)
+            throws RouteNotFoundException, JsonProcessingException, IOException {
         String openShiftToken = keycloakClient.getOpenShiftToken(keycloakToken);
         return getStacks(masterUrl, namespace, openShiftToken, keycloakToken);
     }
 
     @ApiOperation(value = "List the available stacks")
     @GetMapping("/stack/oso")
-    public List<Stack> listOnOpenShift(@RequestParam String masterUrl, @RequestParam String namespace, @ApiParam("OpenShift token") @RequestHeader("Authorization") String openShiftToken) throws RouteNotFoundException, JsonProcessingException, IOException {
+    public List<Stack> listOnOpenShift(@RequestParam String masterUrl, @RequestParam String namespace, @ApiParam(value = "OpenShift token", required = true) @RequestHeader("Authorization") String openShiftToken)
+            throws RouteNotFoundException, JsonProcessingException, IOException {
         return getStacks(masterUrl, namespace, openShiftToken, null);
     }
 
@@ -68,5 +70,5 @@ public class StackController {
         String cheServerUrl = openShiftClientWrapper.getCheServerUrl(masterUrl, namespace, openShiftToken);
         return stackClient.listStacks(cheServerUrl, keycloakToken);
     }
-    
+
 }

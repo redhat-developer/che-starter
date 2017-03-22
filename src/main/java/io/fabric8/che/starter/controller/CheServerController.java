@@ -73,7 +73,7 @@ public class CheServerController {
                 openShiftClient.close();
             }
         }
-
+        // FIXME: need to return che-server route url
         return new CheServerInfo();
     }
 }
