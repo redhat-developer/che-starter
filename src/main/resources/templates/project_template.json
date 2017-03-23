@@ -1,6 +1,6 @@
 [{
   "name": "${project.name}",
-  "type": "maven",
+  "projectType": "maven",
   "description": "A hello world Java application.",
   "path": "/${project.name}",
   "source": {
