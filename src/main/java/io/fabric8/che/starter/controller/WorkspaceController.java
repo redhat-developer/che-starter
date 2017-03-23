@@ -100,8 +100,8 @@ public class WorkspaceController {
             throws IOException, URISyntaxException, RouteNotFoundException, StackNotFoundException, GitHubOAthTokenException {
 
         String openShiftToken = keycloakClient.getOpenShiftToken(keycloakToken);
-        String oAuthToken = keycloakClient.getGitHubToken(keycloakToken);
-        return createWorkspace(masterUrl, namespace, openShiftToken, oAuthToken, params);
+        String gitHubOAuthToken = keycloakClient.getGitHubToken(keycloakToken);
+        return createWorkspace(masterUrl, namespace, openShiftToken, gitHubOAuthToken, params);
     }
 
     @ApiOperation(value = "Create and start a new workspace. Stop all other workspaces (only one workspace can be running at a time). If a workspace with the imported project already exists, just start it")
@@ -114,7 +114,7 @@ public class WorkspaceController {
         return createWorkspace(masterUrl, namespace, openShiftToken, null, params);
     }
 
-    public Workspace createWorkspace(String masterUrl, String namespace, String openShiftToken, String oAuthToken, WorkspaceCreateParams params) 
+    public Workspace createWorkspace(String masterUrl, String namespace, String openShiftToken, String gitHubOAuthToken, WorkspaceCreateParams params) 
             throws RouteNotFoundException, URISyntaxException, IOException, StackNotFoundException, GitHubOAthTokenException {
         String cheServerUrl = openShiftClientWrapper.getCheServerUrl(masterUrl, namespace, openShiftToken);
 
@@ -141,8 +141,8 @@ public class WorkspaceController {
                 params.getRepo(), params.getBranch());
         
         // Set the GitHub oAuth token if it is available
-        if (oAuthToken != null && !"".equals(oAuthToken)) {
-            tokenClient.setGitHubOAuthToken(cheServerUrl, oAuthToken);
+        if (gitHubOAuthToken != null && !"".equals(gitHubOAuthToken)) {
+            tokenClient.setGitHubOAuthToken(cheServerUrl, gitHubOAuthToken);
         }
 
         // Create the project - this is an async call
