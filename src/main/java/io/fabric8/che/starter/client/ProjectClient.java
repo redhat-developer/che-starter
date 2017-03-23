@@ -27,6 +27,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import io.fabric8.che.starter.exception.ProjectCreationException;
 import io.fabric8.che.starter.model.DevMachineServer;
 import io.fabric8.che.starter.model.Project;
 import io.fabric8.che.starter.model.Workspace;
@@ -48,7 +49,7 @@ public class ProjectClient {
 
     @Async
     public void createProject(String cheServerURL, String workspaceId, String name, String repo, String branch)
-            throws IOException {
+            throws IOException, ProjectCreationException {
 
         // Before we can create a project, we must start the new workspace
         workspaceClient.startWorkspace(cheServerURL, workspaceId);
@@ -90,7 +91,8 @@ public class ProjectClient {
             Project p = response.getBody()[0];
             LOG.info("Successfully created project {}", p.getName());
         } else {
-            LOG.info("There seems to have been a problem creating project {}", name);
+            LOG.info("Error occurred while creating project {}", name);
+            throw new ProjectCreationException("Error occurred while creating project " + name);
         }
     }
 

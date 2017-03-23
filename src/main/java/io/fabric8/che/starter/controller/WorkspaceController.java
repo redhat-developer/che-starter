@@ -35,6 +35,7 @@ import io.fabric8.che.starter.client.TokenClient;
 import io.fabric8.che.starter.client.WorkspaceClient;
 import io.fabric8.che.starter.client.keycloak.KeycloakClient;
 import io.fabric8.che.starter.exception.GitHubOAthTokenException;
+import io.fabric8.che.starter.exception.ProjectCreationException;
 import io.fabric8.che.starter.exception.RouteNotFoundException;
 import io.fabric8.che.starter.exception.StackNotFoundException;
 import io.fabric8.che.starter.model.Workspace;
@@ -97,7 +98,7 @@ public class WorkspaceController {
     public Workspace create(@RequestParam String masterUrl, @RequestParam String namespace,
             @RequestBody WorkspaceCreateParams params,
             @ApiParam(value = "Keycloak token", required = true) @RequestHeader("Authorization") String keycloakToken)
-            throws IOException, URISyntaxException, RouteNotFoundException, StackNotFoundException, GitHubOAthTokenException {
+            throws IOException, URISyntaxException, RouteNotFoundException, StackNotFoundException, GitHubOAthTokenException, ProjectCreationException {
 
         String openShiftToken = keycloakClient.getOpenShiftToken(keycloakToken);
         String gitHubOAuthToken = keycloakClient.getGitHubToken(keycloakToken);
@@ -109,13 +110,13 @@ public class WorkspaceController {
     public Workspace createOnOpenShift(@RequestParam String masterUrl, @RequestParam String namespace,
             @RequestBody WorkspaceCreateParams params,
             @ApiParam(value = "OpenShift token", required = true) @RequestHeader("Authorization") String openShiftToken)
-            throws IOException, URISyntaxException, RouteNotFoundException, StackNotFoundException, GitHubOAthTokenException {
+            throws IOException, URISyntaxException, RouteNotFoundException, StackNotFoundException, GitHubOAthTokenException, ProjectCreationException {
 
         return createWorkspace(masterUrl, namespace, openShiftToken, null, params);
     }
 
     public Workspace createWorkspace(String masterUrl, String namespace, String openShiftToken, String gitHubOAuthToken, WorkspaceCreateParams params) 
-            throws RouteNotFoundException, URISyntaxException, IOException, StackNotFoundException, GitHubOAthTokenException {
+            throws RouteNotFoundException, URISyntaxException, IOException, StackNotFoundException, GitHubOAthTokenException, ProjectCreationException {
         String cheServerUrl = openShiftClientWrapper.getCheServerUrl(masterUrl, namespace, openShiftToken);
 
         String projectName = projectHelper.getProjectNameFromGitRepository(params.getRepo());
@@ -141,7 +142,7 @@ public class WorkspaceController {
                 params.getRepo(), params.getBranch());
         
         // Set the GitHub oAuth token if it is available
-        if (gitHubOAuthToken != null && !"".equals(gitHubOAuthToken)) {
+        if (!StringUtils.isBlank(gitHubOAuthToken)) {
             tokenClient.setGitHubOAuthToken(cheServerUrl, gitHubOAuthToken);
         }
 
@@ -155,7 +156,7 @@ public class WorkspaceController {
     public List<Workspace> listWorkspaces(String masterUrl, String namespace, String openShiftToken, String repository)
             throws RouteNotFoundException {
         String cheServerUrl = openShiftClientWrapper.getCheServerUrl(masterUrl, namespace, openShiftToken);
-        if (!StringUtils.isEmpty(repository)) {
+        if (!StringUtils.isBlank(repository)) {
             LOG.info("Fetching workspaces for repositoriy: {}", repository);
             return workspaceClient.listWorkspacesPerRepository(cheServerUrl, repository);
         }
