@@ -53,5 +53,11 @@ public class GlobalExceptionHandler {
     public String handleGitHubOAthTokenException(GitHubOAthTokenException e) {
         return e.getMessage();
     }
+    
+    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR, reason = "Error occurred while creating project")
+    @ExceptionHandler(ProjectCreationException.class)
+    public String handleProjectCreationException(ProjectCreationException e) {
+        return e.getMessage();
+    }
 
 }
