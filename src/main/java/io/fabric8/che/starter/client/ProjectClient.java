@@ -72,10 +72,10 @@ public class ProjectClient {
 
         Workspace workspace = workspaceClient.getWorkspace(cheServerURL, workspaceId);
 
-        DevMachineServer server = workspace.getRuntime().getDevMachine().getRuntime().getServers().get("4401/tcp");
+        String wsAgentUrl = getWsAgentUrl(workspace);
 
-        // Next we create a new project within the workspace
-        String url = CheRestEndpoints.CREATE_PROJECT.generateUrl(server.getUrl(), workspaceId);
+        // Next we create a new project against workspace agent API Url
+        String url = CheRestEndpoints.CREATE_PROJECT.generateUrl(wsAgentUrl);
         LOG.info("Creating project against workspace agent URL: {}", url);
 
         String jsonTemplate = projectTemplate.createRequest().setName(name).setRepo(repo).setBranch(branch).getJSON();
@@ -94,6 +94,10 @@ public class ProjectClient {
             LOG.info("Error occurred while creating project {}", name);
             throw new ProjectCreationException("Error occurred while creating project " + name);
         }
+    }
+
+    private String getWsAgentUrl (final Workspace workspace) {
+        return workspace.getRuntime().getDevMachine().getRuntime().getServers().get("4401/tcp").getUrl();
     }
 
 }
