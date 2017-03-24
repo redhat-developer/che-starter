@@ -30,8 +30,8 @@ import org.springframework.web.client.RestTemplate;
 import io.fabric8.che.starter.exception.ProjectCreationException;
 import io.fabric8.che.starter.model.DevMachineServer;
 import io.fabric8.che.starter.model.Project;
-import io.fabric8.che.starter.model.Workspace;
-import io.fabric8.che.starter.model.WorkspaceStatus;
+import io.fabric8.che.starter.model.workspace.Workspace;
+import io.fabric8.che.starter.model.workspace.WorkspaceStatus;
 import io.fabric8.che.starter.template.ProjectTemplate;
 
 @Component

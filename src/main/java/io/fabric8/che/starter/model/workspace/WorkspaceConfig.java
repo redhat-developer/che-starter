@@ -10,19 +10,29 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package io.fabric8.che.starter.model;
+package io.fabric8.che.starter.model.workspace;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class WorkspaceRuntime {
-    private DevMachine devMachine;
+public class WorkspaceConfig {
+    private String name;
+    private String description;
 
-    public DevMachine getDevMachine() {
-        return devMachine;
+    public String getName() {
+        return name;
     }
 
-    public void setDevMachine(DevMachine devMachine) {
-        this.devMachine = devMachine;
+    public void setName(String name) {
+        this.name = name;
     }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
 }

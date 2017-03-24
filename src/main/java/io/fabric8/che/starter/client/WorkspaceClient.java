@@ -29,9 +29,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import io.fabric8.che.starter.exception.StackNotFoundException;
-import io.fabric8.che.starter.model.Workspace;
-import io.fabric8.che.starter.model.WorkspaceLink;
-import io.fabric8.che.starter.model.WorkspaceStatus;
+import io.fabric8.che.starter.model.workspace.Workspace;
+import io.fabric8.che.starter.model.workspace.WorkspaceLink;
+import io.fabric8.che.starter.model.workspace.WorkspaceStatus;
 import io.fabric8.che.starter.template.WorkspaceTemplate;
 import io.fabric8.che.starter.util.WorkspaceHelper;
 

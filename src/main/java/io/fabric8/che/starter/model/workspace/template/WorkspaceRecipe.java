@@ -10,29 +10,27 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package io.fabric8.che.starter.model;
+package io.fabric8.che.starter.model.workspace.template;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class WorkspaceStatus {
-    private String code;
-    private String workspaceStatus;
+public class WorkspaceRecipe {
 
-    public String getCode() {
-        return code;
+    private String location;
+    private String type;
+
+    public String getLocation() {
+        return location;
     }
-
-    public void setCode(String code) {
-        this.code = code;
+    public void setLocation(String location) {
+        this.location = location;
     }
-
-    public String getWorkspaceStatus() {
-        return workspaceStatus;
+    public String getType() {
+        return type;
     }
-
-    public void setWorkspaceStatus(String workspaceStatus) {
-        this.workspaceStatus = workspaceStatus;
+    public void setType(String type) {
+        this.type = type;
     }
-
+    
 }

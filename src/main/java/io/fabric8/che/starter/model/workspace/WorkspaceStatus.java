@@ -10,23 +10,29 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package io.fabric8.che.starter.model.request;
+package io.fabric8.che.starter.model.workspace;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-/**
- * This DTO is used to when a client calls the set GitHub token method.
- *
- */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class TokenCreateParams {
-    private String token;
+public class WorkspaceStatus {
+    private String code;
+    private String workspaceStatus;
 
-    public String getToken() {
-        return token;
+    public String getCode() {
+        return code;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public void setCode(String code) {
+        this.code = code;
     }
+
+    public String getWorkspaceStatus() {
+        return workspaceStatus;
+    }
+
+    public void setWorkspaceStatus(String workspaceStatus) {
+        this.workspaceStatus = workspaceStatus;
+    }
+
 }

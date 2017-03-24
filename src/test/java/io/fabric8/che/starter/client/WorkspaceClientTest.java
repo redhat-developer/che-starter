@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 import io.fabric8.che.starter.TestConfig;
 import io.fabric8.che.starter.exception.StackNotFoundException;
-import io.fabric8.che.starter.model.Workspace;
+import io.fabric8.che.starter.model.workspace.Workspace;
 import io.fabric8.che.starter.util.WorkspaceHelper;
 
 public class WorkspaceClientTest extends TestConfig {

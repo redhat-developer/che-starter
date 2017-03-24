@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Component;
 
-import io.fabric8.che.starter.model.Workspace;
+import io.fabric8.che.starter.model.workspace.Workspace;
 
 @Component
 public class WorkspaceHelper {
