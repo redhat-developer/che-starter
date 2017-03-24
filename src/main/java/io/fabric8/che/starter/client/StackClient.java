@@ -25,6 +25,7 @@ import org.springframework.web.client.RestTemplate;
 import io.fabric8.che.starter.client.keycloak.KeycloakInterceptor;
 import io.fabric8.che.starter.exception.StackNotFoundException;
 import io.fabric8.che.starter.model.Stack;
+import io.fabric8.che.starter.model.StackProjectMapping;
 
 @Component
 public class StackClient {
@@ -65,6 +66,10 @@ public class StackClient {
         } else {
             throw new StackNotFoundException("No stacks were returned from Che server");
         }
+    }
+
+    public String getProjectTypeByStackId(final String stackId) {
+        return StackProjectMapping.get().getOrDefault(stackId, StackProjectMapping.BLANK_PROJECT_TYPE);
     }
 
 }
