@@ -36,13 +36,13 @@ public class ProjectTemplate {
 
     @Autowired
     private ProjectHelper helper;
-    
-    String templateCache;
-    
+
+    private String template;
+
     @PostConstruct
-    public void initCache() throws IOException {
-        templateCache = Reader.read(resource.getInputStream());
-    }    
+    public void init() throws IOException {
+        template = Reader.read(resource.getInputStream());
+    }
 
     public class ProjectCreateRequest {
         private String name;
@@ -75,7 +75,7 @@ public class ProjectTemplate {
         }
 
         public String getJSON() {
-            String json = templateCache;
+            String json = template;
             json = StringUtils.replace(json, PROJECT_NAME, name);
             json = StringUtils.replace(json, PROJECT_GIT_REPO, repo);
             json = StringUtils.replace(json, PROJECT_GIT_BRANCH, branch);

@@ -30,12 +30,12 @@ public class TokenTemplate {
     @Value(value = "classpath:templates/token_template.json")
     private Resource resource;
 
-    String templateCache;
+    private String template;
 
     @PostConstruct
-    public void initCache() throws IOException {
-        templateCache = Reader.read(resource.getInputStream());
-    }    
+    public void init() throws IOException {
+        template = Reader.read(resource.getInputStream());
+    }
 
     public class TokenCreateRequest {
         private String token;
@@ -48,11 +48,10 @@ public class TokenTemplate {
         }
 
         public String getJSON() {
-            String json = templateCache;
+            String json = template;
             json = StringUtils.replace(json, TOKEN_VALUE, token);
             return json;
         }
-        
     }
 
     public TokenCreateRequest createRequest() {

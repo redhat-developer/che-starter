@@ -34,11 +34,11 @@ public class WorkspaceTemplate {
     @Value(value = "classpath:templates/workspace_template.json")
     private Resource resource;
 
-    String templateCache;
+    private String template;
 
     @PostConstruct
-    public void initCache() throws IOException {
-        templateCache = Reader.read(resource.getInputStream());
+    public void init() throws IOException {
+        template = Reader.read(resource.getInputStream());
     }
 
     @Autowired
@@ -81,7 +81,7 @@ public class WorkspaceTemplate {
         }
 
         public String getJSON() { 
-            String json = templateCache;
+            String json = template;
             json = StringUtils.replace(json, WORKSPACE_NAME, name);
             json = StringUtils.replace(json, WORKSPACE_STACK_IMAGE, stackImage);
             json = StringUtils.replace(json, WORKSPACE_DESCRIPTION, description);
