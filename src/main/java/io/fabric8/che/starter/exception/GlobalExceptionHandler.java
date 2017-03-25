@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import io.fabric8.kubernetes.client.KubernetesClientException;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -48,12 +50,18 @@ public class GlobalExceptionHandler {
         return e.getMessage();
     }
 
+    @ResponseStatus(value = HttpStatus.UNAUTHORIZED, reason = "Credentials are invalid")
+    @ExceptionHandler(KubernetesClientException.class)
+    public String handleKubernetesClientException(KubernetesClientException e) {
+        return e.getMessage();
+    }
+
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR, reason = "Error setting GitHub oAuth token on Che Server")
     @ExceptionHandler(GitHubOAthTokenException.class)
     public String handleGitHubOAthTokenException(GitHubOAthTokenException e) {
         return e.getMessage();
     }
-    
+
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR, reason = "Error occurred while creating project")
     @ExceptionHandler(ProjectCreationException.class)
     public String handleProjectCreationException(ProjectCreationException e) {

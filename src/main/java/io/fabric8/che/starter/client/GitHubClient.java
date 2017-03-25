@@ -19,7 +19,9 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -27,8 +29,9 @@ import io.fabric8.che.starter.exception.GitHubOAthTokenException;
 import io.fabric8.che.starter.template.TokenTemplate;
 
 @Component
-public class TokenClient {
-    private static final Logger LOG = LogManager.getLogger(TokenClient.class);
+public class GitHubClient {
+    private static final Logger LOG = LogManager.getLogger(GitHubClient.class);
+    private static final String GIT_HUB_USER_ENDPOINT = "https://api.github.com/user";
 
     @Autowired
     private TokenTemplate tokenTemplate;
@@ -41,7 +44,7 @@ public class TokenClient {
      * @throws IOException
      * @throws GitHubOAthTokenException 
      */
-    public void setGitHubOAuthToken(String cheServerURL, String token) 
+    public void setGitHubOAuthToken(final String cheServerURL, final String token) 
             throws IOException, GitHubOAthTokenException {
         String url = cheServerURL + CheRestEndpoints.SET_OAUTH_TOKEN.getEndpoint().replace("{provider}", "github");
         String jsonTemplate = tokenTemplate.createRequest().setToken(token).getJSON();
@@ -57,5 +60,15 @@ public class TokenClient {
             LOG.error("Error setting GitHub oAuth token on Che Server: " + cheServerURL, e);
             throw new GitHubOAthTokenException(e);
         }
+    }
+
+    public String getUserInfo(final String token) {
+        RestTemplate template = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + token);
+        HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        ResponseEntity<String> response = template.exchange(GIT_HUB_USER_ENDPOINT, HttpMethod.GET, entity, String.class);
+        return response.toString();
     }
 }
