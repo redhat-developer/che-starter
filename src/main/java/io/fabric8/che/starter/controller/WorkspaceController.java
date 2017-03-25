@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import io.fabric8.che.starter.client.ProjectClient;
-import io.fabric8.che.starter.client.TokenClient;
+import io.fabric8.che.starter.client.GitHubClient;
 import io.fabric8.che.starter.client.WorkspaceClient;
 import io.fabric8.che.starter.client.keycloak.KeycloakClient;
 import io.fabric8.che.starter.exception.GitHubOAthTokenException;
@@ -64,7 +64,7 @@ public class WorkspaceController {
     KeycloakClient keycloakClient;
 
     @Autowired
-    TokenClient tokenClient;
+    GitHubClient tokenClient;
 
     @Autowired
     ProjectHelper projectHelper;
