@@ -44,7 +44,6 @@ public class GitHubTokenClientTest extends TestConfig {
     @Test
     public void getUserInfo() {
         GitHubUserInfo userInfo = client.getUserInfo(GIT_HUB_TOKEN);
-        LOG.info(userInfo.getLogin());
         LOG.info(userInfo.getName());
         LOG.info(userInfo.getEmail());
     }
