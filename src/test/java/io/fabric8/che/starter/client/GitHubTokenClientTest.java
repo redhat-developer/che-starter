@@ -16,17 +16,18 @@ import java.io.IOException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.client.HttpClientErrorException;
 
 import io.fabric8.che.starter.TestConfig;
 import io.fabric8.che.starter.exception.GitHubOAthTokenException;
+import io.fabric8.che.starter.model.GitHubUserInfo;
 
 public class GitHubTokenClientTest extends TestConfig {
     private static final Logger LOG = LogManager.getLogger(GitHubTokenClientTest.class);
-    private static final String GITHUB_TOKEN = "e72e16c7e42f292c6912e7710c838347ae178b4a";
+    private static final String GIT_HUB_TOKEN = "GIT_HUB_TOKEN";
 
     @Value("${che.server.url}")
     String cheServerURL;
@@ -36,13 +37,16 @@ public class GitHubTokenClientTest extends TestConfig {
 
     @Test(expected = GitHubOAthTokenException.class)
     public void setGitHubToken() throws GitHubOAthTokenException, IOException {
-        client.setGitHubOAuthToken(cheServerURL, GITHUB_TOKEN);
+        client.setGitHubOAuthToken(cheServerURL, GIT_HUB_TOKEN);
     }
 
-    @Test(expected = HttpClientErrorException.class)
+    @Ignore("Valid GitHub token must be provided")
+    @Test
     public void getUserInfo() {
-        String userInfo = client.getUserInfo(GITHUB_TOKEN);
-        LOG.info(userInfo);
+        GitHubUserInfo userInfo = client.getUserInfo(GIT_HUB_TOKEN);
+        LOG.info(userInfo.getLogin());
+        LOG.info(userInfo.getName());
+        LOG.info(userInfo.getEmail());
     }
 
 }

@@ -26,6 +26,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import io.fabric8.che.starter.exception.GitHubOAthTokenException;
+import io.fabric8.che.starter.model.GitHubUserInfo;
 import io.fabric8.che.starter.template.TokenTemplate;
 
 @Component
@@ -62,13 +63,13 @@ public class GitHubClient {
         }
     }
 
-    public String getUserInfo(final String token) {
+    public GitHubUserInfo getUserInfo(final String token) {
         RestTemplate template = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + token);
         HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
         headers.setContentType(MediaType.APPLICATION_JSON);
-        ResponseEntity<String> response = template.exchange(GIT_HUB_USER_ENDPOINT, HttpMethod.GET, entity, String.class);
-        return response.toString();
+        ResponseEntity<GitHubUserInfo> response = template.exchange(GIT_HUB_USER_ENDPOINT, HttpMethod.GET, entity, GitHubUserInfo.class);
+        return response.getBody();
     }
 }
