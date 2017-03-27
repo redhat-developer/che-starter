@@ -44,6 +44,24 @@
             "name": "CHE_LOG_LEVEL",
             "value": "INFO",
             "required": false
+        },
+        {
+            "description": "OpenShift address",
+            "name": "OSO_ADDRESS",
+            "value": "",
+            "required": true
+        },
+        {
+            "description": "OpenShift domain name",
+            "name": "OSO_DOMAIN_NAME",
+            "value": "",
+            "required": true
+        },
+        {
+            "description": "Path to certificate file that will be used by k8s client",
+            "name": "KUBERNETES_CERTS_CA_FILE",
+            "value": "",
+            "required": true
         }
     ],
     "objects": [
