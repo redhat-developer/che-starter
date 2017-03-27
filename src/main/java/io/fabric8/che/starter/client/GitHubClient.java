@@ -41,14 +41,14 @@ public class GitHubClient {
      * Uploads the Github oAuth token to the workspace so that the developer can send push requests
      *  
      * @param cheServerURL
-     * @param token
+     * @param gitHubToken
      * @throws IOException
      * @throws GitHubOAthTokenException 
      */
-    public void setGitHubOAuthToken(final String cheServerURL, final String token) 
+    public void setGitHubOAuthToken(final String cheServerURL, final String gitHubToken) 
             throws IOException, GitHubOAthTokenException {
         String url = cheServerURL + CheRestEndpoints.SET_OAUTH_TOKEN.getEndpoint().replace("{provider}", "github");
-        String jsonTemplate = tokenTemplate.createRequest().setToken(token).getJSON();
+        String jsonTemplate = tokenTemplate.createRequest().setToken(gitHubToken).getJSON();
 
         RestTemplate template = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -58,15 +58,15 @@ public class GitHubClient {
         try {
             template.postForLocation(url, entity);
         } catch (Exception e) {
-            LOG.error("Error setting GitHub oAuth token on Che Server: " + cheServerURL, e);
-            throw new GitHubOAthTokenException(e);
+            LOG.error("Error setting GitHub OAuth token on Che Server: {}", cheServerURL);
+            throw new GitHubOAthTokenException("Error setting GitHub OAuth token", e);
         }
     }
 
-    public GitHubUserInfo getUserInfo(final String token) {
+    public GitHubUserInfo getUserInfo(final String gitHubToken) {
         RestTemplate template = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer " + token);
+        headers.add("Authorization", "Bearer " + gitHubToken);
         HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
         headers.setContentType(MediaType.APPLICATION_JSON);
         ResponseEntity<GitHubUserInfo> response = template.exchange(GIT_HUB_USER_ENDPOINT, HttpMethod.GET, entity, GitHubUserInfo.class);
