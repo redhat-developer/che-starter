@@ -18,74 +18,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Workspace {
+
     private String id;
-    private String name;
-    private String description;
-    private String login;
     private String status;
-    private String repository;
-    private String branch;
+    // Runtime is returned only on get workspace by composite key, in collection call, it is not
+    private WorkspaceRuntime runtime;
     private WorkspaceConfig config;
     private List<WorkspaceLink> links;
-    private WorkspaceRuntime runtime;
-    private String location;
-    private String workspaceIdeUrl;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getLogin() {
-        return login;
-    }
-
-    public void setLogin(String login) {
-        this.login = login;
-    }
-
-    public String getRepository() {
-        return repository;
-    }
-
-    public void setRepository(String repository) {
-        this.repository = repository;
-    }
-
-    public String getBranch() {
-        return branch;
-    }
-
-    public void setBranch(String branch) {
-        this.branch = branch;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public String getWorkspaceIdeUrl() {
-        return workspaceIdeUrl;
-    }
-
-    public void setWorkspaceIdeUrl(String workspaceIdeUrl) {
-        this.workspaceIdeUrl = workspaceIdeUrl;
-    }
 
     public String getId() {
         return id;

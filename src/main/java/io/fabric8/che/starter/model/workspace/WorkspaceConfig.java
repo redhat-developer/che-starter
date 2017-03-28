@@ -12,13 +12,27 @@
  */
 package io.fabric8.che.starter.model.workspace;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WorkspaceConfig {
+	
+	private List<WorkspaceCommand> commands;
+	// there could go list of projects
+	private String defaultEnv;
+	private String description;
+	private WorkspaceEnvironments environments;
     private String name;
-    private String description;
+    private List<WorkspaceLink> links;
 
+    public WorkspaceConfig() {
+    	commands = new ArrayList<WorkspaceCommand>();
+    	links = new ArrayList<WorkspaceLink>();
+    }
+    
     public String getName() {
         return name;
     }
@@ -34,5 +48,37 @@ public class WorkspaceConfig {
     public void setDescription(String description) {
         this.description = description;
     }
+
+	public List<WorkspaceCommand> getCommands() {
+		return commands;
+	}
+
+	public void setCommands(List<WorkspaceCommand> commands) {
+		this.commands = commands;
+	}
+
+	public String getDefaultEnv() {
+		return defaultEnv;
+	}
+
+	public void setDefaultEnv(String defaultEnv) {
+		this.defaultEnv = defaultEnv;
+	}
+
+	public WorkspaceEnvironments getEnvironments() {
+		return environments;
+	}
+
+	public void setEnvironments(WorkspaceEnvironments environments) {
+		this.environments = environments;
+	}
+
+	public List<WorkspaceLink> getLinks() {
+		return links;
+	}
+
+	public void setLinks(List<WorkspaceLink> links) {
+		this.links = links;
+	}
 
 }

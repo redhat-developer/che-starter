@@ -24,8 +24,8 @@ import org.springframework.web.client.RestTemplate;
 
 import io.fabric8.che.starter.client.keycloak.KeycloakInterceptor;
 import io.fabric8.che.starter.exception.StackNotFoundException;
-import io.fabric8.che.starter.model.Stack;
-import io.fabric8.che.starter.model.StackProjectMapping;
+import io.fabric8.che.starter.model.stack.Stack;
+import io.fabric8.che.starter.model.stack.StackProjectMapping;
 
 @Component
 public class StackClient {
@@ -54,12 +54,12 @@ public class StackClient {
      * @return image name for stack
      * @throws StackNotFoundException if no image name exists for such stack ID or call to Che server was not successful
      */
-    public String getStackImage(String cheServerUrl, String stackId, String keycloakToken) throws StackNotFoundException {
+    public Stack getStack(String cheServerUrl, String stackId, String keycloakToken) throws StackNotFoundException {
         List<Stack> stacks = listStacks(cheServerUrl, keycloakToken);
-        if (!stacks.isEmpty()) {
+        if (stacks != null && !stacks.isEmpty()) {
             try {
                 Stack stack = stacks.stream().filter(s -> stackId.equals(s.getId())).findFirst().get();
-                return stack.getSource().getOrigin();
+                return stack;
             } catch (NoSuchElementException e) {
                 throw new StackNotFoundException("Stack with id " + stackId + " was not found");
             }

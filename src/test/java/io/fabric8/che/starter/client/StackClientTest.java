@@ -26,8 +26,8 @@ import org.springframework.beans.factory.annotation.Value;
 
 import io.fabric8.che.starter.TestConfig;
 import io.fabric8.che.starter.exception.StackNotFoundException;
-import io.fabric8.che.starter.model.Stack;
-import io.fabric8.che.starter.model.StackProjectMapping;
+import io.fabric8.che.starter.model.stack.Stack;
+import io.fabric8.che.starter.model.stack.StackProjectMapping;
 
 public class StackClientTest extends TestConfig {
     private static final Logger LOG = LogManager.getLogger(StackClientTest.class);
@@ -58,9 +58,9 @@ public class StackClientTest extends TestConfig {
     }
 
     @Test
-    public void getVertxImage() throws StackNotFoundException {
-        String vertxImage = client.getStackImage(cheServerUrl, VERTX_STACK_ID, KEYCLOAK_TOKEN);
-        LOG.info("vertx image is found: {}", vertxImage);
+    public void getVertxStack() throws StackNotFoundException {
+        Stack vertxStack = client.getStack(cheServerUrl, VERTX_STACK_ID, KEYCLOAK_TOKEN);
+        LOG.info("vertx stack is found: {}", vertxStack);
     }
 
     @Test
@@ -71,7 +71,7 @@ public class StackClientTest extends TestConfig {
 
     @Test(expected = StackNotFoundException.class)
     public void getNonExistingStackImage() throws StackNotFoundException {
-        client.getStackImage(cheServerUrl, NON_EXISTING_STACK_ID, KEYCLOAK_TOKEN);
+        client.getStack(cheServerUrl, NON_EXISTING_STACK_ID, KEYCLOAK_TOKEN);
     }
 
 }

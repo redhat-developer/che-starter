@@ -13,6 +13,7 @@
 package io.fabric8.che.starter.client;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -28,11 +29,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import io.fabric8.che.starter.client.keycloak.KeycloakInterceptor;
 import io.fabric8.che.starter.exception.StackNotFoundException;
 import io.fabric8.che.starter.model.workspace.Workspace;
-import io.fabric8.che.starter.model.workspace.WorkspaceLink;
+import io.fabric8.che.starter.model.workspace.WorkspaceConfig;
 import io.fabric8.che.starter.model.workspace.WorkspaceStatus;
-import io.fabric8.che.starter.template.WorkspaceTemplate;
 import io.fabric8.che.starter.util.WorkspaceHelper;
 
 @Component
@@ -44,9 +45,6 @@ public class WorkspaceClient {
     public static final String WORKSPACE_STATUS_RUNNING = "RUNNING";
     public static final String WORKSPACE_STATUS_STARTING = "STARTING";
     public static final String WORKSPACE_STATUS_STOPPED = "STOPPED";
-
-    @Autowired
-    private WorkspaceTemplate workspaceTemplate;
 
     @Autowired
     private WorkspaceHelper workspaceHelper;
@@ -61,19 +59,7 @@ public class WorkspaceClient {
                 new ParameterizedTypeReference<List<Workspace>>() {
                 });
 
-        List<Workspace> workspaces = response.getBody();
-        for (Workspace workspace : workspaces) {
-            workspace.setName(workspace.getConfig().getName());
-            workspace.setDescription(workspace.getConfig().getDescription());
-
-            for (WorkspaceLink link : workspace.getLinks()) {
-                if (WORKSPACE_LINK_IDE_URL.equals(link.getRel())) {
-                    workspace.setWorkspaceIdeUrl(link.getHref());
-                    break;
-                }
-            }
-        }
-        return workspaces;
+        return response.getBody();
     }
 
     public List<Workspace> listWorkspacesPerRepository(String cheServerUrl, String repository) {
@@ -81,39 +67,43 @@ public class WorkspaceClient {
         return workspaceHelper.filterByRepository(workspaces, repository);
     }
 
-    public Workspace createWorkspace(String cheServerUrl, String name, String stackId, String repo, String branch) throws StackNotFoundException, IOException {
+    /**
+     * Create workspace on the Che server with given URL.
+     * 
+     * @param cheServerUrl
+     * @param keycloakToken
+     * @param name
+     * @param stackId
+     * @param repo
+     * @param branch
+     * @return
+     * @throws StackNotFoundException
+     * @throws IOException
+     */
+    public Workspace createWorkspace(String cheServerUrl, String keycloakToken, String name, String stackId, String repo, String branch) throws StackNotFoundException, IOException {
         // The first step is to create the workspace
         String url = CheRestEndpoints.CREATE_WORKSPACE.generateUrl(cheServerUrl);
 
         name = StringUtils.isBlank(name) ? workspaceHelper.generateName() : name;
 
-        String stackImage = stackClient.getStackImage(cheServerUrl, stackId, null);
-
-        String jsonTemplate = workspaceTemplate.createRequest().
-                                                setName(name).
-                                                setStackImage(stackImage).
-                                                setDescription(workspaceHelper.getDescription(repo, branch)).
-                                                getJSON();
-
+        WorkspaceConfig wsConfig = stackClient.getStack(cheServerUrl, stackId, null).getWorkspaceConfig();
+        wsConfig.setName(name);
+        wsConfig.setDescription(repo + "#" + branch);
+        
         RestTemplate template = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> entity = new HttpEntity<String>(jsonTemplate, headers);
+        
+        if (keycloakToken != null) {
+            template.setInterceptors(Collections.singletonList(new KeycloakInterceptor(keycloakToken)));
+        }
+        
+        HttpEntity<WorkspaceConfig> entity = new HttpEntity<WorkspaceConfig>(wsConfig, headers);
 
         ResponseEntity<Workspace> workspaceResponse = template.exchange(url, HttpMethod.POST, entity, Workspace.class);
         Workspace workspace = workspaceResponse.getBody();
 
         LOG.info("Workspace has been created: {}", workspace);
-
-        workspace.setName(workspace.getConfig().getName());
-        workspace.setDescription(workspace.getConfig().getDescription());
-
-        for (WorkspaceLink link : workspace.getLinks()) {
-            if (WORKSPACE_LINK_IDE_URL.equals(link.getRel())) {
-                workspace.setWorkspaceIdeUrl(link.getHref());
-                break;
-            }
-        }
 
         return workspace;
     }

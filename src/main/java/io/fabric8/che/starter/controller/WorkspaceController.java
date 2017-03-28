@@ -102,7 +102,7 @@ public class WorkspaceController {
 
         String openShiftToken = keycloakClient.getOpenShiftToken(keycloakToken);
         String gitHubOAuthToken = keycloakClient.getGitHubToken(keycloakToken);
-        return createWorkspace(masterUrl, namespace, openShiftToken, gitHubOAuthToken, params);
+        return createWorkspace(masterUrl, namespace, openShiftToken, gitHubOAuthToken, keycloakToken, params);
     }
 
     @ApiOperation(value = "Create and start a new workspace. Stop all other workspaces (only one workspace can be running at a time). If a workspace with the imported project already exists, just start it")
@@ -112,11 +112,22 @@ public class WorkspaceController {
             @ApiParam(value = "OpenShift token", required = true) @RequestHeader("Authorization") String openShiftToken)
             throws IOException, URISyntaxException, RouteNotFoundException, StackNotFoundException, GitHubOAthTokenException, ProjectCreationException {
 
-        return createWorkspace(masterUrl, namespace, openShiftToken, null, params);
+        return createWorkspace(masterUrl, namespace, openShiftToken, null, null, params);
     }
 
-    public Workspace createWorkspace(String masterUrl, String namespace, String openShiftToken, String gitHubOAuthToken, WorkspaceCreateParams params) 
-            throws RouteNotFoundException, URISyntaxException, IOException, StackNotFoundException, GitHubOAthTokenException, ProjectCreationException {
+    /**
+     * Create workspace from specified params.
+     * 
+     * @param masterUrl
+     * @param namespace
+     * @param openShiftToken
+     * @param gitHubOAuthToken
+     * @param keycloakToken
+     * @param params
+     * @return create Workspace
+     */
+    public Workspace createWorkspace(String masterUrl, String namespace, String openShiftToken, String gitHubOAuthToken, String keycloakToken, 
+    		WorkspaceCreateParams params) throws RouteNotFoundException, URISyntaxException, IOException, StackNotFoundException, GitHubOAthTokenException, ProjectCreationException {
         String cheServerUrl = openShiftClientWrapper.getCheServerUrl(masterUrl, namespace, openShiftToken);
 
         String projectName = projectHelper.getProjectNameFromGitRepository(params.getRepo());
@@ -126,7 +137,7 @@ public class WorkspaceController {
         String description = workspaceHelper.getDescription(params.getRepo(), params.getBranch());
 
         for (Workspace ws : workspaces) {
-            String wsDescription = ws.getDescription();
+            String wsDescription = ws.getConfig().getDescription();
             if (wsDescription != null && wsDescription.equals(description)) {
                 // Before we can create a project, we must start the new workspace.  First check it's not already running
                 if (!WorkspaceClient.WORKSPACE_STATUS_RUNNING.equals(ws.getStatus()) && 
@@ -138,7 +149,7 @@ public class WorkspaceController {
         }
 
         // Create the workspace
-        Workspace workspaceInfo = workspaceClient.createWorkspace(cheServerUrl, params.getName(), params.getStack(),
+        Workspace workspaceInfo = workspaceClient.createWorkspace(cheServerUrl, keycloakToken, params.getName(), params.getStack(),
                 params.getRepo(), params.getBranch());
         
         // Set the GitHub oAuth token if it is available

@@ -10,27 +10,20 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package io.fabric8.che.starter.model.workspace.template;
+package io.fabric8.che.starter.model.workspace;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class WorkspaceRecipe {
+public class WorkspaceMachineAttribute {
 
-    private String location;
-    private String type;
+	private String memoryLimitBytes;
 
-    public String getLocation() {
-        return location;
-    }
-    public void setLocation(String location) {
-        this.location = location;
-    }
-    public String getType() {
-        return type;
-    }
-    public void setType(String type) {
-        this.type = type;
-    }
-    
+	public String getMemoryLimitBytes() {
+		return memoryLimitBytes;
+	}
+
+	public void setMemoryLimitBytes(String memoryLimitBytes) {
+		this.memoryLimitBytes = memoryLimitBytes;
+	}
 }
