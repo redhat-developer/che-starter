@@ -30,7 +30,7 @@ public class WorkspaceHelper {
 
     public List<Workspace> filterByRepository(final List<Workspace> workspaces, final String repository) {
         return workspaces.stream().filter(w -> {
-            String description = w.getDescription();
+            String description = w.getConfig().getDescription();
             return description != null && description.split(REPO_BRANCH_DELIMITER)[0].equals(repository);
         }).collect(Collectors.toList());
     }

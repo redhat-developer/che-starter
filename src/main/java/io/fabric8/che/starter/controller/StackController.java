@@ -29,7 +29,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.fabric8.che.starter.client.StackClient;
 import io.fabric8.che.starter.client.keycloak.KeycloakClient;
 import io.fabric8.che.starter.exception.RouteNotFoundException;
-import io.fabric8.che.starter.model.Stack;
+import io.fabric8.che.starter.model.stack.Stack;
 import io.fabric8.che.starter.openshift.OpenShiftClientWrapper;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

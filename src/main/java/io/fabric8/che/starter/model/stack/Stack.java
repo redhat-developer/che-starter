@@ -10,15 +10,18 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package io.fabric8.che.starter.model;
+package io.fabric8.che.starter.model.stack;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import io.fabric8.che.starter.model.workspace.WorkspaceConfig;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Stack {
     private String id;
     private String name;
     private String description;
+    private WorkspaceConfig workspaceConfig;
     private StackSource source;
 
     public String getId() {
@@ -52,4 +55,12 @@ public class Stack {
     public void setSource(StackSource source) {
     	this.source = source;
     }
+
+	public WorkspaceConfig getWorkspaceConfig() {
+		return workspaceConfig;
+	}
+
+	public void setWorkspaceConfig(WorkspaceConfig workspaceConfig) {
+		this.workspaceConfig = workspaceConfig;
+	}
 }

@@ -10,11 +10,22 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package io.fabric8.che.starter.model.workspace.template;
+package io.fabric8.che.starter.model.workspace;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class WorkspaceCommand {
+public class WorkspaceEnvironments {
 
+	 @JsonProperty("default")
+	 private WorkspaceEnvironment defaultEnv;
+	 
+	 public WorkspaceEnvironment getDefaultEnv() {
+		 return defaultEnv;
+	 }
+	 
+	 public void setDefaultEnv(WorkspaceEnvironment defaultEnv) {
+		 this.defaultEnv = defaultEnv;
+	 }
 }
