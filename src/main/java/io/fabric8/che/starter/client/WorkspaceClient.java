@@ -33,18 +33,13 @@ import io.fabric8.che.starter.client.keycloak.KeycloakInterceptor;
 import io.fabric8.che.starter.exception.StackNotFoundException;
 import io.fabric8.che.starter.model.workspace.Workspace;
 import io.fabric8.che.starter.model.workspace.WorkspaceConfig;
+import io.fabric8.che.starter.model.workspace.WorkspaceState;
 import io.fabric8.che.starter.model.workspace.WorkspaceStatus;
 import io.fabric8.che.starter.util.WorkspaceHelper;
 
 @Component
 public class WorkspaceClient {
     private static final Logger LOG = LogManager.getLogger(WorkspaceClient.class);
-
-    public static final String WORKSPACE_LINK_IDE_URL = "ide url";
-    public static final String WORKSPACE_LINK_START_WORKSPACE = "start workspace";
-    public static final String WORKSPACE_STATUS_RUNNING = "RUNNING";
-    public static final String WORKSPACE_STATUS_STARTING = "STARTING";
-    public static final String WORKSPACE_STATUS_STOPPED = "STOPPED";
 
     @Autowired
     private WorkspaceHelper workspaceHelper;
@@ -133,11 +128,11 @@ public class WorkspaceClient {
 
         for (Workspace workspace : workspaces) {
             if (workspace.getId().equals(workspaceId)) {
-                if (WORKSPACE_STATUS_RUNNING.equals(workspace.getStatus()) ||
-                    WORKSPACE_STATUS_STARTING.equals(workspace.getStatus())) {
+                if (WorkspaceState.RUNNING.toString().equals(workspace.getStatus()) ||
+                    WorkspaceState.STARTING.toString().equals(workspace.getStatus())) {
                     alreadyStarted = true;
                 }
-            } else if (!WORKSPACE_STATUS_STOPPED.equals(workspace.getStatus())) {
+            } else if (!WorkspaceState.STOPPED.toString().equals(workspace.getStatus())) {
                 stopWorkspace(cheServerUrl, workspace.getId());
             }
         }

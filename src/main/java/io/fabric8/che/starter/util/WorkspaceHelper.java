@@ -19,10 +19,12 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Component;
 
 import io.fabric8.che.starter.model.workspace.Workspace;
+import io.fabric8.che.starter.model.workspace.WorkspaceLink;
 
 @Component
 public class WorkspaceHelper {
     private static final String REPO_BRANCH_DELIMITER = "#";
+    private static final String WORKSPACE_IDE_URL = "ide url";
 
     public String getDescription(final String repo, final String branch) {
         return repo + REPO_BRANCH_DELIMITER + branch;
@@ -33,6 +35,11 @@ public class WorkspaceHelper {
             String description = w.getConfig().getDescription();
             return description != null && description.split(REPO_BRANCH_DELIMITER)[0].equals(repository);
         }).collect(Collectors.toList());
+    }
+
+    public WorkspaceLink getWorkspaceIdeLink(final Workspace workspace) {
+        List<WorkspaceLink> links = workspace.getLinks();
+        return links.stream().filter(link -> WORKSPACE_IDE_URL.equals(link.getRel())).findFirst().get();
     }
 
     /**
