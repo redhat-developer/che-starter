@@ -40,6 +40,8 @@ import io.fabric8.che.starter.exception.RouteNotFoundException;
 import io.fabric8.che.starter.exception.StackNotFoundException;
 import io.fabric8.che.starter.model.request.WorkspaceCreateParams;
 import io.fabric8.che.starter.model.workspace.Workspace;
+import io.fabric8.che.starter.model.workspace.WorkspaceLink;
+import io.fabric8.che.starter.model.workspace.WorkspaceState;
 import io.fabric8.che.starter.openshift.OpenShiftClientWrapper;
 import io.fabric8.che.starter.util.ProjectHelper;
 import io.fabric8.che.starter.util.WorkspaceHelper;
@@ -95,7 +97,7 @@ public class WorkspaceController {
 
     @ApiOperation(value = "Create and start a new workspace. Stop all other workspaces (only one workspace can be running at a time). If a workspace with the imported project already exists, just start it")
     @PostMapping("/workspace")
-    public Workspace create(@RequestParam String masterUrl, @RequestParam String namespace,
+    public WorkspaceLink create(@RequestParam String masterUrl, @RequestParam String namespace,
             @RequestBody WorkspaceCreateParams params,
             @ApiParam(value = "Keycloak token", required = true) @RequestHeader("Authorization") String keycloakToken)
             throws IOException, URISyntaxException, RouteNotFoundException, StackNotFoundException, GitHubOAthTokenException, ProjectCreationException {
@@ -107,7 +109,7 @@ public class WorkspaceController {
 
     @ApiOperation(value = "Create and start a new workspace. Stop all other workspaces (only one workspace can be running at a time). If a workspace with the imported project already exists, just start it")
     @PostMapping("/workspace/oso")
-    public Workspace createOnOpenShift(@RequestParam String masterUrl, @RequestParam String namespace,
+    public WorkspaceLink createOnOpenShift(@RequestParam String masterUrl, @RequestParam String namespace,
             @RequestBody WorkspaceCreateParams params,
             @ApiParam(value = "OpenShift token", required = true) @RequestHeader("Authorization") String openShiftToken)
             throws IOException, URISyntaxException, RouteNotFoundException, StackNotFoundException, GitHubOAthTokenException, ProjectCreationException {
@@ -126,10 +128,11 @@ public class WorkspaceController {
      * @param params
      * @return create Workspace
      */
-    public Workspace createWorkspace(String masterUrl, String namespace, String openShiftToken, String gitHubOAuthToken, String keycloakToken, 
-    		WorkspaceCreateParams params) throws RouteNotFoundException, URISyntaxException, IOException, StackNotFoundException, GitHubOAthTokenException, ProjectCreationException {
-        String cheServerUrl = openShiftClientWrapper.getCheServerUrl(masterUrl, namespace, openShiftToken);
+    public WorkspaceLink createWorkspace(String masterUrl, String namespace, String openShiftToken, String gitHubOAuthToken,
+            String keycloakToken, WorkspaceCreateParams params) throws RouteNotFoundException, URISyntaxException,
+            IOException, StackNotFoundException, GitHubOAthTokenException, ProjectCreationException {
 
+        String cheServerUrl = openShiftClientWrapper.getCheServerUrl(masterUrl, namespace, openShiftToken);
         String projectName = projectHelper.getProjectNameFromGitRepository(params.getRepo());
 
         List<Workspace> workspaces = workspaceClient.listWorkspaces(cheServerUrl);
@@ -140,16 +143,16 @@ public class WorkspaceController {
             String wsDescription = ws.getConfig().getDescription();
             if (wsDescription != null && wsDescription.equals(description)) {
                 // Before we can create a project, we must start the new workspace.  First check it's not already running
-                if (!WorkspaceClient.WORKSPACE_STATUS_RUNNING.equals(ws.getStatus()) && 
-                        !WorkspaceClient.WORKSPACE_STATUS_STARTING.equals(ws.getStatus())) {
+                if (!WorkspaceState.RUNNING.toString().equals(ws.getStatus()) && 
+                        !WorkspaceState.STARTING.toString().equals(ws.getStatus())) {
                     workspaceClient.startWorkspace(cheServerUrl, ws.getId());
                 }
-                return ws;
+                return workspaceHelper.getWorkspaceIdeLink(ws);
             }
         }
 
         // Create the workspace
-        Workspace workspaceInfo = workspaceClient.createWorkspace(cheServerUrl, keycloakToken, params.getName(), params.getStack(),
+        Workspace workspace = workspaceClient.createWorkspace(cheServerUrl, keycloakToken, params.getName(), params.getStack(),
                 params.getRepo(), params.getBranch());
         
         // Set the GitHub oAuth token if it is available
@@ -158,10 +161,10 @@ public class WorkspaceController {
         }
 
         // Create the project - this is an async call
-        projectClient.createProject(cheServerUrl, workspaceInfo.getId(), projectName, params.getRepo(),
+        projectClient.createProject(cheServerUrl, workspace.getId(), projectName, params.getRepo(),
                 params.getBranch(), params.getStack());
 
-        return workspaceInfo;
+        return workspaceHelper.getWorkspaceIdeLink(workspace);
     }
 
     public List<Workspace> listWorkspaces(String masterUrl, String namespace, String openShiftToken, String repository)

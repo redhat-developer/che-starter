@@ -30,6 +30,7 @@ import org.springframework.web.client.RestTemplate;
 import io.fabric8.che.starter.exception.ProjectCreationException;
 import io.fabric8.che.starter.model.Project;
 import io.fabric8.che.starter.model.workspace.Workspace;
+import io.fabric8.che.starter.model.workspace.WorkspaceState;
 import io.fabric8.che.starter.model.workspace.WorkspaceStatus;
 import io.fabric8.che.starter.template.ProjectTemplate;
 
@@ -59,7 +60,7 @@ public class ProjectClient {
         // Poll until the workspace is started
         WorkspaceStatus status = workspaceClient.getWorkspaceStatus(cheServerURL, workspaceId);
         long currentTime = System.currentTimeMillis();
-        while (!WorkspaceClient.WORKSPACE_STATUS_RUNNING.equals(status.getWorkspaceStatus())
+        while (!WorkspaceState.RUNNING.toString().equals(status.getWorkspaceStatus())
                 && System.currentTimeMillis() < (currentTime + workspaceStartTimeout)) {
             try {
                 Thread.sleep(1000);
