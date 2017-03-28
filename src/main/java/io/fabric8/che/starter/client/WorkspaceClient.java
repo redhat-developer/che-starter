@@ -89,15 +89,15 @@ public class WorkspaceClient {
         WorkspaceConfig wsConfig = stackClient.getStack(cheServerUrl, stackId, null).getWorkspaceConfig();
         wsConfig.setName(name);
         wsConfig.setDescription(repo + "#" + branch);
-        
+
         RestTemplate template = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        
+
         if (keycloakToken != null) {
             template.setInterceptors(Collections.singletonList(new KeycloakInterceptor(keycloakToken)));
         }
-        
+
         HttpEntity<WorkspaceConfig> entity = new HttpEntity<WorkspaceConfig>(wsConfig, headers);
 
         ResponseEntity<Workspace> workspaceResponse = template.exchange(url, HttpMethod.POST, entity, Workspace.class);

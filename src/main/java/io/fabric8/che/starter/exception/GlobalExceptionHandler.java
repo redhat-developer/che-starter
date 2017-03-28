@@ -20,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.HttpClientErrorException;
 
 import io.fabric8.kubernetes.client.KubernetesClientException;
 
@@ -47,6 +48,12 @@ public class GlobalExceptionHandler {
     @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Stack not found")
     @ExceptionHandler(StackNotFoundException.class)
     public String handleStackNotFoundException(StackNotFoundException e) {
+        return e.getMessage();
+    }
+
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Bad Request (most likely the token is invalid)")
+    @ExceptionHandler(HttpClientErrorException.class)
+    public String handleHttpClientErrorException(HttpClientErrorException e) {
         return e.getMessage();
     }
 

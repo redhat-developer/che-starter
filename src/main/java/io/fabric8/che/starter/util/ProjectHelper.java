@@ -17,7 +17,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -34,10 +33,6 @@ public class ProjectHelper {
         URI uri = url.toURI();
         String path = uri.getPath();
         return getProjectNameFromPath(path);
-    }
-
-    public String generateName() {
-        return RandomStringUtils.random(8, true, true).toLowerCase();
     }
 
     private String changeProtocolToHttpsIfNeeded(final String repositoryUrl) {
