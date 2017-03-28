@@ -1,7 +1,7 @@
 [{
   "name": "${project.name}",
-  "projectType": "maven",
-  "description": "A hello world Java application.",
+  "projectType": "${project.type}",
+  "description": "Created via che-starter API",
   "path": "/${project.name}",
   "source": {
     "parameters": {

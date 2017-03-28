@@ -159,7 +159,7 @@ public class WorkspaceController {
 
         // Create the project - this is an async call
         projectClient.createProject(cheServerUrl, workspaceInfo.getId(), projectName, params.getRepo(),
-                params.getBranch());
+                params.getBranch(), params.getStack());
 
         return workspaceInfo;
     }

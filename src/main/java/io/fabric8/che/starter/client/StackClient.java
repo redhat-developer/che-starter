@@ -61,7 +61,7 @@ public class StackClient {
                 Stack stack = stacks.stream().filter(s -> stackId.equals(s.getId())).findFirst().get();
                 return stack;
             } catch (NoSuchElementException e) {
-                throw new StackNotFoundException("Stack with id " + stackId + " was not found");
+                throw new StackNotFoundException("Stack with id '" + stackId + "' was not found");
             }
         } else {
             throw new StackNotFoundException("No stacks were returned from Che server");

@@ -17,25 +17,21 @@ import java.io.IOException;
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
-import io.fabric8.che.starter.util.ProjectHelper;
 import io.fabric8.che.starter.util.Reader;
 
 @Component
 public class ProjectTemplate {
     private final static String PROJECT_NAME = "${project.name}";
+    private final static String PROJECT_TYPE = "${project.type}";
     private final static String PROJECT_GIT_REPO = "${project.git.repo}";
     private final static String PROJECT_GIT_BRANCH = "${project.git.branch}";
 
     @Value(value = "classpath:templates/project_template.json")
     private Resource resource;
-
-    @Autowired
-    private ProjectHelper helper;
 
     private String template;
 
@@ -44,18 +40,23 @@ public class ProjectTemplate {
         template = Reader.read(resource.getInputStream());
     }
 
+    public ProjectCreateRequest create() {
+        return new ProjectCreateRequest();
+    }
+
     public class ProjectCreateRequest {
         private String name;
+        private String projectType;
         private String repo;
         private String branch;
-        private String stack;
-
-        protected ProjectCreateRequest(ProjectTemplate template) {
-            this.name = helper.generateName();
-        }
 
         public ProjectCreateRequest setName(String name) {
             this.name = name;
+            return this;
+        }
+
+        public ProjectCreateRequest setProjectType(String projectType) {
+            this.projectType = projectType;
             return this;
         }
 
@@ -69,30 +70,14 @@ public class ProjectTemplate {
             return this;
         }
 
-        public ProjectCreateRequest setStack(String stack) {
-            this.stack = stack;
-            return this;
-        }
-
         public String getJSON() {
             String json = template;
             json = StringUtils.replace(json, PROJECT_NAME, name);
+            json = StringUtils.replace(json, PROJECT_TYPE, projectType);
             json = StringUtils.replace(json, PROJECT_GIT_REPO, repo);
             json = StringUtils.replace(json, PROJECT_GIT_BRANCH, branch);
             return json;
         }
-
-        public String getBranch() {
-            return branch;
-        }
-
-        public String getStack() {
-            return stack;
-        }
-    }
-
-    public ProjectCreateRequest createRequest() {
-        return new ProjectCreateRequest(this);
     }
 
 }

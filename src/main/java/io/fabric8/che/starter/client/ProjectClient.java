@@ -44,10 +44,13 @@ public class ProjectClient {
     private ProjectTemplate projectTemplate;
 
     @Autowired
-    WorkspaceClient workspaceClient;
+    private WorkspaceClient workspaceClient;
+
+    @Autowired
+    private StackClient stackClient;
 
     @Async
-    public void createProject(String cheServerURL, String workspaceId, String name, String repo, String branch)
+    public void createProject(String cheServerURL, String workspaceId, String name, String repo, String branch, String stack)
             throws IOException, ProjectCreationException {
 
         // Before we can create a project, we must start the new workspace
@@ -77,7 +80,14 @@ public class ProjectClient {
         String url = CheRestEndpoints.CREATE_PROJECT.generateUrl(wsAgentUrl);
         LOG.info("Creating project against workspace agent URL: {}", url);
 
-        String jsonTemplate = projectTemplate.createRequest().setName(name).setRepo(repo).setBranch(branch).getJSON();
+        String projectType = stackClient.getProjectTypeByStackId(stack);
+
+        String jsonTemplate = projectTemplate.create()
+                                             .setName(name)
+                                             .setRepo(repo)
+                                             .setBranch(branch)
+                                             .setProjectType(projectType)
+                                             .getJSON();
 
         RestTemplate template = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
