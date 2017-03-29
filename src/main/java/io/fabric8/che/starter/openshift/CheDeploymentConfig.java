@@ -30,7 +30,7 @@ import io.fabric8.openshift.client.OpenShiftClient;
 import io.fabric8.openshift.client.dsl.ClientDeployableScalableResource;
 
 @Component
-final class CheDeploymentConfig {
+public final class CheDeploymentConfig {
 
     @Value("${che.openshift.deploymentconfig}")
     private String deploymentConfigName;
