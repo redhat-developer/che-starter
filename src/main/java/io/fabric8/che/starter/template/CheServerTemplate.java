@@ -34,7 +34,7 @@ public class CheServerTemplate {
     @PostConstruct
     public void init() throws IOException {
        template = Reader.read(new URL(templateUrl));
-       LOG.info("Che Server Template: {}", template);
+       LOG.info("Che Server Template initialized");
     }
 
     @Value("${che.server.template.url}")

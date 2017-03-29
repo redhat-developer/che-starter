@@ -36,7 +36,7 @@ public class CheServerControllerTest extends TestConfig {
     @Test
     public void readTemplate() throws IOException {
         String template = Reader.read(cheServerTemplate.getInputStream());
-        LOG.info("Che server template: {}", template);
+        LOG.info("Che server template initialized successfully");
     }
 
 }
