@@ -34,6 +34,8 @@ import io.fabric8.che.starter.TestBase;
 @SpringBootTest
 public class StackControllerTest extends TestBase {
 
+	private static final String STACK_ENDPOINT = "/stack/oso";
+	
     @Autowired
     private WebApplicationContext wac;
 
@@ -47,12 +49,38 @@ public class StackControllerTest extends TestBase {
     @Test
     public void testGetStacks() throws Exception {
     	mockMvc.perform(
-    				get("/stack/oso").
+    				get(STACK_ENDPOINT).
     				header("Authorization", AUTHORIZATION).
     				param("masterUrl", VERTX_SERVER).param("namespace", NAMESPACE)).
     		andExpect(status().isOk()).
     		andExpect(jsonPath("$[1].id", is("java-default"))).
     		andExpect(jsonPath("$[0].id", is("vert.x")));
     }
-
+    
+    @Test
+    public void testGetStacksWithWrongToken() throws Exception {
+		mockMvc.perform(
+					get(STACK_ENDPOINT).
+					header("Authorization", "badtoken").
+					param("masterUrl", VERTX_SERVER).param("namespace", NAMESPACE)).
+				andExpect(status().is(401));
+    }
+    
+    @Test
+    public void testGetStacksWithWrongNamespace() throws Exception {
+    	mockMvc.perform(
+    				get(STACK_ENDPOINT).
+    				header("Authorization", AUTHORIZATION).
+    				param("masterUrl", VERTX_SERVER).param("namespace", "noexisting")).
+    			andExpect(status().is(401));
+    }
+    
+    @Test
+    public void testGetStacksWithWrongMasterURL() throws Exception {
+    	mockMvc.perform(
+				get(STACK_ENDPOINT).
+				header("Authorization", AUTHORIZATION).
+				param("masterUrl", "http://i.do.not.exist").param("namespace", NAMESPACE)).
+			andExpect(status().is(401));
+    }
 }
