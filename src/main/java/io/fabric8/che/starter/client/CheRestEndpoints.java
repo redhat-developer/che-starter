@@ -47,5 +47,4 @@ public enum CheRestEndpoints {
     public String toString() {
         return endpoint;
     }
-
 }
