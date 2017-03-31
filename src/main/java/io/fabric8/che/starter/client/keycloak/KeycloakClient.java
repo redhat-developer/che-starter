@@ -45,6 +45,9 @@ public class KeycloakClient implements TokenReceiver {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode json = mapper.readTree(responseBody);
         JsonNode accessToken = json.get(ACCESS_TOKEN);
+        if (accessToken == null) {
+        	return null;
+        }
         return accessToken.asText();
     }
 
@@ -54,6 +57,9 @@ public class KeycloakClient implements TokenReceiver {
         String responseBody = getResponseBody(gitHubTokenUrl, keycloakToken);
         Map<String, String> parameter = UrlHelper.splitQuery(responseBody);
         String token = parameter.get(ACCESS_TOKEN);
+        if (token == null) {
+        	return null;
+        }
         return token;
     }
 

@@ -41,7 +41,7 @@
         <org.apache.commons.lang.version>3.5</org.apache.commons.lang.version>
         <swagger.version>2.6.1</swagger.version>
         <licenseMavenPluginVersion>1.11</licenseMavenPluginVersion>
-        <vertx.server.version>v0.2</vertx.server.version>
+        <vertx.server.version>v1.0</vertx.server.version>
     </properties>
 
     <dependencies>
