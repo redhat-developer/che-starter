@@ -27,8 +27,10 @@ private static Process proc;
 	
 	public static final String VERTX_SERVER = "http://localhost:33333";
 	public static final String NAMESPACE = "eclipse-che";
-	public static final String AUTHORIZATION = "customtoken";
-
+	public static final String OPENSHIFT_TOKEN = "openshifttoken";
+	public static final String KEYCLOAK_TOKEN = "keycloaktoken";
+	public static final String GITHUB_TOKEN = "githubtoken";
+	
 	@BeforeClass
 	public static void setUp() throws IOException {
 		System.out.println(new File(".").getAbsolutePath());
