@@ -35,6 +35,7 @@ import io.fabric8.che.starter.client.GitHubClient;
 import io.fabric8.che.starter.client.WorkspaceClient;
 import io.fabric8.che.starter.client.keycloak.KeycloakClient;
 import io.fabric8.che.starter.exception.GitHubOAthTokenException;
+import io.fabric8.che.starter.exception.KeycloakException;
 import io.fabric8.che.starter.exception.ProjectCreationException;
 import io.fabric8.che.starter.exception.RouteNotFoundException;
 import io.fabric8.che.starter.exception.StackNotFoundException;
@@ -79,7 +80,7 @@ public class WorkspaceController {
     public List<Workspace> list(@RequestParam String masterUrl, @RequestParam String namespace,
             @RequestParam(required = false) String repository,
             @ApiParam(value = "Keycloak token", required = true) @RequestHeader("Authorization") String keycloakToken)
-            throws RouteNotFoundException, JsonProcessingException, IOException {
+            throws RouteNotFoundException, JsonProcessingException, IOException, KeycloakException {
 
         String openShiftToken = keycloakClient.getOpenShiftToken(keycloakToken);
         return listWorkspaces(masterUrl, namespace, openShiftToken, repository);
@@ -100,7 +101,7 @@ public class WorkspaceController {
     public WorkspaceLink create(@RequestParam String masterUrl, @RequestParam String namespace,
             @RequestBody WorkspaceCreateParams params,
             @ApiParam(value = "Keycloak token", required = true) @RequestHeader("Authorization") String keycloakToken)
-            throws IOException, URISyntaxException, RouteNotFoundException, StackNotFoundException, GitHubOAthTokenException, ProjectCreationException {
+            throws IOException, URISyntaxException, RouteNotFoundException, StackNotFoundException, GitHubOAthTokenException, ProjectCreationException, KeycloakException {
 
         String openShiftToken = keycloakClient.getOpenShiftToken(keycloakToken);
         String gitHubOAuthToken = keycloakClient.getGitHubToken(keycloakToken);

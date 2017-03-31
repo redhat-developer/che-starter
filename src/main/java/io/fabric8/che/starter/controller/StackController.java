@@ -28,6 +28,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import io.fabric8.che.starter.client.StackClient;
 import io.fabric8.che.starter.client.keycloak.KeycloakClient;
+import io.fabric8.che.starter.exception.KeycloakException;
 import io.fabric8.che.starter.exception.RouteNotFoundException;
 import io.fabric8.che.starter.model.stack.Stack;
 import io.fabric8.che.starter.openshift.OpenShiftClientWrapper;
@@ -51,7 +52,7 @@ public class StackController {
     @ApiOperation(value = "List the available stacks")
     @GetMapping("/stack")
     public List<Stack> list(@RequestParam String masterUrl, @RequestParam String namespace, @ApiParam(value = "Keycloak token", required = true) @RequestHeader("Authorization") String keycloakToken)
-            throws RouteNotFoundException, JsonProcessingException, IOException {
+            throws RouteNotFoundException, JsonProcessingException, IOException, KeycloakException {
         String openShiftToken = keycloakClient.getOpenShiftToken(keycloakToken);
         return getStacks(masterUrl, namespace, openShiftToken, keycloakToken);
     }
