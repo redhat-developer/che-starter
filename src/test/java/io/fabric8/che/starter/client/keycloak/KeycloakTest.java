@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import io.fabric8.che.starter.TestConfig;
+import io.fabric8.che.starter.exception.KeycloakException;
 
 @Ignore("Valid keycloak token must be provided")
 public class KeycloakTest extends TestConfig {
@@ -33,13 +34,13 @@ public class KeycloakTest extends TestConfig {
     KeycloakClient keycloakClient;
 
     @Test
-    public void getGitHubToken() {
+    public void getGitHubToken() throws KeycloakException {
         String gitHubToken = keycloakClient.getGitHubToken(AUTH_HEADER);
         LOG.info("GitHub Token: {}", gitHubToken);
     }
 
     @Test
-    public void getOpenShiftToken() throws JsonProcessingException, IOException {
+    public void getOpenShiftToken() throws JsonProcessingException, IOException, KeycloakException {
         String openShiftToken = keycloakClient.getOpenShiftToken(AUTH_HEADER);
         LOG.info("OpenShift Token: {}", openShiftToken);
     }

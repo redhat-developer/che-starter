@@ -62,6 +62,13 @@ public class GlobalExceptionHandler {
     public String handleKubernetesClientException(KubernetesClientException e) {
         return e.getMessage();
     }
+    
+
+    @ResponseStatus(value = HttpStatus.UNAUTHORIZED, reason = "Keycloak token is invalid")
+    @ExceptionHandler(KeycloakException.class)
+    public String handleKeycloakException(KeycloakException e) {
+        return e.getMessage();
+    }
 
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR, reason = "Error setting GitHub oAuth token on Che Server")
     @ExceptionHandler(GitHubOAthTokenException.class)

@@ -26,10 +26,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.fabric8.che.starter.exception.KeycloakException;
 import io.fabric8.che.starter.util.UrlHelper;
 
 @Component
-public class KeycloakClient implements TokenReceiver {
+public class KeycloakClient {
     private static final String ACCESS_TOKEN = "access_token";
 
     @Value("${OPENSHIFT_TOKEN_URL:http://sso.prod-preview.openshift.io/auth/realms/fabric8/broker/openshift-v3/token}")
@@ -38,27 +39,25 @@ public class KeycloakClient implements TokenReceiver {
     @Value("${GITHUB_TOKEN_URL:http://sso.prod-preview.openshift.io/auth/realms/fabric8/broker/github/token}")
     private String gitHubTokenUrl;
 
-    @Override
-    public String getOpenShiftToken(String keycloakToken) throws JsonProcessingException, IOException {
+    public String getOpenShiftToken(String keycloakToken) throws JsonProcessingException, IOException, KeycloakException {
         // {"access_token":"token","expires_in":86400,"scope":"user:full","token_type":"Bearer"}
         String responseBody = getResponseBody(openShiftTokenUrl, keycloakToken);
         ObjectMapper mapper = new ObjectMapper();
         JsonNode json = mapper.readTree(responseBody);
         JsonNode accessToken = json.get(ACCESS_TOKEN);
         if (accessToken == null) {
-        	return null;
+            throw new KeycloakException("Unable to obtain OpenShift token");
         }
         return accessToken.asText();
     }
 
-    @Override
-    public String getGitHubToken(String keycloakToken) {
+    public String getGitHubToken(String keycloakToken) throws KeycloakException {
         // access_token=token&scope=scope
         String responseBody = getResponseBody(gitHubTokenUrl, keycloakToken);
         Map<String, String> parameter = UrlHelper.splitQuery(responseBody);
         String token = parameter.get(ACCESS_TOKEN);
         if (token == null) {
-        	return null;
+            throw new KeycloakException("Unable to obtain GitHub token");
         }
         return token;
     }
