@@ -1,0 +1,97 @@
+kind: Template
+apiVersion: v1
+metadata:
+  name: che-starter
+  creationTimestamp: null
+objects:
+- kind: DeploymentConfig
+  apiVersion: v1
+  metadata:
+    name: che-starter
+    creationTimestamp: null
+    generation: 1
+    labels:
+      app: che-starter
+  spec:
+    strategy:
+      type: Rolling
+      rollingParams:
+        updatePeriodSeconds: 1
+        intervalSeconds: 1
+        timeoutSeconds: 600
+        maxUnavailable: 25%
+        maxSurge: 25%
+      resources: {}
+    triggers:
+      - type: ConfigChange
+    replicas: 1
+    test: false
+    selector:
+      app: che-starter
+      deploymentconfig: che-starter
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: che-starter
+          deploymentconfig: che-starter
+      spec:
+        volumes:
+          - name: che-starter-volume-1
+            emptyDir: {}
+        containers:
+          - env:
+            - name: OSO_ADDRESS
+              value: tsrv.devshift.net:8443
+            - name: OSO_DOMAIN_NAME
+              value: tsrv.devshift.net
+            - name: KUBERNETES_CERTS_CA_FILE
+              value: '/opt/che-starter/tsrv.devshift.net.cer'
+            name: che-starter
+            image: 'rhche/che-starter:latest'
+            ports:
+              - containerPort: 10000
+                protocol: TCP
+            terminationMessagePath: /dev/termination-log
+            resources: {}
+            volumeMounts:
+              - name: che-starter-volume-1
+                mountPath: /tmp
+            imagePullPolicy: IfNotPresent
+        restartPolicy: Always
+        terminationGracePeriodSeconds: 30
+        dnsPolicy: ClusterFirst
+        securityContext: {}
+  status: {}
+- kind: Service
+  apiVersion: v1
+  metadata:
+    name: che-starter
+    creationTimestamp: null
+    labels:
+      app: che-starter
+  spec:
+    ports:
+      - name: 10000-tcp
+        protocol: TCP
+        port: 10000
+        targetPort: 10000
+    selector:
+      app: che-starter
+      deploymentconfig: che-starter
+    type: ClusterIP
+    sessionAffinity: None
+  status:
+    loadBalancer: {  }
+- kind: Route
+  apiVersion: v1
+  metadata:
+    name: che-starter
+    creationTimestamp: null
+  spec:
+    host: che-starter.$(minishift ip).nip.io
+    to:
+      kind: Service
+      name: che-starter
+      weight: 100
+    wildcardPolicy: None
