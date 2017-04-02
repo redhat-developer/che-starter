@@ -1,13 +1,16 @@
-# How to deploy che-starter on OpenShift
+# How to deploy che-starter on Minishift
 
 ```sh
-cd che-starter
+minishift start
+
+eval $(minishift docker-env)
+
 
 docker build -t rhche/che-starter:nightly .
 
 cd openshift-template
 
-oc create -f che_starter_template.json
+oc create -f che-starter.app.yaml
 
-oc new-app --template=eclipse-che-starter
+oc new-app --template=che-starter
 ```
