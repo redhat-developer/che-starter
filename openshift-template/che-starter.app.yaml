@@ -42,13 +42,22 @@ objects:
         containers:
           - env:
             - name: OSO_ADDRESS
-              value: tsrv.devshift.net:8443
+              valueFrom:
+              configMapKeyRef:
+                name: che-starter
+                key: oso.address
             - name: OSO_DOMAIN_NAME
-              value: tsrv.devshift.net
+              valueFrom:
+              configMapKeyRef:
+                name: che-starter
+                key: oso.domain.name
             - name: KUBERNETES_CERTS_CA_FILE
-              value: '/opt/che-starter/tsrv.devshift.net.cer'
+              valueFrom:
+              configMapKeyRef:
+                name: che-starter
+                key: kubes.certs.ca.file
             name: che-starter
-            image: 'rhche/che-starter:latest'
+            image: ${IMAGE}:${IMAGE_TAG}
             ports:
               - containerPort: 10000
                 protocol: TCP
@@ -95,3 +104,8 @@ objects:
       name: che-starter
       weight: 100
     wildcardPolicy: None
+parameters:
+- name: IMAGE
+  value: rhche/che-starter
+- name: IMAGE_TAG
+  value: latest
