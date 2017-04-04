@@ -12,33 +12,41 @@
  */
 package io.fabric8.che.starter;
 
-import java.io.File;
-import java.io.IOException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.junit4.SpringRunner;
+import io.fabric8.che.starter.model.request.WorkspaceCreateParams;
 
-@RunWith(SpringRunner.class)
 public class TestBase {
 
-private static Process proc;
-	
 	public static final String VERTX_SERVER = "http://localhost:33333";
 	public static final String NAMESPACE = "eclipse-che";
 	public static final String OPENSHIFT_TOKEN = "openshifttoken";
 	public static final String KEYCLOAK_TOKEN = "keycloaktoken";
 	public static final String GITHUB_TOKEN = "githubtoken";
-	
-	@BeforeClass
-	public static void setUp() throws IOException {
-		System.out.println(new File(".").getAbsolutePath());
-		proc = Runtime.getRuntime().exec("java -jar ./target/vertx-server.jar");
+
+	public static final String WORKSPACE_IDE_URL = "http://localhost:33333/che/vertxworkspace";
+
+	protected static final String PROJECT_GIT_REPO = "https://github.com/mlabuda/vertx-with-che.git";
+	protected static final String PROJECT_GIT_BRANCH = "master";
+	protected static final String WORKSPACE_DESCRIPTION = PROJECT_GIT_REPO + "#" + PROJECT_GIT_BRANCH;
+	protected static final String PROJECT_ID = "/vertx-with-che";
+	protected static final String WORKSPACE_STACK_ID = "vert.x";
+	protected static final String WORKSPACE_NAME = "chevertxwsid13";
+
+	public String getCreateWorkspaceRequestBody(WorkspaceCreateParams workspaceParams) throws JsonProcessingException {
+		ObjectMapper objectMapper = new ObjectMapper();
+		return objectMapper.writeValueAsString(workspaceParams);
 	}
-	
-	@AfterClass
-	public static void tearDown() {
-		proc.destroyForcibly();
+
+	public WorkspaceCreateParams initWorkspaceCreateParams() {
+		WorkspaceCreateParams workspaceParams = new WorkspaceCreateParams();
+		workspaceParams.setRepo(PROJECT_GIT_REPO);
+		workspaceParams.setBranch(PROJECT_GIT_BRANCH);
+		workspaceParams.setDescription(WORKSPACE_DESCRIPTION);
+		workspaceParams.setId(PROJECT_ID);
+		workspaceParams.setStack(WORKSPACE_STACK_ID);
+		workspaceParams.setName(WORKSPACE_NAME);
+		return workspaceParams;
 	}
 }
