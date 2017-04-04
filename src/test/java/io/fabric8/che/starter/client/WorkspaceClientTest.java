@@ -38,10 +38,7 @@ public class WorkspaceClientTest extends TestConfig {
 
     @Autowired
     private WorkspaceClient client;
-
-    @Autowired
-    private WorkspaceHelper workspaceHelper;
-
+    
     @Test
     public void listWorkspaces() {
         List<Workspace> workspaces = this.client.listWorkspaces(cheServerURL);
@@ -52,7 +49,7 @@ public class WorkspaceClientTest extends TestConfig {
     
     @Test
     public void createAndDeleteWorkspace() throws IOException, StackNotFoundException {
-        Workspace workspace = client.createWorkspace(cheServerURL, null, workspaceHelper.generateName(), STACK_ID, GITHUB_REPO, BRANCH);
+        Workspace workspace = client.createWorkspace(cheServerURL, null, STACK_ID, GITHUB_REPO, BRANCH);
         client.deleteWorkspace(cheServerURL, workspace.getId());
     }
 

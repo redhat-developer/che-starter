@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,14 +74,12 @@ public class WorkspaceClient {
      * @throws StackNotFoundException
      * @throws IOException
      */
-    public Workspace createWorkspace(String cheServerUrl, String keycloakToken, String name, String stackId, String repo, String branch) throws StackNotFoundException, IOException {
+    public Workspace createWorkspace(String cheServerUrl, String keycloakToken, String stackId, String repo, String branch) throws StackNotFoundException, IOException {
         // The first step is to create the workspace
         String url = CheRestEndpoints.CREATE_WORKSPACE.generateUrl(cheServerUrl);
 
-        name = StringUtils.isBlank(name) ? workspaceHelper.generateName() : name;
-
         WorkspaceConfig wsConfig = stackClient.getStack(cheServerUrl, stackId, null).getWorkspaceConfig();
-        wsConfig.setName(name);
+        wsConfig.setName(workspaceHelper.generateName());
         wsConfig.setDescription(repo + "#" + branch);
 
         RestTemplate template = new RestTemplate();
