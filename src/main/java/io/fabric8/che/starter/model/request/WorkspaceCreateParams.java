@@ -21,43 +21,16 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WorkspaceCreateParams {
-    private String id;
-    private String description;
-    private String name;
-    private String stack;
+    private String stackId;
     private String repo;
     private String branch;
 
-    public String getId() {
-        return id;
+    public String getStackId() {
+        return stackId;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getStack() {
-        return stack;
-    }
-
-    public void setStack(String stack) {
-        this.stack = stack;
+    public void setStackId(String stackId) {
+        this.stackId = stackId;
     }
 
     public String getRepo() {

@@ -174,7 +174,6 @@ public class WorkspaceControllerTest extends TestBase {
 	public void createWorkspaceWithWrongRepoParamTest() throws Exception {
 		WorkspaceCreateParams workspaceParams = initWorkspaceCreateParams();
 		workspaceParams.setRepo("incorrecturl");
-		workspaceParams.setDescription("incorrecturl#master");
 		mockMvc.perform(post(WORKSPACE_ENDPOINT).header("Authorization", KEYCLOAK_TOKEN)
 				.header("Content-Type", "application/json").param("masterUrl", VERTX_SERVER)
 				.param("namespace", NAMESPACE).content(getCreateWorkspaceRequestBody(workspaceParams)))
@@ -185,7 +184,6 @@ public class WorkspaceControllerTest extends TestBase {
 	public void createWorkspaceOSOWithWrongRepoParamTest() throws Exception {
 		WorkspaceCreateParams workspaceParams = initWorkspaceCreateParams();
 		workspaceParams.setRepo("incorrecturl");
-		workspaceParams.setDescription("incorrecturl#master");
 		mockMvc.perform(post(WORKSPACE_OSO_ENDPOINT).header("Authorization", OPENSHIFT_TOKEN)
 				.header("Content-Type", "application/json").param("masterUrl", VERTX_SERVER)
 				.param("namespace", NAMESPACE).content(getCreateWorkspaceRequestBody(workspaceParams)))
@@ -195,10 +193,9 @@ public class WorkspaceControllerTest extends TestBase {
 	@Test
 	public void createWorkspaceWithNonexistingStackParamTest() throws Exception {
 		WorkspaceCreateParams workspaceParams = initWorkspaceCreateParams();
-		workspaceParams.setStack("nada");
+		workspaceParams.setStackId("nada");
 		// Need to also modify description, which is ID of a workspace to avoid getting already existing WS
 		workspaceParams.setBranch("custom");
-		workspaceParams.setDescription(PROJECT_GIT_REPO + "#custom");
 		mockMvc.perform(post(WORKSPACE_ENDPOINT).header("Authorization", KEYCLOAK_TOKEN)
 				.header("Content-Type", "application/json").param("masterUrl", VERTX_SERVER)
 				.param("namespace", NAMESPACE).content(getCreateWorkspaceRequestBody(workspaceParams)))
@@ -208,10 +205,9 @@ public class WorkspaceControllerTest extends TestBase {
 	@Test
 	public void createWorkspaceOSOWithNonexistingStackParamTest() throws Exception {
 		WorkspaceCreateParams workspaceParams = initWorkspaceCreateParams();
-		workspaceParams.setStack("nada");
+		workspaceParams.setStackId("nada");
 		// Need to also modify description, which is ID of a workspace to avoid getting already existing WS
 		workspaceParams.setBranch("custom");
-		workspaceParams.setDescription(PROJECT_GIT_REPO + "#custom");
 		mockMvc.perform(post(WORKSPACE_OSO_ENDPOINT).header("Authorization", OPENSHIFT_TOKEN)
 				.header("Content-Type", "application/json").param("masterUrl", VERTX_SERVER)
 				.param("namespace", NAMESPACE).content(getCreateWorkspaceRequestBody(workspaceParams)))

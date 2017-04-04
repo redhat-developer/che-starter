@@ -43,10 +43,7 @@ public class TestBase {
 		WorkspaceCreateParams workspaceParams = new WorkspaceCreateParams();
 		workspaceParams.setRepo(PROJECT_GIT_REPO);
 		workspaceParams.setBranch(PROJECT_GIT_BRANCH);
-		workspaceParams.setDescription(WORKSPACE_DESCRIPTION);
-		workspaceParams.setId(PROJECT_ID);
-		workspaceParams.setStack(WORKSPACE_STACK_ID);
-		workspaceParams.setName(WORKSPACE_NAME);
+		workspaceParams.setStackId(WORKSPACE_STACK_ID);
 		return workspaceParams;
 	}
 }

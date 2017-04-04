@@ -153,7 +153,7 @@ public class WorkspaceController {
         }
 
         // Create the workspace
-        Workspace workspace = workspaceClient.createWorkspace(cheServerUrl, keycloakToken, params.getName(), params.getStack(),
+        Workspace workspace = workspaceClient.createWorkspace(cheServerUrl, keycloakToken, params.getStackId(),
                 params.getRepo(), params.getBranch());
         
         // Set the GitHub oAuth token if it is available
@@ -163,7 +163,7 @@ public class WorkspaceController {
 
         // Create the project - this is an async call
         projectClient.createProject(cheServerUrl, workspace.getId(), projectName, params.getRepo(),
-                params.getBranch(), params.getStack());
+                params.getBranch(), params.getStackId());
 
         return workspaceHelper.getWorkspaceIdeLink(workspace);
     }
