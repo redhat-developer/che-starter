@@ -1,15 +1,9 @@
 apiVersion: v1
-kind: Template
+kind: ConfigMap
 metadata:
   name: che-starter
-  creationTimestamp: null
-objects:
-- apiVersion: v1
-  kind: ConfigMap
-  metadata:
-    name: che-starter
-  type: Opaque
-  data:
-    oso.domain.name: tsrv.devshift.net
-    oso.address: tsrv.devshift.net:8443
-    kubes.certs.ca.file: /opt/che-starter/tsrv.devshift.net.cer
+type: Opaque
+data:
+  oso.domain.name: tsrv.devshift.net
+  oso.address: tsrv.devshift.net:8443
+  kubes.certs.ca.file: /opt/che-starter/tsrv.devshift.net.cer
