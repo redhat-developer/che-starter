@@ -13,6 +13,9 @@
 package io.fabric8.che.starter.client;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,11 +31,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import io.fabric8.che.starter.exception.ProjectCreationException;
-import io.fabric8.che.starter.model.Project;
+import io.fabric8.che.starter.model.project.Project;
 import io.fabric8.che.starter.model.workspace.Workspace;
 import io.fabric8.che.starter.model.workspace.WorkspaceState;
 import io.fabric8.che.starter.model.workspace.WorkspaceStatus;
-import io.fabric8.che.starter.template.ProjectTemplate;
 
 @Component
 public class ProjectClient {
@@ -40,9 +42,6 @@ public class ProjectClient {
 
     @Value("${che.workspace.start.timeout}")
     private long workspaceStartTimeout;
-
-    @Autowired
-    private ProjectTemplate projectTemplate;
 
     @Autowired
     private WorkspaceClient workspaceClient;
@@ -80,20 +79,13 @@ public class ProjectClient {
         // Next we create a new project against workspace agent API Url
         String url = CheRestEndpoints.CREATE_PROJECT.generateUrl(wsAgentUrl);
         LOG.info("Creating project against workspace agent URL: {}", url);
-
-        String projectType = stackClient.getProjectTypeByStackId(stack);
-
-        String jsonTemplate = projectTemplate.create()
-                                             .setName(name)
-                                             .setRepo(repo)
-                                             .setBranch(branch)
-                                             .setProjectType(projectType)
-                                             .getJSON();
-
+        
+        Project project = initProject(name, repo, branch, stackClient.getProjectTypeByStackId(stack));
+       
         RestTemplate template = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> entity = new HttpEntity<String>(jsonTemplate, headers);
+        HttpEntity<Project[]> entity = new HttpEntity<Project[]>(new Project[] {project}, headers);
 
         ResponseEntity<Project[]> response = template.exchange(url, HttpMethod.POST, entity, Project[].class);
 
@@ -110,4 +102,20 @@ public class ProjectClient {
         return workspace.getRuntime().getDevMachine().getRuntime().getServers().get("4401/tcp").getUrl();
     }
 
+    private Project initProject(String name, String repo, String branch, String projectType) {
+    	Project project = new Project();
+        project.setName(name);
+        Map<String,String> sourceParams = project.getSource().getParameters();
+        sourceParams.put("branch", branch);
+        sourceParams.put("keepVcs", "true");
+        project.getSource().setType("git");
+        project.getSource().setLocation(repo);
+        project.setProjectType(projectType);
+        project.setDescription("Created via che-starter API");
+        project.setPath("/" + name);
+        List<String> mixins = new ArrayList<>();
+        mixins.add("git");
+        project.setMixins(mixins);
+        return project;
+    }
 }
