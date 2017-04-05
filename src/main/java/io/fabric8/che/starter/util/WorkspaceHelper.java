@@ -26,10 +26,6 @@ public class WorkspaceHelper {
     private static final String REPO_BRANCH_DELIMITER = "#";
     private static final String WORKSPACE_IDE_URL = "ide url";
 
-    public String getDescription(final String repo, final String branch) {
-        return repo + REPO_BRANCH_DELIMITER + branch;
-    }
-
     public List<Workspace> filterByRepository(final List<Workspace> workspaces, final String repository) {
         return workspaces.stream().filter(w -> {
             String description = w.getConfig().getDescription();

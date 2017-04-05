@@ -29,7 +29,7 @@ public class TestBase {
 
 	protected static final String PROJECT_GIT_REPO = "https://github.com/mlabuda/vertx-with-che.git";
 	protected static final String PROJECT_GIT_BRANCH = "master";
-	protected static final String WORKSPACE_DESCRIPTION = PROJECT_GIT_REPO + "#" + PROJECT_GIT_BRANCH;
+	protected static final String WORKSPACE_DESCRIPTION = "https://github.com/mlabuda/vertx-with-che.git#master#WI13";
 	protected static final String PROJECT_ID = "/vertx-with-che";
 	protected static final String WORKSPACE_STACK_ID = "vert.x";
 	protected static final String WORKSPACE_NAME = "chevertxwsid13";
@@ -44,6 +44,7 @@ public class TestBase {
 		workspaceParams.setRepo(PROJECT_GIT_REPO);
 		workspaceParams.setBranch(PROJECT_GIT_BRANCH);
 		workspaceParams.setStackId(WORKSPACE_STACK_ID);
+		workspaceParams.setDescription(WORKSPACE_DESCRIPTION);
 		return workspaceParams;
 	}
 }

@@ -25,13 +25,13 @@ import org.springframework.beans.factory.annotation.Value;
 import io.fabric8.che.starter.TestConfig;
 import io.fabric8.che.starter.exception.StackNotFoundException;
 import io.fabric8.che.starter.model.workspace.Workspace;
-import io.fabric8.che.starter.util.WorkspaceHelper;
 
 public class WorkspaceClientTest extends TestConfig {
     private static final Logger LOG = LogManager.getLogger(WorkspaceClientTest.class);
     private static final String GITHUB_REPO = "https://github.com/che-samples/console-java-simple";
     private static final String BRANCH = "master";
     private static final String STACK_ID = "java-default";
+    private static final String DESCRIPTION = GITHUB_REPO + "#" + BRANCH + "#" + "WI1345";
 
     @Value("${che.server.url}")
     String cheServerURL;
@@ -49,7 +49,7 @@ public class WorkspaceClientTest extends TestConfig {
     
     @Test
     public void createAndDeleteWorkspace() throws IOException, StackNotFoundException {
-        Workspace workspace = client.createWorkspace(cheServerURL, null, STACK_ID, GITHUB_REPO, BRANCH);
+        Workspace workspace = client.createWorkspace(cheServerURL, null, STACK_ID, GITHUB_REPO, BRANCH, DESCRIPTION);
         client.deleteWorkspace(cheServerURL, workspace.getId());
     }
 

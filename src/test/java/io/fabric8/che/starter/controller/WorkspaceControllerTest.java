@@ -195,7 +195,7 @@ public class WorkspaceControllerTest extends TestBase {
 		WorkspaceCreateParams workspaceParams = initWorkspaceCreateParams();
 		workspaceParams.setStackId("nada");
 		// Need to also modify description, which is ID of a workspace to avoid getting already existing WS
-		workspaceParams.setBranch("custom");
+		workspaceParams.setDescription("https://github.com/mlabuda/vertx-with-che.git#master#WI0");
 		mockMvc.perform(post(WORKSPACE_ENDPOINT).header("Authorization", KEYCLOAK_TOKEN)
 				.header("Content-Type", "application/json").param("masterUrl", VERTX_SERVER)
 				.param("namespace", NAMESPACE).content(getCreateWorkspaceRequestBody(workspaceParams)))
@@ -207,7 +207,7 @@ public class WorkspaceControllerTest extends TestBase {
 		WorkspaceCreateParams workspaceParams = initWorkspaceCreateParams();
 		workspaceParams.setStackId("nada");
 		// Need to also modify description, which is ID of a workspace to avoid getting already existing WS
-		workspaceParams.setBranch("custom");
+		workspaceParams.setDescription("https://github.com/mlabuda/vertx-with-che.git#master#WI0");
 		mockMvc.perform(post(WORKSPACE_OSO_ENDPOINT).header("Authorization", OPENSHIFT_TOKEN)
 				.header("Content-Type", "application/json").param("masterUrl", VERTX_SERVER)
 				.param("namespace", NAMESPACE).content(getCreateWorkspaceRequestBody(workspaceParams)))
