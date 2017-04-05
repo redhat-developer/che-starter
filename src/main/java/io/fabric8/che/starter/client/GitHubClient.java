@@ -16,7 +16,6 @@ import java.io.IOException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -27,15 +26,13 @@ import org.springframework.web.client.RestTemplate;
 
 import io.fabric8.che.starter.exception.GitHubOAthTokenException;
 import io.fabric8.che.starter.model.GitHubUserInfo;
-import io.fabric8.che.starter.template.TokenTemplate;
+import io.fabric8.che.starter.model.Token;
 
 @Component
 public class GitHubClient {
     private static final Logger LOG = LogManager.getLogger(GitHubClient.class);
     private static final String GIT_HUB_USER_ENDPOINT = "https://api.github.com/user";
 
-    @Autowired
-    private TokenTemplate tokenTemplate;
 
     /**
      * Uploads the Github oAuth token to the workspace so that the developer can send push requests
@@ -48,12 +45,14 @@ public class GitHubClient {
     public void setGitHubOAuthToken(final String cheServerURL, final String gitHubToken) 
             throws IOException, GitHubOAthTokenException {
         String url = cheServerURL + CheRestEndpoints.SET_OAUTH_TOKEN.getEndpoint().replace("{provider}", "github");
-        String jsonTemplate = tokenTemplate.createRequest().setToken(gitHubToken).getJSON();
-
+        
+        Token token = new Token();
+        token.setToken(gitHubToken);
+        
         RestTemplate template = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> entity = new HttpEntity<String>(jsonTemplate, headers);
+        HttpEntity<Token> entity = new HttpEntity<Token>(token, headers);
 
         try {
             template.postForLocation(url, entity);
