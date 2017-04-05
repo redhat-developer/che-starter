@@ -39,8 +39,10 @@ public final class CheServerRoute {
         }
         if (route != null) {
             String host = route.getSpec().getHost();
+            String protocol = route.getSpec().getPort().getTargetPort().getStrVal();
             LOG.info("Host '{}' has been found", host);
-            return "http://" + host;
+            LOG.info("Route protocol '{}'", protocol);
+            return protocol + "://" + host;
         }
         throw new RouteNotFoundException(
                 "Routes '" + cheRoute + "'/'" + cheHostRoute + "' not found in '" + namespace + "' namespace");
