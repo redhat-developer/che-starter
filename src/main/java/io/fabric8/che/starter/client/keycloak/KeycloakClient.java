@@ -33,10 +33,10 @@ import io.fabric8.che.starter.util.UrlHelper;
 public class KeycloakClient {
     private static final String ACCESS_TOKEN = "access_token";
 
-    @Value("${OPENSHIFT_TOKEN_URL:http://sso.prod-preview.openshift.io/auth/realms/fabric8/broker/openshift-v3/token}")
+    @Value("${OPENSHIFT_TOKEN_URL:https://sso.prod-preview.openshift.io/auth/realms/fabric8/broker/openshift-v3/token}")
     private String openShiftTokenUrl;
 
-    @Value("${GITHUB_TOKEN_URL:http://sso.prod-preview.openshift.io/auth/realms/fabric8/broker/github/token}")
+    @Value("${GITHUB_TOKEN_URL:https://sso.prod-preview.openshift.io/auth/realms/fabric8/broker/github/token}")
     private String gitHubTokenUrl;
 
     public String getOpenShiftToken(String keycloakToken) throws JsonProcessingException, IOException, KeycloakException {
