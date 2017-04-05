@@ -24,7 +24,8 @@ public class WorkspaceCreateParams {
     private String stackId;
     private String repo;
     private String branch;
-
+    private String description;
+    
     public String getStackId() {
         return stackId;
     }
@@ -49,4 +50,11 @@ public class WorkspaceCreateParams {
         this.branch = branch;
     }
 
+    public String getDescription() {
+    	return description;
+    }
+    
+    public void setDescription(String description) {
+    	this.description = description;
+    }
 }

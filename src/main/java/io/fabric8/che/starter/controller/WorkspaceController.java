@@ -138,11 +138,9 @@ public class WorkspaceController {
 
         List<Workspace> workspaces = workspaceClient.listWorkspaces(cheServerUrl);
 
-        String description = workspaceHelper.getDescription(params.getRepo(), params.getBranch());
-
         for (Workspace ws : workspaces) {
             String wsDescription = ws.getConfig().getDescription();
-            if (wsDescription != null && wsDescription.equals(description)) {
+            if (wsDescription != null && wsDescription.equals(params.getDescription())) {
                 // Before we can create a project, we must start the new workspace.  First check it's not already running
                 if (!WorkspaceState.RUNNING.toString().equals(ws.getStatus()) && 
                         !WorkspaceState.STARTING.toString().equals(ws.getStatus())) {
@@ -154,7 +152,7 @@ public class WorkspaceController {
 
         // Create the workspace
         Workspace workspace = workspaceClient.createWorkspace(cheServerUrl, keycloakToken, params.getStackId(),
-                params.getRepo(), params.getBranch());
+                params.getRepo(), params.getBranch(), params.getDescription());
         
         // Set the GitHub oAuth token if it is available
         if (!StringUtils.isBlank(gitHubOAuthToken)) {
