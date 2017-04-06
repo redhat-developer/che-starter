@@ -18,25 +18,18 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
 
 import io.fabric8.che.starter.TestConfig;
-import io.fabric8.che.starter.util.Reader;
 
 public class CheServerControllerTest extends TestConfig {
     private static final Logger LOG = LogManager.getLogger(CheServerControllerTest.class);
-
-    @Value(value = "classpath:templates/che_server_template.json")
-    private Resource cheServerTemplate;
 
     @Autowired
     CheServerController controller;
 
     @Test
     public void readTemplate() throws IOException {
-        String template = Reader.read(cheServerTemplate.getInputStream());
-        LOG.info("Che server template initialized successfully");
+    	// TODO
     }
 
 }
