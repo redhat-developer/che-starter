@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -26,11 +28,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.fabric8.che.starter.controller.CheServerController;
 import io.fabric8.che.starter.exception.KeycloakException;
 import io.fabric8.che.starter.util.UrlHelper;
 
 @Component
 public class KeycloakClient {
+    private static final Logger LOG = LogManager.getLogger(KeycloakClient.class);
     private static final String ACCESS_TOKEN = "access_token";
 
     @Value("${OPENSHIFT_TOKEN_URL:https://sso.prod-preview.openshift.io/auth/realms/fabric8/broker/openshift-v3/token}")
@@ -41,6 +45,7 @@ public class KeycloakClient {
 
     public String getOpenShiftToken(String keycloakToken) throws JsonProcessingException, IOException, KeycloakException {
         // {"access_token":"token","expires_in":86400,"scope":"user:full","token_type":"Bearer"}
+        LOG.info("OpenShift token url - {}", openShiftTokenUrl);
         String responseBody = getResponseBody(openShiftTokenUrl, keycloakToken);
         ObjectMapper mapper = new ObjectMapper();
         JsonNode json = mapper.readTree(responseBody);
@@ -53,6 +58,7 @@ public class KeycloakClient {
 
     public String getGitHubToken(String keycloakToken) throws KeycloakException {
         // access_token=token&scope=scope
+        LOG.info("GitHub token url - {}", gitHubTokenUrl);
         String responseBody = getResponseBody(gitHubTokenUrl, keycloakToken);
         Map<String, String> parameter = UrlHelper.splitQuery(responseBody);
         String token = parameter.get(ACCESS_TOKEN);
