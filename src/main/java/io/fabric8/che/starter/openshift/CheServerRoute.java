@@ -19,11 +19,14 @@ import org.springframework.stereotype.Component;
 
 import io.fabric8.che.starter.exception.RouteNotFoundException;
 import io.fabric8.openshift.api.model.Route;
+import io.fabric8.openshift.api.model.TLSConfig;
 import io.fabric8.openshift.client.OpenShiftClient;
 
 @Component
 public final class CheServerRoute {
     private static final Logger LOG = LogManager.getLogger(CheServerRoute.class);
+    private final String HTTP = "http";
+    private final String HTTPS = "https";
 
     @Value("${che.openshift.route}")
     private String cheRoute;
@@ -39,7 +42,7 @@ public final class CheServerRoute {
         }
         if (route != null) {
             String host = route.getSpec().getHost();
-            String protocol = route.getSpec().getPort().getTargetPort().getStrVal();
+            String protocol = getProtocol(route);
             LOG.info("Host '{}' has been found", host);
             LOG.info("Route protocol '{}'", protocol);
             return protocol + "://" + host;
@@ -50,6 +53,11 @@ public final class CheServerRoute {
 
     private Route getRouteByName(final OpenShiftClient client, final String namespace, final String routeName) {
         return client.routes().inNamespace(namespace).withName(routeName).get();
+    }
+
+    private String getProtocol(final Route route) {
+        TLSConfig tls = route.getSpec().getTls();
+        return (tls != null) ? HTTPS : HTTP;
     }
 
 }
