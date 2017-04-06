@@ -18,18 +18,27 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Component;
 
+import io.fabric8.che.starter.model.project.Project;
 import io.fabric8.che.starter.model.workspace.Workspace;
 import io.fabric8.che.starter.model.workspace.WorkspaceLink;
 
 @Component
 public class WorkspaceHelper {
-    private static final String REPO_BRANCH_DELIMITER = "#";
     private static final String WORKSPACE_IDE_URL = "ide url";
 
     public List<Workspace> filterByRepository(final List<Workspace> workspaces, final String repository) {
         return workspaces.stream().filter(w -> {
-            String description = w.getConfig().getDescription();
-            return description != null && description.split(REPO_BRANCH_DELIMITER)[0].equals(repository);
+        	List<Project> projects = w.getConfig().getProjects();
+        	if (projects != null && !projects.isEmpty()) {
+        		for (Project project: projects) {
+        			if (project.getSource() != null && project.getSource().getLocation() != null) {
+        				if (repository.equals(project.getSource().getLocation())) {
+        					return true;
+        				}
+        			}
+        		}
+        	}
+            return false;
         }).collect(Collectors.toList());
     }
 
