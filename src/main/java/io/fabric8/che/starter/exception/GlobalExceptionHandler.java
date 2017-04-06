@@ -82,4 +82,9 @@ public class GlobalExceptionHandler {
         return e.getMessage();
     }
 
+    @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Workspace not found")
+    @ExceptionHandler(WorkspaceNotFound.class)
+    public String handleWorkspaceNotFoundException(WorkspaceNotFound e) {
+        return e.getMessage();
+    }
 }
