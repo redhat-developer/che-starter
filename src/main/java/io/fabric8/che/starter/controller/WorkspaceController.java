@@ -33,6 +33,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.fabric8.che.starter.client.ProjectClient;
 import io.fabric8.che.starter.client.GitHubClient;
 import io.fabric8.che.starter.client.WorkspaceClient;
+import io.fabric8.che.starter.client.WorkspacePreferencesClient;
 import io.fabric8.che.starter.client.keycloak.KeycloakClient;
 import io.fabric8.che.starter.exception.GitHubOAthTokenException;
 import io.fabric8.che.starter.exception.KeycloakException;
@@ -75,6 +76,9 @@ public class WorkspaceController {
 
     @Autowired
     WorkspaceHelper workspaceHelper;
+
+    @Autowired
+    WorkspacePreferencesClient workspacePreferencesClient;
 
     @ApiOperation(value = "List workspaces per git repository. If repository parameter is not specified return all workspaces")
     @GetMapping("/workspace")
@@ -136,13 +140,12 @@ public class WorkspaceController {
             IOException, StackNotFoundException, GitHubOAthTokenException, ProjectCreationException, WorkspaceNotFound {
 
         String cheServerUrl = openShiftClientWrapper.getCheServerUrl(masterUrl, namespace, openShiftToken);
-        String projectName = projectHelper.getProjectNameFromGitRepository(params.getRepo());
 
         String workspaceName = params.getWorkspaceName();
         if (!StringUtils.isBlank(workspaceName)) {
-        	return startWorkspace(cheServerUrl, workspaceName);
+           return startWorkspace(cheServerUrl, workspaceName);
         }
-        
+
         // Create the workspace
         Workspace workspace = workspaceClient.createWorkspace(cheServerUrl, keycloakToken, params.getStackId(),
                 params.getRepo(), params.getBranch(), params.getDescription());
@@ -150,7 +153,10 @@ public class WorkspaceController {
         // Set the GitHub oAuth token if it is available
         if (!StringUtils.isBlank(gitHubOAuthToken)) {
             tokenClient.setGitHubOAuthToken(cheServerUrl, gitHubOAuthToken);
+            workspacePreferencesClient.setCommiterInfo(cheServerUrl, gitHubOAuthToken);
         }
+
+        String projectName = projectHelper.getProjectNameFromGitRepository(params.getRepo());
 
         // Create the project - this is an async call
         projectClient.createProject(cheServerUrl, workspace.getId(), projectName, params.getRepo(),

@@ -36,7 +36,7 @@ public class ProjectHelper {
     }
 
     private String changeProtocolToHttpsIfNeeded(final String repositoryUrl) {
-        if (repositoryUrl.startsWith(GIT_PROTOCOL)) {
+        if (!StringUtils.isBlank(repositoryUrl) && repositoryUrl.startsWith(GIT_PROTOCOL)) {
             return StringUtils.replaceOnce(repositoryUrl.replace(":", "/"), GIT_PROTOCOL, HTTPS_PROTOCOL);
         }
         return repositoryUrl;
