@@ -26,7 +26,7 @@ public class WorspacePreferences {
         return commiterName;
     }
 
-    @JsonProperty("git.commiter.name")
+    @JsonProperty("git.committer.name")
     public void setCommiterName(String commiterName) {
         this.commiterName = commiterName;
     }
@@ -35,7 +35,7 @@ public class WorspacePreferences {
         return commiterEmail;
     }
 
-    @JsonProperty("git.commiter.email")
+    @JsonProperty("git.committer.email")
     public void setCommiterEmail(String commiterEmail) {
         this.commiterEmail = commiterEmail;
     }
