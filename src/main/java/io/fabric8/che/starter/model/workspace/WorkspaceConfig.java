@@ -17,6 +17,8 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import io.fabric8.che.starter.model.project.Project;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WorkspaceConfig {
 	
@@ -27,10 +29,12 @@ public class WorkspaceConfig {
 	private WorkspaceEnvironments environments;
     private String name;
     private List<WorkspaceLink> links;
+    private List<Project> projects;
 
     public WorkspaceConfig() {
     	commands = new ArrayList<WorkspaceCommand>();
     	links = new ArrayList<WorkspaceLink>();
+    	projects = new ArrayList<Project>();
     }
     
     public String getName() {
@@ -79,6 +83,14 @@ public class WorkspaceConfig {
 
 	public void setLinks(List<WorkspaceLink> links) {
 		this.links = links;
+	}
+
+	public List<Project> getProjects() {
+		return projects;
+	}
+
+	public void setProjects(List<Project> projects) {
+		this.projects = projects;
 	}
 
 }
