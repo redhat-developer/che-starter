@@ -26,7 +26,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class Project {
 
 	private String name;
-	private String projectType;
+	private String type;
 	private String description;
 	private String path;
 	private Source source;
@@ -45,11 +45,11 @@ public class Project {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public String getProjectType() {
-		return projectType;
+	public String getType() {
+		return type;
 	}
-	public void setProjectType(String projectType) {
-		this.projectType = projectType;
+	public void setType(String type) {
+		this.type = type;
 	}
 	public String getDescription() {
 		return description;
