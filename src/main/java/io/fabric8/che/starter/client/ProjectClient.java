@@ -80,9 +80,12 @@ public class ProjectClient {
         // Next we create a new project against workspace agent API Url
         String url = CheRestEndpoints.CREATE_PROJECT.generateUrl(wsAgentUrl);
         LOG.info("Creating project against workspace agent URL: {}", url);
-        
-        Project project = initProject(name, repo, branch, stackClient.getProjectTypeByStackId(stack));
-       
+
+        String projectType = stackClient.getProjectTypeByStackId(stack);
+        LOG.info("Project type: {}", projectType);
+  
+        Project project = initProject(name, repo, branch, projectType);
+
         RestTemplate template = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -113,7 +116,7 @@ public class ProjectClient {
         source.setType("git");
         source.setLocation(repo);
         project.setSource(source);
-        project.setType(projectType);
+        project.setProjectType(projectType);
         project.setDescription("Created via che-starter API");
         project.setPath("/" + name);
         List<String> mixins = new ArrayList<>();
