@@ -28,7 +28,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.fabric8.che.starter.controller.CheServerController;
 import io.fabric8.che.starter.exception.KeycloakException;
 import io.fabric8.che.starter.util.UrlHelper;
 

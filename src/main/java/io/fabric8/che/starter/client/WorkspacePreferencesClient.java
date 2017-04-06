@@ -19,7 +19,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -33,7 +32,7 @@ public class WorkspacePreferencesClient {
     @Autowired
     GitHubClient client;
 
-    public String setCommiterInfo(final String gitHubToken, final String cheServerUrl) {
+    public void setCommiterInfo(final String cheServerUrl, final String gitHubToken) {
         GitHubUserInfo userInfo = client.getUserInfo(gitHubToken);
         WorspacePreferences preferences = getPreferences(userInfo);
 
@@ -41,8 +40,7 @@ public class WorkspacePreferencesClient {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<WorspacePreferences> entity = new HttpEntity<WorspacePreferences>(preferences, headers);
-        ResponseEntity<String> response = template.exchange(CheRestEndpoints.UPDATE_PREFERENCES.generateUrl(cheServerUrl), HttpMethod.PUT, entity, String.class);
-        return response.getBody();
+        template.exchange(CheRestEndpoints.UPDATE_PREFERENCES.generateUrl(cheServerUrl), HttpMethod.PUT, entity, String.class);
     }
 
     private WorspacePreferences getPreferences(final GitHubUserInfo userInfo) {
