@@ -113,7 +113,7 @@ public class ProjectClient {
         source.setType("git");
         source.setLocation(repo);
         project.setSource(source);
-        project.setProjectType(projectType);
+        project.setType(projectType);
         project.setDescription("Created via che-starter API");
         project.setPath("/" + name);
         List<String> mixins = new ArrayList<>();
