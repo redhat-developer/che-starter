@@ -30,7 +30,7 @@ public class Source {
 	private String location;
 	
 	public Source() {
-		setParameters(new HashMap<String, String>());
+		parameters = new HashMap<String, String>();
 	}
 
 	public Map<String, String> getParameters() {

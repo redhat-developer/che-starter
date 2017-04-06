@@ -12,6 +12,7 @@
  */
 package io.fabric8.che.starter.model.project;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -26,13 +27,18 @@ public class Project {
 
 	private String name;
 	private String projectType;
-	// DEFAULT VALUE SET IN CHE STARTER
 	private String description;
 	private String path;
 	private Source source;
 	private Attribute attributes;
 	private List<ProjectLink> links;
 	private List<String> mixins;
+	
+	public Project() {
+		links = new ArrayList<ProjectLink>();
+		mixins = new ArrayList<String>();
+	}
+	
 	public String getName() {
 		return name;
 	}

@@ -32,6 +32,7 @@ import org.springframework.web.client.RestTemplate;
 
 import io.fabric8.che.starter.exception.ProjectCreationException;
 import io.fabric8.che.starter.model.project.Project;
+import io.fabric8.che.starter.model.project.Source;
 import io.fabric8.che.starter.model.workspace.Workspace;
 import io.fabric8.che.starter.model.workspace.WorkspaceState;
 import io.fabric8.che.starter.model.workspace.WorkspaceStatus;
@@ -105,11 +106,13 @@ public class ProjectClient {
     private Project initProject(String name, String repo, String branch, String projectType) {
     	Project project = new Project();
         project.setName(name);
-        Map<String,String> sourceParams = project.getSource().getParameters();
+        Source source = new Source();
+        Map<String,String> sourceParams = source.getParameters();
         sourceParams.put("branch", branch);
         sourceParams.put("keepVcs", "true");
-        project.getSource().setType("git");
-        project.getSource().setLocation(repo);
+        source.setType("git");
+        source.setLocation(repo);
+        project.setSource(source);
         project.setProjectType(projectType);
         project.setDescription("Created via che-starter API");
         project.setPath("/" + name);
