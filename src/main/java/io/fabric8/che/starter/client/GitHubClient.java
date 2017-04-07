@@ -45,10 +45,10 @@ public class GitHubClient {
     public void setGitHubOAuthToken(final String cheServerURL, final String gitHubToken) 
             throws IOException, GitHubOAthTokenException {
         String url = cheServerURL + CheRestEndpoints.SET_OAUTH_TOKEN.getEndpoint().replace("{provider}", "github");
-        
+
         Token token = new Token();
         token.setToken(gitHubToken);
-        
+
         RestTemplate template = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

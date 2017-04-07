@@ -32,7 +32,7 @@ public class WorkspacePreferencesClient {
     @Autowired
     GitHubClient client;
 
-    public void setCommiterInfo(final String cheServerUrl, final String gitHubToken) {
+    public void setCommitterInfo(final String cheServerUrl, final String gitHubToken) {
         GitHubUserInfo userInfo = client.getUserInfo(gitHubToken);
         WorspacePreferences preferences = getPreferences(userInfo);
 
@@ -47,12 +47,12 @@ public class WorkspacePreferencesClient {
         String name = userInfo.getName();
         String email = userInfo.getEmail();
 
-        LOG.info("Commiter name: {}", name);
-        LOG.info("Commiter email: {}", email);
+        LOG.info("Committer name: {}", name);
+        LOG.info("Committer email: {}", email);
 
         WorspacePreferences preferences = new WorspacePreferences();
-        preferences.setCommiterName(name);
-        preferences.setCommiterEmail(email);
+        preferences.setCommitterName(name);
+        preferences.setCommitterEmail(email);
         return preferences;
     }
 
