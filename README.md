@@ -101,8 +101,6 @@ Many of the services available via the Swagger interface require setting masterU
     oc whoami -t
 ````
 
-The output of this command (which looks like a random string of characters and numbers) is the authorization token.
-
 License
 -------
 EPL 1.0, See [LICENSE](LICENSE.txt) file.
