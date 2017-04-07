@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpServerErrorException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -149,11 +150,15 @@ public class WorkspaceController {
         // Create the workspace
         Workspace workspace = workspaceClient.createWorkspace(cheServerUrl, keycloakToken, params.getStackId(),
                 params.getRepo(), params.getBranch(), params.getDescription());
-        
+
         // Set the GitHub oAuth token if it is available
         if (!StringUtils.isBlank(gitHubOAuthToken)) {
             tokenClient.setGitHubOAuthToken(cheServerUrl, gitHubOAuthToken);
-            workspacePreferencesClient.setCommiterInfo(cheServerUrl, gitHubOAuthToken);
+            try {
+                workspacePreferencesClient.setCommitterInfo(cheServerUrl, gitHubOAuthToken);
+            } catch (HttpServerErrorException e) {
+                LOG.warn("Unable to set committer info in Che Git preferences");
+            }
         }
 
         String projectName = projectHelper.getProjectNameFromGitRepository(params.getRepo());
