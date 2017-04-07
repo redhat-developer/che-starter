@@ -25,66 +25,90 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Project {
 
-	private String name;
-	private String projectType;
-	private String description;
-	private String path;
-	private Source source;
-	private Attribute attributes;
-	private List<ProjectLink> links;
-	private List<String> mixins;
-	
-	public Project() {
-		links = new ArrayList<ProjectLink>();
-		mixins = new ArrayList<String>();
-	}
-	
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	public String getProjectType() {
-		return projectType;
-	}
-	public void setProjectType(String type) {
-		this.projectType = type;
-	}
-	public String getDescription() {
-		return description;
-	}
-	public void setDescription(String description) {
-		this.description = description;
-	}
-	public String getPath() {
-		return path;
-	}
-	public void setPath(String path) {
-		this.path = path;
-	}
-	public Source getSource() {
-		return source;
-	}
-	public void setSource(Source source) {
-		this.source = source;
-	}
-	public Attribute getAttributes() {
-		return attributes;
-	}
-	public void setAttributes(Attribute attributes) {
-		this.attributes = attributes;
-	}
-	public List<ProjectLink> getLinks() {
-		return links;
-	}
-	public void setLinks(List<ProjectLink> links) {
-		this.links = links;
-	}
-	public List<String> getMixins() {
-		return mixins;
-	}
-	public void setMixins(List<String> mixins) {
-		this.mixins = mixins;
-	}
+    private String name;
+    private String type;
+    private String projectType;
+    private String description;
+    private String path;
+    private Source source;
+    private Attribute attributes;
+    private List<ProjectLink> links;
+    private List<String> mixins;
+
+    public Project() {
+        links = new ArrayList<ProjectLink>();
+        mixins = new ArrayList<String>();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getProjectType() {
+        return projectType;
+    }
+
+    public void setProjectType(String type) {
+        this.projectType = type;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public Source getSource() {
+        return source;
+    }
+
+    public void setSource(Source source) {
+        this.source = source;
+    }
+
+    public Attribute getAttributes() {
+        return attributes;
+    }
+
+    public void setAttributes(Attribute attributes) {
+        this.attributes = attributes;
+    }
+
+    public List<ProjectLink> getLinks() {
+        return links;
+    }
+
+    public void setLinks(List<ProjectLink> links) {
+        this.links = links;
+    }
+
+    public List<String> getMixins() {
+        return mixins;
+    }
+
+    public void setMixins(List<String> mixins) {
+        this.mixins = mixins;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 }
