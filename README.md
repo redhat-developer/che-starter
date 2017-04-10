@@ -101,6 +101,15 @@ Many of the services available via the Swagger interface require setting masterU
     oc whoami -t
 ````
 
+The output of this command (which looks like a random string of characters and numbers) is the authorization token.
+
+Code Conventions
+----------------
+- Indent using spaces only
+- New line in the end
+
+[Apache Maven Checkstyle Plugin](https://maven.apache.org/plugins/maven-checkstyle-plugin/) is used for validating the code conventions. All conventions can be found in the [checkstyle.xml](https://github.com/redhat-developer/che-starter/blob/master/src/main/resources/checkstyle.xml)
+
 License
 -------
 EPL 1.0, See [LICENSE](LICENSE.txt) file.
