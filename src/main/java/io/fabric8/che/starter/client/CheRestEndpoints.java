@@ -30,7 +30,7 @@ public enum CheRestEndpoints {
     private CheRestEndpoints(final String endpoint) {
         this.endpoint = endpoint;
     }
-    
+
     public String getEndpoint() {
         return endpoint;
     }

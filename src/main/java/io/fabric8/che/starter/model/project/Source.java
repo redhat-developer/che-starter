@@ -25,35 +25,35 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Source {
 
-	private Map<String, String> parameters;
-	private String type;
-	private String location;
-	
-	public Source() {
-		parameters = new HashMap<String, String>();
-	}
+    private Map<String, String> parameters;
+    private String type;
+    private String location;
 
-	public Map<String, String> getParameters() {
-		return parameters;
-	}
+    public Source() {
+        parameters = new HashMap<String, String>();
+    }
 
-	public void setParameters(Map<String, String> parameters) {
-		this.parameters = parameters;
-	}
+    public Map<String, String> getParameters() {
+        return parameters;
+    }
 
-	public String getType() {
-		return type;
-	}
+    public void setParameters(Map<String, String> parameters) {
+        this.parameters = parameters;
+    }
 
-	public void setType(String type) {
-		this.type = type;
-	}
+    public String getType() {
+        return type;
+    }
 
-	public String getLocation() {
-		return location;
-	}
+    public void setType(String type) {
+        this.type = type;
+    }
 
-	public void setLocation(String location) {
-		this.location = location;
-	}
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
 }

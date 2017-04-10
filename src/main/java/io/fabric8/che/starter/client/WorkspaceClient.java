@@ -74,8 +74,8 @@ public class WorkspaceClient {
      * @throws StackNotFoundException
      * @throws IOException
      */
-    public Workspace createWorkspace(String cheServerUrl, String keycloakToken, String stackId, String repo, String branch, String description) 
-    		throws StackNotFoundException, IOException {
+    public Workspace createWorkspace(String cheServerUrl, String keycloakToken, String stackId, String repo,
+            String branch, String description) throws StackNotFoundException, IOException {
         // The first step is to create the workspace
         String url = CheRestEndpoints.CREATE_WORKSPACE.generateUrl(cheServerUrl);
 

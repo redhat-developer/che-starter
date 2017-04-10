@@ -28,7 +28,7 @@ public class WorkspaceCreateParams {
     private String description;
     @JsonProperty("config.name")
     private String workspaceName;
-    
+
     public String getStackId() {
         return stackId;
     }
@@ -54,18 +54,18 @@ public class WorkspaceCreateParams {
     }
 
     public String getDescription() {
-    	return description;
+        return description;
     }
-    
+
     public void setDescription(String description) {
-    	this.description = description;
+        this.description = description;
     }
 
-	public String getWorkspaceName() {
-		return workspaceName;
-	}
+    public String getWorkspaceName() {
+        return workspaceName;
+    }
 
-	public void setWorkspaceName(String workspaceName) {
-		this.workspaceName = workspaceName;
-	}
+    public void setWorkspaceName(String workspaceName) {
+        this.workspaceName = workspaceName;
+    }
 }

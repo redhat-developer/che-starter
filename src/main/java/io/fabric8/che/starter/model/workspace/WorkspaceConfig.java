@@ -21,22 +21,22 @@ import io.fabric8.che.starter.model.project.Project;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WorkspaceConfig {
-	
-	private List<WorkspaceCommand> commands;
-	// there could go list of projects
-	private String defaultEnv;
-	private String description;
-	private WorkspaceEnvironments environments;
+
+    private List<WorkspaceCommand> commands;
+    // there could go list of projects
+    private String defaultEnv;
+    private String description;
+    private WorkspaceEnvironments environments;
     private String name;
     private List<WorkspaceLink> links;
     private List<Project> projects;
 
     public WorkspaceConfig() {
-    	commands = new ArrayList<WorkspaceCommand>();
-    	links = new ArrayList<WorkspaceLink>();
-    	projects = new ArrayList<Project>();
+        commands = new ArrayList<WorkspaceCommand>();
+        links = new ArrayList<WorkspaceLink>();
+        projects = new ArrayList<Project>();
     }
-    
+
     public String getName() {
         return name;
     }
@@ -53,44 +53,44 @@ public class WorkspaceConfig {
         this.description = description;
     }
 
-	public List<WorkspaceCommand> getCommands() {
-		return commands;
-	}
+    public List<WorkspaceCommand> getCommands() {
+        return commands;
+    }
 
-	public void setCommands(List<WorkspaceCommand> commands) {
-		this.commands = commands;
-	}
+    public void setCommands(List<WorkspaceCommand> commands) {
+        this.commands = commands;
+    }
 
-	public String getDefaultEnv() {
-		return defaultEnv;
-	}
+    public String getDefaultEnv() {
+        return defaultEnv;
+    }
 
-	public void setDefaultEnv(String defaultEnv) {
-		this.defaultEnv = defaultEnv;
-	}
+    public void setDefaultEnv(String defaultEnv) {
+        this.defaultEnv = defaultEnv;
+    }
 
-	public WorkspaceEnvironments getEnvironments() {
-		return environments;
-	}
+    public WorkspaceEnvironments getEnvironments() {
+        return environments;
+    }
 
-	public void setEnvironments(WorkspaceEnvironments environments) {
-		this.environments = environments;
-	}
+    public void setEnvironments(WorkspaceEnvironments environments) {
+        this.environments = environments;
+    }
 
-	public List<WorkspaceLink> getLinks() {
-		return links;
-	}
+    public List<WorkspaceLink> getLinks() {
+        return links;
+    }
 
-	public void setLinks(List<WorkspaceLink> links) {
-		this.links = links;
-	}
+    public void setLinks(List<WorkspaceLink> links) {
+        this.links = links;
+    }
 
-	public List<Project> getProjects() {
-		return projects;
-	}
+    public List<Project> getProjects() {
+        return projects;
+    }
 
-	public void setProjects(List<Project> projects) {
-		this.projects = projects;
-	}
+    public void setProjects(List<Project> projects) {
+        this.projects = projects;
+    }
 
 }

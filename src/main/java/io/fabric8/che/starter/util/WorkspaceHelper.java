@@ -28,16 +28,16 @@ public class WorkspaceHelper {
 
     public List<Workspace> filterByRepository(final List<Workspace> workspaces, final String repository) {
         return workspaces.stream().filter(w -> {
-        	List<Project> projects = w.getConfig().getProjects();
-        	if (projects != null && !projects.isEmpty()) {
-        		for (Project project: projects) {
-        			if (project.getSource() != null && project.getSource().getLocation() != null) {
-        				if (repository.equals(project.getSource().getLocation())) {
-        					return true;
-        				}
-        			}
-        		}
-        	}
+            List<Project> projects = w.getConfig().getProjects();
+            if (projects != null && !projects.isEmpty()) {
+                for (Project project : projects) {
+                    if (project.getSource() != null && project.getSource().getLocation() != null) {
+                        if (repository.equals(project.getSource().getLocation())) {
+                            return true;
+                        }
+                    }
+                }
+            }
             return false;
         }).collect(Collectors.toList());
     }

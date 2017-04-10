@@ -20,24 +20,27 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WorkspaceMachine {
 
-	private List<String> agents;
-	private WorkspaceMachineAttribute attributes;
-	
-	public WorkspaceMachine() {
-		agents = new ArrayList<String>();
-	}
-	
-	public List<String> getAgents() {
-		return agents;
-	}
-	public void setAgents(List<String> agents) {
-		this.agents = agents;
-	}
-	public WorkspaceMachineAttribute getAttributes() {
-		return attributes;
-	}
-	public void setAttributes(WorkspaceMachineAttribute attributes) {
-		this.attributes = attributes;
-	}
-	
+    private List<String> agents;
+    private WorkspaceMachineAttribute attributes;
+
+    public WorkspaceMachine() {
+        agents = new ArrayList<String>();
+    }
+
+    public List<String> getAgents() {
+        return agents;
+    }
+
+    public void setAgents(List<String> agents) {
+        this.agents = agents;
+    }
+
+    public WorkspaceMachineAttribute getAttributes() {
+        return attributes;
+    }
+
+    public void setAttributes(WorkspaceMachineAttribute attributes) {
+        this.attributes = attributes;
+    }
+
 }

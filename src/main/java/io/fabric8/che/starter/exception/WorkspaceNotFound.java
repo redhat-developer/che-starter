@@ -13,7 +13,7 @@
 package io.fabric8.che.starter.exception;
 
 public class WorkspaceNotFound extends Exception {
-	
+
     private static final long serialVersionUID = 13L;
 
     public WorkspaceNotFound() {

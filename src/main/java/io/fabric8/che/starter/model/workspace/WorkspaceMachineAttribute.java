@@ -17,13 +17,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WorkspaceMachineAttribute {
 
-	private String memoryLimitBytes;
+    private String memoryLimitBytes;
 
-	public String getMemoryLimitBytes() {
-		return memoryLimitBytes;
-	}
+    public String getMemoryLimitBytes() {
+        return memoryLimitBytes;
+    }
 
-	public void setMemoryLimitBytes(String memoryLimitBytes) {
-		this.memoryLimitBytes = memoryLimitBytes;
-	}
+    public void setMemoryLimitBytes(String memoryLimitBytes) {
+        this.memoryLimitBytes = memoryLimitBytes;
+    }
 }
