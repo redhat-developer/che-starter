@@ -107,7 +107,7 @@ public class ProjectClient {
     }
 
     private Project initProject(String name, String repo, String branch, String projectType) {
-    	Project project = new Project();
+        Project project = new Project();
         project.setName(name);
         Source source = new Source();
         Map<String,String> sourceParams = source.getParameters();

@@ -179,7 +179,7 @@ public class WorkspaceController {
      * @throws WorkspaceNotFound if workspace does not exist
      */
     private WorkspaceLink startWorkspace(String cheServerUrl, String workspaceName) throws WorkspaceNotFound {
-    	List<Workspace> workspaces = workspaceClient.listWorkspaces(cheServerUrl);
+        List<Workspace> workspaces = workspaceClient.listWorkspaces(cheServerUrl);
         for (Workspace ws : workspaces) {
             String wsName = ws.getConfig().getName();
             if (wsName != null && wsName.equals(workspaceName)) {
@@ -192,7 +192,7 @@ public class WorkspaceController {
         }
         throw new WorkspaceNotFound("Workspace with name " + workspaceName + " was not found");
     }
-    
+
     public List<Workspace> listWorkspaces(String masterUrl, String namespace, String openShiftToken, String repository)
             throws RouteNotFoundException {
         String cheServerUrl = openShiftClientWrapper.getCheServerUrl(masterUrl, namespace, openShiftToken);

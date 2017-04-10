@@ -49,18 +49,18 @@ public class Stack {
     }
 
     public StackSource getSource() {
-    	return source;
+        return source;
     }
-    
+
     public void setSource(StackSource source) {
-    	this.source = source;
+        this.source = source;
     }
 
-	public WorkspaceConfig getWorkspaceConfig() {
-		return workspaceConfig;
-	}
+    public WorkspaceConfig getWorkspaceConfig() {
+        return workspaceConfig;
+    }
 
-	public void setWorkspaceConfig(WorkspaceConfig workspaceConfig) {
-		this.workspaceConfig = workspaceConfig;
-	}
+    public void setWorkspaceConfig(WorkspaceConfig workspaceConfig) {
+        this.workspaceConfig = workspaceConfig;
+    }
 }

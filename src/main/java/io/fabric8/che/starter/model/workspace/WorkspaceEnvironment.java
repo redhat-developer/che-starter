@@ -20,27 +20,27 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WorkspaceEnvironment {
 
-	private WorkspaceRecipe recipe;
-	private Map<String, WorkspaceMachine> machines;
-	
-	public WorkspaceEnvironment() {
-		setMachines(new HashMap<String, WorkspaceMachine>());
-	}
+    private WorkspaceRecipe recipe;
+    private Map<String, WorkspaceMachine> machines;
 
-	public WorkspaceRecipe getRecipe() {
-		return recipe;
-	}
+    public WorkspaceEnvironment() {
+        setMachines(new HashMap<String, WorkspaceMachine>());
+    }
 
-	public void setRecipe(WorkspaceRecipe recipe) {
-		this.recipe = recipe;
-	}
+    public WorkspaceRecipe getRecipe() {
+        return recipe;
+    }
 
-	public Map<String, WorkspaceMachine> getMachines() {
-		return machines;
-	}
+    public void setRecipe(WorkspaceRecipe recipe) {
+        this.recipe = recipe;
+    }
 
-	public void setMachines(Map<String, WorkspaceMachine> machines) {
-		this.machines = machines;
-	}
-	
+    public Map<String, WorkspaceMachine> getMachines() {
+        return machines;
+    }
+
+    public void setMachines(Map<String, WorkspaceMachine> machines) {
+        this.machines = machines;
+    }
+
 }

@@ -18,14 +18,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WorkspaceEnvironments {
 
-	 @JsonProperty("default")
-	 private WorkspaceEnvironment defaultEnv;
-	 
-	 public WorkspaceEnvironment getDefaultEnv() {
-		 return defaultEnv;
-	 }
-	 
-	 public void setDefaultEnv(WorkspaceEnvironment defaultEnv) {
-		 this.defaultEnv = defaultEnv;
-	 }
+    @JsonProperty("default")
+    private WorkspaceEnvironment defaultEnv;
+
+    public WorkspaceEnvironment getDefaultEnv() {
+        return defaultEnv;
+    }
+
+    public void setDefaultEnv(WorkspaceEnvironment defaultEnv) {
+        this.defaultEnv = defaultEnv;
+    }
 }

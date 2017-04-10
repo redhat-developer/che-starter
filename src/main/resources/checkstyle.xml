@@ -3,7 +3,7 @@
 <!DOCTYPE module PUBLIC
   "-//Puppy Crawl//DTD Check Configuration 1.2//EN"
   "http://www.puppycrawl.com/dtds/configuration_1_2.dtd">
- 
+
 <module name="Checker">
     <module name="TreeWalker">
         <module name="PackageName">
@@ -15,4 +15,9 @@
     <!-- Checks whether files end with a new line. -->
     <!-- See http://checkstyle.sf.net/config_misc.html#NewlineAtEndOfFile -->
     <module name="NewlineAtEndOfFile" />
+
+    <!-- Checks if file contains spaces only -->
+    <module name="FileTabCharacter">
+        <property name="eachLine" value="false" />
+    </module>
 </module>

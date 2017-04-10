@@ -33,7 +33,6 @@ public class GitHubClient {
     private static final Logger LOG = LogManager.getLogger(GitHubClient.class);
     private static final String GIT_HUB_USER_ENDPOINT = "https://api.github.com/user";
 
-
     /**
      * Uploads the Github oAuth token to the workspace so that the developer can send push requests
      *  
