@@ -16,6 +16,7 @@ import java.io.IOException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -31,7 +32,9 @@ import io.fabric8.che.starter.model.Token;
 @Component
 public class GitHubClient {
     private static final Logger LOG = LogManager.getLogger(GitHubClient.class);
-    private static final String GIT_HUB_USER_ENDPOINT = "https://api.github.com/user";
+    
+    @Value("${GITHUB_USER_URL:https://api.github.com/user}")
+    private String GIT_HUB_USER_ENDPOINT;
 
     /**
      * Uploads the Github oAuth token to the workspace so that the developer can send push requests
