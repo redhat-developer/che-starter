@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -85,21 +87,23 @@ public class WorkspaceController {
     @GetMapping("/workspace")
     public List<Workspace> list(@RequestParam String masterUrl, @RequestParam String namespace,
             @RequestParam(required = false) String repository,
-            @ApiParam(value = "Keycloak token", required = true) @RequestHeader("Authorization") String keycloakToken)
+            @ApiParam(value = "Keycloak token", required = true) @RequestHeader("Authorization") String keycloakToken, HttpServletRequest request)
             throws RouteNotFoundException, JsonProcessingException, IOException, KeycloakException {
 
         String openShiftToken = keycloakClient.getOpenShiftToken(keycloakToken);
-        return listWorkspaces(masterUrl, namespace, openShiftToken, repository);
+        String requestURL = request.getRequestURL().toString();
+        return listWorkspaces(masterUrl, namespace, openShiftToken, repository, requestURL);
     }
 
     @ApiOperation(value = "List workspaces per git repository. If repository parameter is not specified return all workspaces")
     @GetMapping("/workspace/oso")
     public List<Workspace> listOnOpenShift(@RequestParam String masterUrl, @RequestParam String namespace,
             @RequestParam(required = false) String repository,
-            @ApiParam(value = "OpenShift token", required = true) @RequestHeader("Authorization") String openShiftToken)
+            @ApiParam(value = "OpenShift token", required = true) @RequestHeader("Authorization") String openShiftToken, HttpServletRequest request)
             throws RouteNotFoundException, JsonProcessingException, IOException {
 
-        return listWorkspaces(masterUrl, namespace, openShiftToken, repository);
+        String requestURL = request.getRequestURL().toString();
+        return listWorkspaces(masterUrl, namespace, openShiftToken, repository, requestURL);
     }
 
     @ApiOperation(value = "Create and start a new workspace. Stop all other workspaces (only one workspace can be running at a time). If a workspace with the imported project already exists, just start it")
@@ -193,13 +197,18 @@ public class WorkspaceController {
         throw new WorkspaceNotFound("Workspace with name " + workspaceName + " was not found");
     }
 
-    public List<Workspace> listWorkspaces(String masterUrl, String namespace, String openShiftToken, String repository)
+    public List<Workspace> listWorkspaces(final String masterUrl, final String namespace, final String openShiftToken, final String repository, final String requestUrl)
             throws RouteNotFoundException {
         String cheServerUrl = openShiftClientWrapper.getCheServerUrl(masterUrl, namespace, openShiftToken);
+
+        List<Workspace> workspaces;
         if (!StringUtils.isBlank(repository)) {
             LOG.info("Fetching workspaces for repositoriy: {}", repository);
-            return workspaceClient.listWorkspacesPerRepository(cheServerUrl, repository);
+            workspaces = workspaceClient.listWorkspacesPerRepository(cheServerUrl, repository);
+        } else {
+            workspaces = workspaceClient.listWorkspaces(cheServerUrl);
         }
-        return workspaceClient.listWorkspaces(cheServerUrl);
+        workspaceHelper.addWorkspaceStartLink(workspaces, requestUrl);
+        return workspaces;
     }
 }
