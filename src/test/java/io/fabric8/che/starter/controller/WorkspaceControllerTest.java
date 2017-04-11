@@ -37,7 +37,8 @@ import io.fabric8.che.starter.model.request.WorkspaceCreateParams;
 @RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
 @SpringBootTest(properties = { "OPENSHIFT_TOKEN_URL=http://localhost:33333/keycloak/token/openshift",
-        "GITHUB_TOKEN_URL=http://localhost:33333/keycloak/token/github" })
+        "GITHUB_TOKEN_URL=http://localhost:33333/keycloak/token/github",
+        "GITHUB_USER_URL=http://localhost:33333/github/user"})
 public class WorkspaceControllerTest extends TestBase {
 
     private static final String WORKSPACE_ENDPOINT = "/workspace";
@@ -107,7 +108,6 @@ public class WorkspaceControllerTest extends TestBase {
                 .param("masterUrl", "http://i.do.not.exist").param("namespace", NAMESPACE)).andExpect(status().is(401));
     }
 
-    @Ignore("Ignoring because of https://github.com/redhat-developer/che-starter/pull/122")
     @Test
     public void createWorkspaceTest() throws Exception {
         mockMvc.perform(post(WORKSPACE_ENDPOINT).header("Authorization", KEYCLOAK_TOKEN)
