@@ -12,7 +12,7 @@
 # http://www.eclipse.org/legal/epl-v10.html
 # #L%
 ###
-cat jenkins-env | grep RHCHEBOT_DOCKER_HUB_PASSWORD > inherit-env
+cat jenkins-env | grep -e RHCHEBOT_DOCKER_HUB_PASSWORD -e GIT > inherit-env
 . inherit-env
 
 yum -y update
@@ -36,6 +36,11 @@ if [ $? -eq 0 ]; then
 
   docker login -u rhchebot -p $RHCHEBOT_DOCKER_HUB_PASSWORD -e noreply@redhat.com
   docker push rhche/che-starter:nightly
+
+  TAG=$(echo $GIT_COMMIT | cut -c1-6)
+
+  docker tag rhche/che-starter:nightly registry.devshift.net/almighty/che-starter:$TAG
+  docker push registry.devshift.net/almighty/che-starter:$TAG
 
   docker tag rhche/che-starter:nightly registry.devshift.net/almighty/che-starter:latest
   docker push registry.devshift.net/almighty/che-starter:latest
