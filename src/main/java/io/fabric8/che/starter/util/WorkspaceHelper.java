@@ -24,7 +24,9 @@ import io.fabric8.che.starter.model.workspace.WorkspaceLink;
 
 @Component
 public class WorkspaceHelper {
-    private static final String WORKSPACE_IDE_URL = "ide url";
+    public static final String WORKSPACE_START_IDE_URL = "ide start url";
+    public static final String WORKSPACE_IDE_URL = "ide url";
+    public static final String HTTP_METHOD_PATCH = "PATCH";
 
     public List<Workspace> filterByRepository(final List<Workspace> workspaces, final String repository) {
         return workspaces.stream().filter(w -> {
@@ -40,6 +42,29 @@ public class WorkspaceHelper {
             }
             return false;
         }).collect(Collectors.toList());
+    }
+
+    /**
+     * @param workspaces
+     * @param requestURL
+     * @see https://github.com/redhat-developer/che-starter/issues/133
+     */
+    public void addWorkspaceStartLink(final List<Workspace> workspaces, final String requestURL) {
+        for (Workspace w : workspaces) {
+            addWorkspaceStartLink(w, requestURL);
+        }
+    }
+
+    public void addWorkspaceStartLink(final Workspace workspace, final String requestURL) {
+        String workspaceId = workspace.getId();
+        String href = generateHrefForWorkspaceStartLink(requestURL, workspaceId);
+
+        WorkspaceLink startingLink = new WorkspaceLink();
+        startingLink.setHref(href);
+        startingLink.setMethod(HTTP_METHOD_PATCH);
+        startingLink.setRel(WORKSPACE_START_IDE_URL);
+
+        workspace.getLinks().add(startingLink);
     }
 
     public WorkspaceLink getWorkspaceIdeLink(final Workspace workspace) {
@@ -60,6 +85,10 @@ public class WorkspaceHelper {
 
     public String generateName() {
         return RandomStringUtils.random(8, true, true).toLowerCase();
+    }
+
+    private String generateHrefForWorkspaceStartLink(final String requestURL, final String workspaceId) {
+        return requestURL + "/" + workspaceId;
     }
 
 }
