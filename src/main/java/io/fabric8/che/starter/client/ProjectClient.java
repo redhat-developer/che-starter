@@ -13,14 +13,15 @@
 package io.fabric8.che.starter.client;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -31,51 +32,34 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import io.fabric8.che.starter.exception.ProjectCreationException;
+import io.fabric8.che.starter.exception.WorkspaceNotFound;
 import io.fabric8.che.starter.model.project.Project;
 import io.fabric8.che.starter.model.project.Source;
 import io.fabric8.che.starter.model.workspace.Workspace;
-import io.fabric8.che.starter.model.workspace.WorkspaceState;
-import io.fabric8.che.starter.model.workspace.WorkspaceStatus;
 
 @Component
 public class ProjectClient {
+
     private static final Logger LOG = LogManager.getLogger(ProjectClient.class);
-
-    @Value("${che.workspace.start.timeout}")
-    private long workspaceStartTimeout;
-
-    @Autowired
-    private WorkspaceClient workspaceClient;
 
     @Autowired
     private StackClient stackClient;
+    
+    @Autowired
+    private WorkspaceClient workspaceClient;
 
+    /**
+     * Starts a workspace, wait for it and import project
+     */
     @Async
-    public void createProject(String cheServerURL, String workspaceId, String name, String repo, String branch, String stack)
-            throws IOException, ProjectCreationException {
-
-        // Before we can create a project, we must start the new workspace
-        workspaceClient.startWorkspace(cheServerURL, workspaceId);
-
-        // Poll until the workspace is started
-        WorkspaceStatus status = workspaceClient.getWorkspaceStatus(cheServerURL, workspaceId);
-        long currentTime = System.currentTimeMillis();
-        while (!WorkspaceState.RUNNING.toString().equals(status.getWorkspaceStatus())
-                && System.currentTimeMillis() < (currentTime + workspaceStartTimeout)) {
-            try {
-                Thread.sleep(1000);
-                LOG.info("Polling workspace '{}' status...", workspaceId);
-            } catch (InterruptedException e) {
-                LOG.error("Error while polling for workspace status", e);
-                break;
-            }
-            status = workspaceClient.getWorkspaceStatus(cheServerURL, workspaceId);
-        }
-        LOG.info("Workspace '{}' is running", workspaceId);
-
-        Workspace workspace = workspaceClient.getWorkspace(cheServerURL, workspaceId);
-
-        String wsAgentUrl = getWsAgentUrl(workspace);
+    public void createProject(String cheServerURL, Workspace workspace, String projectName, String repo, String branch, String stack)
+            throws IOException, ProjectCreationException, WorkspaceNotFound, URISyntaxException, MalformedURLException {
+        
+        workspaceClient.startWorkspace(cheServerURL, workspace.getConfig().getName());
+        workspaceClient.waitUntilWorkspaceIsRunning(cheServerURL, workspace);
+        Workspace startedWorkspace = workspaceClient.getWorkspaceById(cheServerURL, workspace.getId());
+        
+        String wsAgentUrl = getWsAgentUrl(startedWorkspace);
 
         // Next we create a new project against workspace agent API Url
         String url = CheRestEndpoints.CREATE_PROJECT.generateUrl(wsAgentUrl);
@@ -83,13 +67,13 @@ public class ProjectClient {
 
         String projectType = stackClient.getProjectTypeByStackId(stack);
         LOG.info("Project type: {}", projectType);
-  
-        Project project = initProject(name, repo, branch, projectType);
+
+        Project project = initProject(projectName, repo, branch, projectType);
 
         RestTemplate template = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<Project[]> entity = new HttpEntity<Project[]>(new Project[] {project}, headers);
+        HttpEntity<Project[]> entity = new HttpEntity<Project[]>(new Project[] { project }, headers);
 
         ResponseEntity<Project[]> response = template.exchange(url, HttpMethod.POST, entity, Project[].class);
 
@@ -97,12 +81,53 @@ public class ProjectClient {
             Project p = response.getBody()[0];
             LOG.info("Successfully created project {}", p.getName());
         } else {
-            LOG.info("Error occurred while creating project {}", name);
-            throw new ProjectCreationException("Error occurred while creating project " + name);
+            LOG.info("Error occurred while creating project {}", projectName);
+            throw new ProjectCreationException("Error occurred while creating project " + projectName);
         }
     }
 
-    private String getWsAgentUrl (final Workspace workspace) {
+    /**
+     * Delete a project from workspace. Workspace must be running to delete a
+     * project.
+     * 
+     * @param cheServerURL
+     * @param workspaceName
+     * @param projectName
+     */
+    public void deleteProject(String cheServerURL, Workspace workspace, String projectName) {
+        String wsAgentUrl = getWsAgentUrl(workspace);
+
+        String deleteProjectURL = CheRestEndpoints.DELETE_PROJECT.generateUrl(wsAgentUrl, projectName);
+        LOG.info("Deleting project {}", projectName);
+        RestTemplate template = new RestTemplate();
+        template.delete(deleteProjectURL);
+    }
+
+    @Async
+    public void deleteAllProjectsAndWorkspace(String cheServerURL, String workspaceName) throws WorkspaceNotFound {
+        Workspace differentWorkspace = workspaceClient.getStartedWorkspace(cheServerURL);
+
+        Workspace workspaceToDelete = workspaceClient.startWorkspace(cheServerURL, workspaceName);
+        workspaceClient.waitUntilWorkspaceIsRunning(cheServerURL, workspaceToDelete);
+        workspaceToDelete = workspaceClient.getWorkspaceById(cheServerURL, workspaceToDelete.getId());
+        
+        List<Project> projectsToDelete = workspaceToDelete.getConfig().getProjects();
+        if (projectsToDelete != null && !projectsToDelete.isEmpty()) {
+            for (Project project : projectsToDelete) {
+                deleteProject(cheServerURL, workspaceToDelete, project.getName());
+            }
+        }
+        
+        workspaceClient.stopWorkspace(cheServerURL, workspaceToDelete.getId());
+        workspaceClient.waitUntilWorkspaceIsStopped(cheServerURL, workspaceToDelete);
+        workspaceClient.deleteWorkspace(cheServerURL, workspaceToDelete.getId());
+
+        if (differentWorkspace != null) {
+            workspaceClient.startWorkspace(cheServerURL, differentWorkspace.getConfig().getName());
+        }
+    }
+    
+    private String getWsAgentUrl(final Workspace workspace) {
         return workspace.getRuntime().getDevMachine().getRuntime().getServers().get("4401/tcp").getUrl();
     }
 
@@ -110,7 +135,7 @@ public class ProjectClient {
         Project project = new Project();
         project.setName(name);
         Source source = new Source();
-        Map<String,String> sourceParams = source.getParameters();
+        Map<String, String> sourceParams = source.getParameters();
         sourceParams.put("branch", branch);
         sourceParams.put("keepVcs", "true");
         source.setType("git");

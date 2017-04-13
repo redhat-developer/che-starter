@@ -23,7 +23,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -33,8 +35,8 @@ import org.springframework.web.client.HttpServerErrorException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import io.fabric8.che.starter.client.ProjectClient;
 import io.fabric8.che.starter.client.GitHubClient;
+import io.fabric8.che.starter.client.ProjectClient;
 import io.fabric8.che.starter.client.WorkspaceClient;
 import io.fabric8.che.starter.client.WorkspacePreferencesClient;
 import io.fabric8.che.starter.client.keycloak.KeycloakClient;
@@ -47,7 +49,6 @@ import io.fabric8.che.starter.exception.WorkspaceNotFound;
 import io.fabric8.che.starter.model.request.WorkspaceCreateParams;
 import io.fabric8.che.starter.model.workspace.Workspace;
 import io.fabric8.che.starter.model.workspace.WorkspaceLink;
-import io.fabric8.che.starter.model.workspace.WorkspaceState;
 import io.fabric8.che.starter.openshift.OpenShiftClientWrapper;
 import io.fabric8.che.starter.util.ProjectHelper;
 import io.fabric8.che.starter.util.WorkspaceHelper;
@@ -69,13 +70,13 @@ public class WorkspaceController {
     ProjectClient projectClient;
 
     @Autowired
+    ProjectHelper projectHelper;
+    
+    @Autowired
     KeycloakClient keycloakClient;
 
     @Autowired
     GitHubClient tokenClient;
-
-    @Autowired
-    ProjectHelper projectHelper;
 
     @Autowired
     WorkspaceHelper workspaceHelper;
@@ -87,7 +88,8 @@ public class WorkspaceController {
     @GetMapping("/workspace")
     public List<Workspace> list(@RequestParam String masterUrl, @RequestParam String namespace,
             @RequestParam(required = false) String repository,
-            @ApiParam(value = "Keycloak token", required = true) @RequestHeader("Authorization") String keycloakToken, HttpServletRequest request)
+            @ApiParam(value = "Keycloak token", required = true) @RequestHeader("Authorization") String keycloakToken,
+            HttpServletRequest request)
             throws RouteNotFoundException, JsonProcessingException, IOException, KeycloakException {
 
         String openShiftToken = keycloakClient.getOpenShiftToken(keycloakToken);
@@ -99,8 +101,8 @@ public class WorkspaceController {
     @GetMapping("/workspace/oso")
     public List<Workspace> listOnOpenShift(@RequestParam String masterUrl, @RequestParam String namespace,
             @RequestParam(required = false) String repository,
-            @ApiParam(value = "OpenShift token", required = true) @RequestHeader("Authorization") String openShiftToken, HttpServletRequest request)
-            throws RouteNotFoundException, JsonProcessingException, IOException {
+            @ApiParam(value = "OpenShift token", required = true) @RequestHeader("Authorization") String openShiftToken,
+            HttpServletRequest request) throws RouteNotFoundException, JsonProcessingException, IOException {
 
         String requestURL = request.getRequestURL().toString();
         return listWorkspaces(masterUrl, namespace, openShiftToken, repository, requestURL);
@@ -111,7 +113,8 @@ public class WorkspaceController {
     public WorkspaceLink create(@RequestParam String masterUrl, @RequestParam String namespace,
             @RequestBody WorkspaceCreateParams params,
             @ApiParam(value = "Keycloak token", required = true) @RequestHeader("Authorization") String keycloakToken)
-            throws IOException, URISyntaxException, RouteNotFoundException, StackNotFoundException, GitHubOAthTokenException, ProjectCreationException, KeycloakException, WorkspaceNotFound {
+            throws IOException, URISyntaxException, RouteNotFoundException, StackNotFoundException,
+            GitHubOAthTokenException, ProjectCreationException, KeycloakException, WorkspaceNotFound {
 
         String openShiftToken = keycloakClient.getOpenShiftToken(keycloakToken);
         String gitHubOAuthToken = keycloakClient.getGitHubToken(keycloakToken);
@@ -123,9 +126,55 @@ public class WorkspaceController {
     public WorkspaceLink createOnOpenShift(@RequestParam String masterUrl, @RequestParam String namespace,
             @RequestBody WorkspaceCreateParams params,
             @ApiParam(value = "OpenShift token", required = true) @RequestHeader("Authorization") String openShiftToken)
-            throws IOException, URISyntaxException, RouteNotFoundException, StackNotFoundException, GitHubOAthTokenException, ProjectCreationException, WorkspaceNotFound {
+            throws IOException, URISyntaxException, RouteNotFoundException, StackNotFoundException,
+            GitHubOAthTokenException, ProjectCreationException, WorkspaceNotFound {
 
         return createWorkspace(masterUrl, namespace, openShiftToken, null, null, params);
+    }
+
+    @ApiOperation(value = "Delete an existing workspace.")
+    @DeleteMapping("/workspace/{name}")
+    public void deleteExistingWorkspace(@PathVariable String name, @RequestParam String masterUrl,
+            @RequestParam String namespace,
+            @ApiParam(value = "Keycloak token", required = true) @RequestHeader("Authorization") String keycloakToken)
+            throws JsonProcessingException, IOException, KeycloakException, RouteNotFoundException, WorkspaceNotFound {
+
+        String openShiftToken = keycloakClient.getOpenShiftToken(keycloakToken);
+        deleteWorkspace(masterUrl, namespace, openShiftToken, name);
+    }
+
+    @ApiOperation(value = "Delete an existing workspace.")
+    @DeleteMapping("/workspace/oso/{name}")
+    public void deleteExistingWorkspaceOnOpenShift(@PathVariable String name, @RequestParam String masterUrl,
+            @RequestParam String namespace,
+            @ApiParam(value = "OpenShift token", required = true) @RequestHeader("Authorization") String openShiftToken)
+            throws JsonProcessingException, IOException, KeycloakException, RouteNotFoundException, WorkspaceNotFound {
+
+        deleteWorkspace(masterUrl, namespace, openShiftToken, name);
+    }
+
+    /**
+     * Deletes a workspace by its name. If there are projects on a workspace,
+     * remove those at first, then delete a workspace. If different workspace is
+     * running, during this process it is stopped and after successful deletion
+     * it gets started again.
+     * 
+     * @param masterURL
+     *            master URL
+     * @param namespace
+     *            namespace
+     * @param openShiftToken
+     *            OpenShift token
+     * @param workspaceName
+     *            workspace name
+     * @throws RouteNotFoundException
+     * @throws WorkspaceNotFound
+     */
+    public void deleteWorkspace(String masterURL, String namespace, String openShiftToken, String workspaceName)
+            throws RouteNotFoundException, WorkspaceNotFound {
+        String cheServerURL = openShiftClientWrapper.getCheServerUrl(masterURL, namespace, openShiftToken);
+
+        projectClient.deleteAllProjectsAndWorkspace(cheServerURL, workspaceName);
     }
 
     /**
@@ -138,75 +187,74 @@ public class WorkspaceController {
      * @param keycloakToken
      * @param params
      * @return create Workspace
-     * @throws WorkspaceNotFound 
+     * @throws WorkspaceNotFound
      */
-    public WorkspaceLink createWorkspace(String masterUrl, String namespace, String openShiftToken, String gitHubOAuthToken,
-            String keycloakToken, WorkspaceCreateParams params) throws RouteNotFoundException, URISyntaxException,
-            IOException, StackNotFoundException, GitHubOAthTokenException, ProjectCreationException, WorkspaceNotFound {
+    public WorkspaceLink createWorkspace(String masterUrl, String namespace, String openShiftToken,
+            String gitHubOAuthToken, String keycloakToken, WorkspaceCreateParams params)
+            throws RouteNotFoundException, URISyntaxException, IOException, StackNotFoundException,
+            GitHubOAthTokenException, ProjectCreationException, WorkspaceNotFound {
 
-        String cheServerUrl = openShiftClientWrapper.getCheServerUrl(masterUrl, namespace, openShiftToken);
+        String cheServerURL = openShiftClientWrapper.getCheServerUrl(masterUrl, namespace, openShiftToken);
+        Workspace workspace = null;
 
         String workspaceName = params.getWorkspaceName();
         if (!StringUtils.isBlank(workspaceName)) {
-           return startWorkspace(cheServerUrl, workspaceName);
+            workspace = workspaceClient.startWorkspace(cheServerURL, workspaceName);
+            return workspaceHelper.getWorkspaceIdeLink(workspace);
         }
 
-        // Create the workspace
-        Workspace workspace = workspaceClient.createWorkspace(cheServerUrl, keycloakToken, params.getStackId(),
-                params.getRepo(), params.getBranch(), params.getDescription());
-
-        // Set the GitHub oAuth token if it is available
-        if (!StringUtils.isBlank(gitHubOAuthToken)) {
-            tokenClient.setGitHubOAuthToken(cheServerUrl, gitHubOAuthToken);
-            try {
-                workspacePreferencesClient.setCommitterInfo(cheServerUrl, gitHubOAuthToken);
-            } catch (HttpServerErrorException e) {
-                LOG.warn("Unable to set committer info in Che Git preferences");
-            }
-        }
+        workspace = createWorkspaceFromParams(cheServerURL, keycloakToken, gitHubOAuthToken, params);
 
         String projectName = projectHelper.getProjectNameFromGitRepository(params.getRepo());
-
-        // Create the project - this is an async call
-        projectClient.createProject(cheServerUrl, workspace.getId(), projectName, params.getRepo(),
+        projectClient.createProject(cheServerURL, workspace, projectName, params.getRepo(), 
                 params.getBranch(), params.getStackId());
 
         return workspaceHelper.getWorkspaceIdeLink(workspace);
     }
 
     /**
-     * Starts a workspace with specified name.
+     * Creates a new workspace from params.
      * 
-     * @param cheServerUrl che server URL
-     * @param workspaceName workspace name to start
-     * @return workspace IDE link
-     * @throws WorkspaceNotFound if workspace does not exist
+     * @param cheServerURL
+     *            che server URL
+     * @param keycloakToken
+     *            keycloak token to authenticate against Che server
+     * @param params
+     *            workspace create params
+     * @throws IOException
+     * @throws StackNotFoundException
+     * @throws GitHubOAthTokenException
+     * 
+     * @return created workspace
      */
-    private WorkspaceLink startWorkspace(String cheServerUrl, String workspaceName) throws WorkspaceNotFound {
-        List<Workspace> workspaces = workspaceClient.listWorkspaces(cheServerUrl);
-        for (Workspace ws : workspaces) {
-            String wsName = ws.getConfig().getName();
-            if (wsName != null && wsName.equals(workspaceName)) {
-                if (!WorkspaceState.RUNNING.toString().equals(ws.getStatus()) && 
-                        !WorkspaceState.STARTING.toString().equals(ws.getStatus())) {
-                    workspaceClient.startWorkspace(cheServerUrl, ws.getId());
-                }
-                return workspaceHelper.getWorkspaceIdeLink(ws);
+    private Workspace createWorkspaceFromParams(String cheServerURL, String keycloakToken, String githubToken,
+            WorkspaceCreateParams params) throws StackNotFoundException, IOException, GitHubOAthTokenException {
+
+        Workspace workspace = workspaceClient.createWorkspace(cheServerURL, keycloakToken, params.getStackId(),
+                params.getRepo(), params.getBranch(), params.getDescription());
+
+        if (!StringUtils.isBlank(githubToken)) {
+            tokenClient.setGitHubOAuthToken(cheServerURL, githubToken);
+            try {
+                workspacePreferencesClient.setCommitterInfo(cheServerURL, githubToken);
+            } catch (HttpServerErrorException e) {
+                LOG.warn("Unable to set committer info in Che Git preferences");
             }
         }
-        throw new WorkspaceNotFound("Workspace with name " + workspaceName + " was not found");
+
+        return workspace;
     }
 
-    public List<Workspace> listWorkspaces(final String masterUrl, final String namespace, final String openShiftToken, final String repository, final String requestUrl)
-            throws RouteNotFoundException {
-        String cheServerUrl = openShiftClientWrapper.getCheServerUrl(masterUrl, namespace, openShiftToken);
+    public List<Workspace> listWorkspaces(final String masterURL, final String namespace, final String openShiftToken,
+            final String repository, final String requestUrl) throws RouteNotFoundException {
+        String cheServerURL = openShiftClientWrapper.getCheServerUrl(masterURL, namespace, openShiftToken);
 
         List<Workspace> workspaces;
         if (!StringUtils.isBlank(repository)) {
             LOG.info("Fetching workspaces for repositoriy: {}", repository);
-            workspaces = workspaceClient.listWorkspacesPerRepository(cheServerUrl, repository);
+            workspaces = workspaceClient.listWorkspacesPerRepository(cheServerURL, repository);
         } else {
-            workspaces = workspaceClient.listWorkspaces(cheServerUrl);
+            workspaces = workspaceClient.listWorkspaces(cheServerURL);
         }
         workspaceHelper.addWorkspaceStartLink(workspaces, requestUrl);
         return workspaces;
