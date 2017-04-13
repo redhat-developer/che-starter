@@ -22,6 +22,7 @@ public enum CheRestEndpoints {
     STOP_WORKSPACE      ("/api/workspace/{id}/runtime"),
     LIST_STACKS         ("/api/stack?maxItems=1000"),
     CREATE_PROJECT      ("/project/batch"),
+    DELETE_PROJECT      ("/project/{id}"),
     SET_OAUTH_TOKEN     ("/wsmaster/api/oauth/token?oauth_provider={provider}"),
     UPDATE_PREFERENCES  ("/wsmaster/api/preferences");
 
@@ -42,7 +43,7 @@ public enum CheRestEndpoints {
     public String generateUrl(String cheServerUrl, String id) {
         return cheServerUrl + endpoint.replace("{id}", id);
     }
-
+    
     @Override
     public String toString() {
         return endpoint;
