@@ -173,11 +173,12 @@ public class WorkspaceController {
      * @throws RouteNotFoundException
      * @throws WorkspaceNotFound
      */
-    public void deleteWorkspace(String masterURL, String namespace, String openShiftToken, String workspaceName, String keycloakToken)
-            throws RouteNotFoundException, WorkspaceNotFound {
-        String cheServerURL = openShiftClientWrapper.getCheServerUrl(masterURL, namespace, openShiftToken);
 
-        projectClient.deleteAllProjectsAndWorkspace(cheServerURL, workspaceName, keycloakToken);
+    public void deleteWorkspace(String masterUrl, String namespace, String openShiftToken, String workspaceName, String keycloakToken)
+            throws RouteNotFoundException, WorkspaceNotFound {
+        String cheServerURL = openShiftClientWrapper.getCheServerUrl(masterUrl, namespace, openShiftToken);
+
+        projectClient.deleteAllProjectsAndWorkspace(cheServerURL, workspaceName, masterUrl, namespace, openShiftToken, keycloakToken);
     }
 
     /**
@@ -202,7 +203,7 @@ public class WorkspaceController {
 
         String workspaceName = params.getWorkspaceName();
         if (StringUtils.isNotBlank(workspaceName)) {
-            workspace = workspaceClient.startWorkspace(cheServerURL, workspaceName, keycloakToken);
+            workspace = workspaceClient.startWorkspace(cheServerURL, workspaceName, masterUrl, namespace, openShiftToken, keycloakToken);
             if (StringUtils.isNotBlank(gitHubOAuthToken)) {
                 tokenClient.setGitHubOAuthToken(cheServerURL, gitHubOAuthToken, keycloakToken);
             }
@@ -213,7 +214,8 @@ public class WorkspaceController {
 
         String projectName = projectHelper.getProjectNameFromGitRepository(params.getRepo());
         projectClient.createProject(cheServerURL, workspace, projectName, params.getRepo(), 
-                params.getBranch(), params.getStackId(), keycloakToken);
+                params.getBranch(), params.getStackId(), masterUrl, namespace, openShiftToken, keycloakToken);
+
 
         return workspace;
     }

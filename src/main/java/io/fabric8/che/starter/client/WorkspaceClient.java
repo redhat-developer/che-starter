@@ -13,7 +13,10 @@
 package io.fabric8.che.starter.client;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +38,17 @@ import io.fabric8.che.starter.model.workspace.Workspace;
 import io.fabric8.che.starter.model.workspace.WorkspaceConfig;
 import io.fabric8.che.starter.model.workspace.WorkspaceState;
 import io.fabric8.che.starter.model.workspace.WorkspaceStatus;
+import io.fabric8.che.starter.openshift.OpenShiftClientWrapper;
 import io.fabric8.che.starter.util.WorkspaceHelper;
+import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.api.model.PodList;
+import io.fabric8.kubernetes.api.model.extensions.Deployment;
+import io.fabric8.kubernetes.api.model.extensions.DeploymentList;
+import io.fabric8.kubernetes.client.KubernetesClientException;
+import io.fabric8.kubernetes.client.Watch;
+import io.fabric8.kubernetes.client.Watcher;
+import io.fabric8.kubernetes.client.dsl.FilterWatchListDeletable;
+import io.fabric8.openshift.client.OpenShiftClient;
 
 @Component
 public class WorkspaceClient {
@@ -52,6 +65,15 @@ public class WorkspaceClient {
 
     @Autowired
     private StackClient stackClient;
+    
+    @Autowired
+    OpenShiftClientWrapper openshiftClientWrapper;
+    
+    @Value("${che.openshift.start.timeout}")
+    private String startTimeout;    
+    
+    @Value("${che.openshift.deploymentconfig}")
+    private String deploymentConfigName;        
 
     public void waitUntilWorkspaceIsRunning(String cheServerURL, Workspace workspace, String keycloakToken) {
         WorkspaceStatus status = getWorkspaceStatus(cheServerURL, workspace.getId(), keycloakToken);
@@ -60,7 +82,7 @@ public class WorkspaceClient {
                 && System.currentTimeMillis() < (currentTime + workspaceStartTimeout)) {
             try {
                 Thread.sleep(1000);
-                LOG.info("Polling workspace '{}' status...", workspace.getConfig().getName());
+                LOG.info("Polling workspace [{}] status...", workspace.getConfig().getName());
             } catch (InterruptedException e) {
                 LOG.error("Error while polling for workspace status", e);
                 break;
@@ -69,22 +91,76 @@ public class WorkspaceClient {
         }
         LOG.info("Workspace '{}' is running", workspace.getConfig().getName());
     }
-
-    public void waitUntilWorkspaceIsStopped(String cheServerURL, Workspace workspace, String keycloakToken) {
-        WorkspaceStatus status = getWorkspaceStatus(cheServerURL, workspace.getId(), keycloakToken);
-        long currentTime = System.currentTimeMillis();
-        while (!WorkspaceState.STOPPED.toString().equals(status.getWorkspaceStatus())
-                && System.currentTimeMillis() < (currentTime + workspaceStopTimeout)) {
-            try {
-                Thread.sleep(1000);
-                LOG.info("Polling workspace '{}' status...", workspace.getConfig().getName());
-            } catch (InterruptedException e) {
-                LOG.error("Error while polling for workspace status", e);
-                break;
+    
+    /**
+     * This method blocks execution until the specified workspace has been stopped and its resources
+     * made available again.
+     * 
+     * @param masterUrl The master URL for the OpenShift API
+     * @param namespace The OpenShift namespace
+     * @param openShiftToken The OpenShift token
+     * @param cheServerURL Che server URL
+     * @param workspace The workspace to stop
+     * @param keycloakToken The KeyCloak token
+     */
+    public void waitUntilWorkspaceIsStopped(String masterUrl, String namespace, String openShiftToken, 
+            String cheServerURL, Workspace workspace, String keycloakToken) {
+        
+        try (OpenShiftClient client = openshiftClientWrapper.get(masterUrl, openShiftToken)) {
+            String resourceName = "che-ws-" + workspace.getId().replace("workspace", "");
+            FilterWatchListDeletable<Pod, PodList, Boolean, Watch, Watcher<Pod>> pods = client.pods().inNamespace(namespace).withLabel("deployment", resourceName);
+            
+            final CountDownLatch podCount = new CountDownLatch(pods.list().getItems().size());
+            final List<Pod> podsToDelete = pods.list().getItems();
+            
+            pods.watch(new Watcher<Pod>() {
+                @Override
+                public void eventReceived(Action action, Pod pod) {
+                    try {                    
+                        switch (action) {
+                            case ADDED:
+                            case MODIFIED:
+                            case ERROR:
+                                break;
+                            case DELETED:
+                                LOG.info("Pod {} deleted",  pod.getMetadata().getName());
+                                podCount.countDown();
+                                break;
+                        }
+                    } catch (Exception ex) {
+                        LOG.error("Failed to process {} on Pod {}. Error: ",  action,  pod,  ex);
+                    }
+                }
+                
+                @Override
+                public void onClose(KubernetesClientException ex) {}
+            });
+            
+            WorkspaceStatus status = getWorkspaceStatus(cheServerURL, workspace.getId(), keycloakToken);
+            long currentTime = System.currentTimeMillis();
+    
+            // Poll the Che server until it returns a status of 'STOPPED' for the workspace
+            while (!WorkspaceState.STOPPED.toString().equals(status.getWorkspaceStatus())
+                    && System.currentTimeMillis() < (currentTime + workspaceStopTimeout)) {
+                try {
+                    Thread.sleep(1000);
+                    LOG.info("Polling Che server for workspace [{}] status...", workspace.getConfig().getName());
+                } catch (InterruptedException e) {
+                    LOG.error("Error while polling for workspace status", e);
+                    break;
+                }
+                status = getWorkspaceStatus(cheServerURL, workspace.getId(), keycloakToken);
             }
-            status = getWorkspaceStatus(cheServerURL, workspace.getId(), keycloakToken);
-        }
-        LOG.info("Workspace '{}' is stopped", workspace.getConfig().getName());
+
+            currentTime = System.currentTimeMillis();
+            
+            try {
+                LOG.info("Waiting for all pods to be deleted for workspace [{}]", workspace.getConfig().getName());
+                podCount.await(workspaceStopTimeout, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException ex) {
+                LOG.error("Exception while waiting for pods to be deleted", ex);
+            }
+        }        
     }
 
     public List<Workspace> listWorkspaces(String cheServerUrl, String keycloakToken) {
@@ -181,7 +257,8 @@ public class WorkspaceClient {
      * @return started workspace
      * @throws WorkspaceNotFound
      */
-    public Workspace startWorkspace(String cheServerURL, String workspaceName, String keycloakToken) throws WorkspaceNotFound {
+    public Workspace startWorkspace(String cheServerURL, String workspaceName, String masterUrl, String namespace, 
+            String openShiftToken, String keycloakToken) throws WorkspaceNotFound {
         List<Workspace> workspaces = listWorkspaces(cheServerURL, keycloakToken);
 
         boolean alreadyStarted = false;
@@ -195,8 +272,8 @@ public class WorkspaceClient {
                     alreadyStarted = true;
                 }
             } else if (!WorkspaceState.STOPPED.toString().equals(workspace.getStatus())) {
-                stopWorkspace(cheServerURL, workspace.getId(), keycloakToken);
-                waitUntilWorkspaceIsStopped(cheServerURL, workspace, keycloakToken);
+                stopWorkspace(cheServerURL, workspace, keycloakToken);
+                waitUntilWorkspaceIsStopped(masterUrl, namespace, openShiftToken, cheServerURL, workspace, keycloakToken);
             }
         }
 
@@ -254,14 +331,13 @@ public class WorkspaceClient {
     }
 
     /**
-     * Stops running workspace
-     * @param cheServerURL Che server URL
-     * @param id workspace id
+     * Stops a running workspace.
      */
-    public void stopWorkspace(String cheServerURL, String id, String keycloakToken) {
-        String url = CheRestEndpoints.STOP_WORKSPACE.generateUrl(cheServerURL, id);
-        RestTemplate template = new KeycloakRestTemplate(keycloakToken);
-        template.delete(url);
+    public void stopWorkspace(String cheServerURL, Workspace workspace, String keycloakToken) {
+            LOG.info("Stopping workspace [{}]", workspace.getId());        
+            String url = CheRestEndpoints.STOP_WORKSPACE.generateUrl(cheServerURL, workspace.getId());
+            RestTemplate template = new KeycloakRestTemplate(keycloakToken);
+            template.delete(url);
     }
 
 }
