@@ -35,6 +35,9 @@ public class WorkspaceClientTest extends TestConfig {
     private static final String STACK_ID = "java-default";
     private static final String DESCRIPTION = GITHUB_REPO + "#" + BRANCH + "#" + "WI1345";
     private static final String KEYCLOAK_TOKEN = null;
+    private static final String MASTER_URL = "";
+    private static final String NAMESPACE = "";
+    private static final String OPENSHIFT_TOKEN = null;
 
     @Value("${che.server.url}")
     String cheServerURL;
@@ -55,19 +58,23 @@ public class WorkspaceClientTest extends TestConfig {
     public void createAndDeleteWorkspace() throws IOException, StackNotFoundException, WorkspaceNotFound {
         Workspace workspace = client.createWorkspace(cheServerURL, null, STACK_ID, GITHUB_REPO, BRANCH, DESCRIPTION);
         client.waitUntilWorkspaceIsRunning(cheServerURL, workspace, KEYCLOAK_TOKEN);
-        client.stopWorkspace(cheServerURL, workspace.getId(), KEYCLOAK_TOKEN);
-        client.waitUntilWorkspaceIsStopped(cheServerURL, workspace, KEYCLOAK_TOKEN);
+        
+        client.stopWorkspace(cheServerURL, workspace, KEYCLOAK_TOKEN);
+        client.waitUntilWorkspaceIsStopped(MASTER_URL, NAMESPACE, OPENSHIFT_TOKEN, cheServerURL, workspace, KEYCLOAK_TOKEN);        
+        
         client.deleteWorkspace(cheServerURL, workspace.getId(), KEYCLOAK_TOKEN);
     }
 
     @Test
     public void stopWorskpace() {
         List<Workspace> workspaces = client.listWorkspaces(cheServerURL, KEYCLOAK_TOKEN);
+
         if (!workspaces.isEmpty()) {
             List<Workspace> runningWorkspaces = workspaces.stream().filter(w -> w.getStatus().equals("RUNNING"))
                     .collect(Collectors.toList());
-            if (!runningWorkspaces.isEmpty()) {
-                client.stopWorkspace(cheServerURL, runningWorkspaces.get(0).getId(), KEYCLOAK_TOKEN);
+            if (!runningWorkspaces.isEmpty()) {                
+                client.stopWorkspace(cheServerURL, runningWorkspaces.get(0), KEYCLOAK_TOKEN);
+                client.waitUntilWorkspaceIsStopped(MASTER_URL, NAMESPACE, OPENSHIFT_TOKEN, cheServerURL, runningWorkspaces.get(0), KEYCLOAK_TOKEN);        
             }
         }
     }

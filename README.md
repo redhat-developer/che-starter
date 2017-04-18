@@ -61,7 +61,7 @@ There are several ways for debugging the project:
 * Running the project in the debug mode from the command line: 
 
 ```bash
-    $ java -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=8000,suspend=n -jar target/che-starter-1.0-SNAPSHOT.jar 
+    $ java -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=8000,suspend=n -Dspring.profiles.active=local -jar target/che-starter-1.0-SNAPSHOT.jar 
 ````
 
 CI Jobs

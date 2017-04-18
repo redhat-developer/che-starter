@@ -52,10 +52,11 @@ public class ProjectClient {
      * Starts a workspace, wait for it and import project
      */
     @Async
-    public void createProject(String cheServerURL, Workspace workspace, String projectName, String repo, String branch, String stack, String keycloakToken)
+    public void createProject(String cheServerURL, Workspace workspace, String projectName, String repo, String branch, String stack, 
+            String masterUrl, String namespace, String openShiftToken, String keycloakToken)
             throws IOException, ProjectCreationException, WorkspaceNotFound, URISyntaxException, MalformedURLException {
 
-        workspaceClient.startWorkspace(cheServerURL, workspace.getConfig().getName(), keycloakToken);
+        workspaceClient.startWorkspace(cheServerURL, workspace.getConfig().getName(), masterUrl, namespace, openShiftToken, keycloakToken);
         workspaceClient.waitUntilWorkspaceIsRunning(cheServerURL, workspace, keycloakToken);
         Workspace startedWorkspace = workspaceClient.getWorkspaceById(cheServerURL, workspace.getId(), keycloakToken);
 
@@ -104,10 +105,11 @@ public class ProjectClient {
     }
 
     @Async
-    public void deleteAllProjectsAndWorkspace(String cheServerURL, String workspaceName, String keycloakToken) throws WorkspaceNotFound {
+    public void deleteAllProjectsAndWorkspace(String cheServerURL, String workspaceName, String masterUrl, String namespace, String openShiftToken, 
+            String keycloakToken) throws WorkspaceNotFound {
         Workspace runningWorkspace = workspaceClient.getStartedWorkspace(cheServerURL, keycloakToken);
 
-        Workspace workspaceToDelete = workspaceClient.startWorkspace(cheServerURL, workspaceName, keycloakToken);
+        Workspace workspaceToDelete = workspaceClient.startWorkspace(cheServerURL, workspaceName, masterUrl, namespace, openShiftToken, keycloakToken);
         workspaceClient.waitUntilWorkspaceIsRunning(cheServerURL, workspaceToDelete, keycloakToken);
         workspaceToDelete = workspaceClient.getWorkspaceById(cheServerURL, workspaceToDelete.getId(), keycloakToken);
 
@@ -117,13 +119,15 @@ public class ProjectClient {
                 deleteProject(cheServerURL, workspaceToDelete, project.getName(), keycloakToken);
             }
         }
-
-        workspaceClient.stopWorkspace(cheServerURL, workspaceToDelete.getId(), keycloakToken);
-        workspaceClient.waitUntilWorkspaceIsStopped(cheServerURL, workspaceToDelete, keycloakToken);
+        
+        workspaceClient.stopWorkspace(cheServerURL, workspaceToDelete, keycloakToken);
+        workspaceClient.waitUntilWorkspaceIsStopped(masterUrl, namespace, openShiftToken, cheServerURL, workspaceToDelete, keycloakToken);
+        
         workspaceClient.deleteWorkspace(cheServerURL, workspaceToDelete.getId(), keycloakToken);
 
         if (runningWorkspace != null && !runningWorkspace.getConfig().getName().equals(workspaceName)) {
-            workspaceClient.startWorkspace(cheServerURL, runningWorkspace.getConfig().getName(), keycloakToken);
+            workspaceClient.startWorkspace(cheServerURL, runningWorkspace.getConfig().getName(), masterUrl, namespace, openShiftToken, keycloakToken);
+
         }
     }
 
