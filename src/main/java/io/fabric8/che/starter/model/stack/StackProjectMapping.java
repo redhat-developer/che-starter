@@ -25,10 +25,11 @@ import com.google.common.collect.ImmutableMap;
 public final class StackProjectMapping {
     public static final String BLANK_PROJECT_TYPE = "blank";
     private static final Map<String, String> STACK_PROJECT_MAPPING = ImmutableMap.<String, String> builder().
+            put("java-centos", "maven").
             put("vert.x", "maven").
-            put("java-default", "maven").
-            put("node-default", "node-js").
-            put("dotnet-default", "blank").
+            put("spring-boot", "maven").
+            put("WildFly Swarm", "maven").
+            put("CentOS nodejs", "node-js").
             build();
 
     private StackProjectMapping() {
