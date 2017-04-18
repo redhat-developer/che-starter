@@ -162,7 +162,7 @@ public class WorkspaceClient {
                 return getWorkspaceById(cheServerURL, workspace.getId());
             }
         }
-        throw new WorkspaceNotFound("Workspace with name " + workspaceName + " was not found");
+        throw new WorkspaceNotFound("Workspace '" + workspaceName + "' was not found");
     }
 
     /** Deletes a workspace. Workspace must be stopped before invoking its  deletion.
@@ -202,11 +202,12 @@ public class WorkspaceClient {
                 }
             } else if (!WorkspaceState.STOPPED.toString().equals(workspace.getStatus())) {
                 stopWorkspace(cheServerURL, workspace.getId());
+                waitUntilWorkspaceIsStopped(cheServerURL, workspace);
             }
         }
 
         if (workspaceToStart == null) {
-            throw new WorkspaceNotFound("Workspace " + workspaceName + " does not exists");
+            throw new WorkspaceNotFound("Workspace '" + workspaceName + "' does not exist.");
         }
 
         if (!alreadyStarted) {
