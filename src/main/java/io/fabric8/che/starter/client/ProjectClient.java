@@ -105,7 +105,7 @@ public class ProjectClient {
 
     @Async
     public void deleteAllProjectsAndWorkspace(String cheServerURL, String workspaceName) throws WorkspaceNotFound {
-        Workspace differentWorkspace = workspaceClient.getStartedWorkspace(cheServerURL);
+        Workspace runningWorkspace = workspaceClient.getStartedWorkspace(cheServerURL);
 
         Workspace workspaceToDelete = workspaceClient.startWorkspace(cheServerURL, workspaceName);
         workspaceClient.waitUntilWorkspaceIsRunning(cheServerURL, workspaceToDelete);
@@ -122,8 +122,8 @@ public class ProjectClient {
         workspaceClient.waitUntilWorkspaceIsStopped(cheServerURL, workspaceToDelete);
         workspaceClient.deleteWorkspace(cheServerURL, workspaceToDelete.getId());
 
-        if (differentWorkspace != null) {
-            workspaceClient.startWorkspace(cheServerURL, differentWorkspace.getConfig().getName());
+        if (runningWorkspace != null && !runningWorkspace.getConfig().getName().equals(workspaceName)) {
+            workspaceClient.startWorkspace(cheServerURL, runningWorkspace.getConfig().getName());
         }
     }
     
