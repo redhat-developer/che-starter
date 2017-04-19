@@ -84,7 +84,7 @@ public final class CheDeploymentConfig {
             public void run() {
                 poller.cancel(true);
             }
-        }, Integer.valueOf(startTimeout), TimeUnit.SECONDS);
+        }, Integer.valueOf(startTimeout), TimeUnit.MILLISECONDS);
         try {
             while (!waitUntilReady(queue)) {
             }
