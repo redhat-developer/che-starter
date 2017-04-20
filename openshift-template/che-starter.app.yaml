@@ -92,7 +92,13 @@ objects:
               - containerPort: 10000
                 protocol: TCP
             terminationMessagePath: /dev/termination-log
-            resources: {}
+            resources:
+              requests:
+                cpu: 50m
+                memory: 1Gi
+              limits:
+                cpu: 500m
+                memory: 2Gi
             volumeMounts:
               - name: che-starter-volume-1
                 mountPath: /tmp
