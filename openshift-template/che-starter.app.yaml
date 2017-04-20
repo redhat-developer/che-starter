@@ -43,29 +43,29 @@ objects:
           - env:
             - name: GITHUB_TOKEN_URL
               valueFrom:
-              configMapKeyRef:
-                name: che-starter
-                key: github.tokenurl
+                configMapKeyRef:
+                  name: che-starter
+                  key: github.tokenurl
             - name: OPENSHIFT_TOKEN_URL
               valueFrom:
-              configMapKeyRef:
-                name: che-starter
-                key: oso.tokenurl
+                configMapKeyRef:
+                  name: che-starter
+                  key: oso.tokenurl
             - name: OSO_ADDRESS
               valueFrom:
-              configMapKeyRef:
-                name: che-starter
-                key: oso.address
+                configMapKeyRef:
+                  name: che-starter
+                  key: oso.address
             - name: OSO_DOMAIN_NAME
               valueFrom:
-              configMapKeyRef:
-                name: che-starter
-                key: oso.domain.name
+                configMapKeyRef:
+                  name: che-starter
+                  key: oso.domain.name
             - name: KUBERNETES_CERTS_CA_FILE
               valueFrom:
-              configMapKeyRef:
-                name: che-starter
-                key: kubes.certs.ca.file
+                configMapKeyRef:
+                  name: che-starter
+                  key: kubes.certs.ca.file
             name: che-starter
             image: ${IMAGE}:${IMAGE_TAG}
             ports:
