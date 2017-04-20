@@ -34,6 +34,7 @@ public class WorkspaceClientTest extends TestConfig {
     private static final String BRANCH = "master";
     private static final String STACK_ID = "java-default";
     private static final String DESCRIPTION = GITHUB_REPO + "#" + BRANCH + "#" + "WI1345";
+    private static final String KEYCLOAK_TOKEN = null;
 
     @Value("${che.server.url}")
     String cheServerURL;
@@ -43,7 +44,7 @@ public class WorkspaceClientTest extends TestConfig {
     
     @Test
     public void listWorkspaces() {
-        List<Workspace> workspaces = this.client.listWorkspaces(cheServerURL);
+        List<Workspace> workspaces = this.client.listWorkspaces(cheServerURL, KEYCLOAK_TOKEN);
         LOG.info("Number of workspaces: {}", workspaces.size());
         workspaces.forEach(w -> LOG.info("workspace ID: {}", w.getId()));
     }
@@ -53,20 +54,20 @@ public class WorkspaceClientTest extends TestConfig {
     @Ignore("Ignored due to issue with running a workspace on remote OS test instance")
     public void createAndDeleteWorkspace() throws IOException, StackNotFoundException, WorkspaceNotFound {
         Workspace workspace = client.createWorkspace(cheServerURL, null, STACK_ID, GITHUB_REPO, BRANCH, DESCRIPTION);
-        client.waitUntilWorkspaceIsRunning(cheServerURL, workspace);
-        client.stopWorkspace(cheServerURL, workspace.getId());
-        client.waitUntilWorkspaceIsStopped(cheServerURL, workspace);
-        client.deleteWorkspace(cheServerURL, workspace.getId());
+        client.waitUntilWorkspaceIsRunning(cheServerURL, workspace, KEYCLOAK_TOKEN);
+        client.stopWorkspace(cheServerURL, workspace.getId(), KEYCLOAK_TOKEN);
+        client.waitUntilWorkspaceIsStopped(cheServerURL, workspace, KEYCLOAK_TOKEN);
+        client.deleteWorkspace(cheServerURL, workspace.getId(), KEYCLOAK_TOKEN);
     }
 
     @Test
     public void stopWorskpace() {
-        List<Workspace> workspaces = client.listWorkspaces(cheServerURL);
+        List<Workspace> workspaces = client.listWorkspaces(cheServerURL, KEYCLOAK_TOKEN);
         if (!workspaces.isEmpty()) {
             List<Workspace> runningWorkspaces = workspaces.stream().filter(w -> w.getStatus().equals("RUNNING"))
                     .collect(Collectors.toList());
             if (!runningWorkspaces.isEmpty()) {
-                client.stopWorkspace(cheServerURL, runningWorkspaces.get(0).getId());
+                client.stopWorkspace(cheServerURL, runningWorkspaces.get(0).getId(), KEYCLOAK_TOKEN);
             }
         }
     }

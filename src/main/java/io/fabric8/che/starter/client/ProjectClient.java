@@ -31,6 +31,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import io.fabric8.che.starter.client.keycloak.KeycloakRestTemplate;
 import io.fabric8.che.starter.exception.ProjectCreationException;
 import io.fabric8.che.starter.exception.WorkspaceNotFound;
 import io.fabric8.che.starter.model.project.Project;
@@ -52,13 +53,13 @@ public class ProjectClient {
      * Starts a workspace, wait for it and import project
      */
     @Async
-    public void createProject(String cheServerURL, Workspace workspace, String projectName, String repo, String branch, String stack)
+    public void createProject(String cheServerURL, Workspace workspace, String projectName, String repo, String branch, String stack, String keycloakToken)
             throws IOException, ProjectCreationException, WorkspaceNotFound, URISyntaxException, MalformedURLException {
-        
-        workspaceClient.startWorkspace(cheServerURL, workspace.getConfig().getName());
-        workspaceClient.waitUntilWorkspaceIsRunning(cheServerURL, workspace);
-        Workspace startedWorkspace = workspaceClient.getWorkspaceById(cheServerURL, workspace.getId());
-        
+
+        workspaceClient.startWorkspace(cheServerURL, workspace.getConfig().getName(), keycloakToken);
+        workspaceClient.waitUntilWorkspaceIsRunning(cheServerURL, workspace, keycloakToken);
+        Workspace startedWorkspace = workspaceClient.getWorkspaceById(cheServerURL, workspace.getId(), keycloakToken);
+
         String wsAgentUrl = getWsAgentUrl(startedWorkspace);
 
         // Next we create a new project against workspace agent API Url
@@ -70,7 +71,7 @@ public class ProjectClient {
 
         Project project = initProject(projectName, repo, branch, projectType);
 
-        RestTemplate template = new RestTemplate();
+        RestTemplate template = new KeycloakRestTemplate(keycloakToken);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<Project[]> entity = new HttpEntity<Project[]>(new Project[] { project }, headers);
@@ -94,39 +95,39 @@ public class ProjectClient {
      * @param workspaceName
      * @param projectName
      */
-    public void deleteProject(String cheServerURL, Workspace workspace, String projectName) {
+    public void deleteProject(String cheServerURL, Workspace workspace, String projectName, String keycloakToken) {
         String wsAgentUrl = getWsAgentUrl(workspace);
 
         String deleteProjectURL = CheRestEndpoints.DELETE_PROJECT.generateUrl(wsAgentUrl, projectName);
         LOG.info("Deleting project {}", projectName);
-        RestTemplate template = new RestTemplate();
+        RestTemplate template = new KeycloakRestTemplate(keycloakToken);
         template.delete(deleteProjectURL);
     }
 
     @Async
-    public void deleteAllProjectsAndWorkspace(String cheServerURL, String workspaceName) throws WorkspaceNotFound {
-        Workspace runningWorkspace = workspaceClient.getStartedWorkspace(cheServerURL);
+    public void deleteAllProjectsAndWorkspace(String cheServerURL, String workspaceName, String keycloakToken) throws WorkspaceNotFound {
+        Workspace runningWorkspace = workspaceClient.getStartedWorkspace(cheServerURL, keycloakToken);
 
-        Workspace workspaceToDelete = workspaceClient.startWorkspace(cheServerURL, workspaceName);
-        workspaceClient.waitUntilWorkspaceIsRunning(cheServerURL, workspaceToDelete);
-        workspaceToDelete = workspaceClient.getWorkspaceById(cheServerURL, workspaceToDelete.getId());
-        
+        Workspace workspaceToDelete = workspaceClient.startWorkspace(cheServerURL, workspaceName, keycloakToken);
+        workspaceClient.waitUntilWorkspaceIsRunning(cheServerURL, workspaceToDelete, keycloakToken);
+        workspaceToDelete = workspaceClient.getWorkspaceById(cheServerURL, workspaceToDelete.getId(), keycloakToken);
+
         List<Project> projectsToDelete = workspaceToDelete.getConfig().getProjects();
         if (projectsToDelete != null && !projectsToDelete.isEmpty()) {
             for (Project project : projectsToDelete) {
-                deleteProject(cheServerURL, workspaceToDelete, project.getName());
+                deleteProject(cheServerURL, workspaceToDelete, project.getName(), keycloakToken);
             }
         }
-        
-        workspaceClient.stopWorkspace(cheServerURL, workspaceToDelete.getId());
-        workspaceClient.waitUntilWorkspaceIsStopped(cheServerURL, workspaceToDelete);
-        workspaceClient.deleteWorkspace(cheServerURL, workspaceToDelete.getId());
+
+        workspaceClient.stopWorkspace(cheServerURL, workspaceToDelete.getId(), keycloakToken);
+        workspaceClient.waitUntilWorkspaceIsStopped(cheServerURL, workspaceToDelete, keycloakToken);
+        workspaceClient.deleteWorkspace(cheServerURL, workspaceToDelete.getId(), keycloakToken);
 
         if (runningWorkspace != null && !runningWorkspace.getConfig().getName().equals(workspaceName)) {
-            workspaceClient.startWorkspace(cheServerURL, runningWorkspace.getConfig().getName());
+            workspaceClient.startWorkspace(cheServerURL, runningWorkspace.getConfig().getName(), keycloakToken);
         }
     }
-    
+
     private String getWsAgentUrl(final Workspace workspace) {
         return workspace.getRuntime().getDevMachine().getRuntime().getServers().get("4401/tcp").getUrl();
     }

@@ -20,7 +20,7 @@ import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 
-public class KeycloakInterceptor implements ClientHttpRequestInterceptor {
+class KeycloakInterceptor implements ClientHttpRequestInterceptor {
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private String keycloakToken;
 

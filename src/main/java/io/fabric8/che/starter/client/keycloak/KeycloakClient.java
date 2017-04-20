@@ -13,7 +13,6 @@
 package io.fabric8.che.starter.client.keycloak;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
@@ -68,8 +67,7 @@ public class KeycloakClient {
     }
 
     private String getResponseBody(String endpoint, String keycloakToken) {
-        RestTemplate template = new RestTemplate();
-        template.setInterceptors(Collections.singletonList(new KeycloakInterceptor(keycloakToken)));
+        RestTemplate template = new KeycloakRestTemplate(keycloakToken);
         ResponseEntity<String> response = template.exchange(endpoint.toString(), HttpMethod.GET, null, String.class);
         return response.getBody();
     }

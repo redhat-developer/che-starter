@@ -12,7 +12,6 @@
  */
 package io.fabric8.che.starter.client;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -22,7 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import io.fabric8.che.starter.client.keycloak.KeycloakInterceptor;
+import io.fabric8.che.starter.client.keycloak.KeycloakRestTemplate;
 import io.fabric8.che.starter.exception.StackNotFoundException;
 import io.fabric8.che.starter.model.stack.Stack;
 import io.fabric8.che.starter.model.stack.StackProjectMapping;
@@ -32,11 +31,8 @@ public class StackClient {
 
     public List<Stack> listStacks(String cheServerUrl, String keycloakToken) {
         String url = CheRestEndpoints.LIST_STACKS.generateUrl(cheServerUrl);
-        RestTemplate template = new RestTemplate();
 
-        if (keycloakToken != null) {
-            template.setInterceptors(Collections.singletonList(new KeycloakInterceptor(keycloakToken)));
-        }
+        RestTemplate template = new KeycloakRestTemplate(keycloakToken);
 
         ResponseEntity<List<Stack>> response = template.exchange(url, HttpMethod.GET, null,
                 new ParameterizedTypeReference<List<Stack>>() {
