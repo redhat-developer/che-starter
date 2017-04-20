@@ -41,6 +41,16 @@ objects:
             emptyDir: {}
         containers:
           - env:
+            - name: GITHUB_TOKEN_URL
+              valueFrom:
+              configMapKeyRef:
+                name: che-starter
+                key: github.tokenurl
+            - name: OPENSHIFT_TOKEN_URL
+              valueFrom:
+              configMapKeyRef:
+                name: che-starter
+                key: oso.tokenurl
             - name: OSO_ADDRESS
               valueFrom:
               configMapKeyRef:
