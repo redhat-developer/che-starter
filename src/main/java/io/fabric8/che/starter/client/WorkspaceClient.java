@@ -13,7 +13,6 @@
 package io.fabric8.che.starter.client;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -29,7 +28,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import io.fabric8.che.starter.client.keycloak.KeycloakInterceptor;
+import io.fabric8.che.starter.client.keycloak.KeycloakRestTemplate;
 import io.fabric8.che.starter.exception.StackNotFoundException;
 import io.fabric8.che.starter.exception.WorkspaceNotFound;
 import io.fabric8.che.starter.model.workspace.Workspace;
@@ -55,8 +54,8 @@ public class WorkspaceClient {
     @Autowired
     private StackClient stackClient;
 
-    public void waitUntilWorkspaceIsRunning(String cheServerURL, Workspace workspace) {
-        WorkspaceStatus status = getWorkspaceStatus(cheServerURL, workspace.getId());
+    public void waitUntilWorkspaceIsRunning(String cheServerURL, Workspace workspace, String keycloakToken) {
+        WorkspaceStatus status = getWorkspaceStatus(cheServerURL, workspace.getId(), keycloakToken);
         long currentTime = System.currentTimeMillis();
         while (!WorkspaceState.RUNNING.toString().equals(status.getWorkspaceStatus())
                 && System.currentTimeMillis() < (currentTime + workspaceStartTimeout)) {
@@ -67,13 +66,13 @@ public class WorkspaceClient {
                 LOG.error("Error while polling for workspace status", e);
                 break;
             }
-            status = getWorkspaceStatus(cheServerURL, workspace.getId());
+            status = getWorkspaceStatus(cheServerURL, workspace.getId(), keycloakToken);
         }
-        LOG.info("Workspace '{}' is running", workspace.getConfig().getName());   
+        LOG.info("Workspace '{}' is running", workspace.getConfig().getName());
     }
-    
-    public void waitUntilWorkspaceIsStopped(String cheServerURL, Workspace workspace) {
-        WorkspaceStatus status = getWorkspaceStatus(cheServerURL, workspace.getId());
+
+    public void waitUntilWorkspaceIsStopped(String cheServerURL, Workspace workspace, String keycloakToken) {
+        WorkspaceStatus status = getWorkspaceStatus(cheServerURL, workspace.getId(), keycloakToken);
         long currentTime = System.currentTimeMillis();
         while (!WorkspaceState.STOPPED.toString().equals(status.getWorkspaceStatus())
                 && System.currentTimeMillis() < (currentTime + workspaceStopTimeout)) {
@@ -84,14 +83,14 @@ public class WorkspaceClient {
                 LOG.error("Error while polling for workspace status", e);
                 break;
             }
-            status = getWorkspaceStatus(cheServerURL, workspace.getId());
+            status = getWorkspaceStatus(cheServerURL, workspace.getId(), keycloakToken);
         }
-        LOG.info("Workspace '{}' is stopped", workspace.getConfig().getName());   
+        LOG.info("Workspace '{}' is stopped", workspace.getConfig().getName());
     }
 
-    public List<Workspace> listWorkspaces(String cheServerUrl) {
+    public List<Workspace> listWorkspaces(String cheServerUrl, String keycloakToken) {
         String url = CheRestEndpoints.LIST_WORKSPACES.generateUrl(cheServerUrl);
-        RestTemplate template = new RestTemplate();
+        RestTemplate template = new KeycloakRestTemplate(keycloakToken);
         ResponseEntity<List<Workspace>> response = template.exchange(url, HttpMethod.GET, null,
                 new ParameterizedTypeReference<List<Workspace>>() {
                 });
@@ -99,8 +98,8 @@ public class WorkspaceClient {
         return response.getBody();
     }
 
-    public List<Workspace> listWorkspacesPerRepository(String cheServerUrl, String repository) {
-        List<Workspace> workspaces = listWorkspaces(cheServerUrl);
+    public List<Workspace> listWorkspacesPerRepository(String cheServerUrl, String repository, String keycloakToken) {
+        List<Workspace> workspaces = listWorkspaces(cheServerUrl, keycloakToken);
         return workspaceHelper.filterByRepository(workspaces, repository);
     }
 
@@ -122,17 +121,13 @@ public class WorkspaceClient {
         // The first step is to create the workspace
         String url = CheRestEndpoints.CREATE_WORKSPACE.generateUrl(cheServerURL);
 
-        WorkspaceConfig wsConfig = stackClient.getStack(cheServerURL, stackId, null).getWorkspaceConfig();
+        WorkspaceConfig wsConfig = stackClient.getStack(cheServerURL, stackId, keycloakToken).getWorkspaceConfig();
         wsConfig.setName(workspaceHelper.generateName());
         wsConfig.setDescription(description);
 
-        RestTemplate template = new RestTemplate();
+        RestTemplate template = new KeycloakRestTemplate(keycloakToken);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-
-        if (keycloakToken != null) {
-            template.setInterceptors(Collections.singletonList(new KeycloakInterceptor(keycloakToken)));
-        }
 
         HttpEntity<WorkspaceConfig> entity = new HttpEntity<WorkspaceConfig>(wsConfig, headers);
 
@@ -144,10 +139,10 @@ public class WorkspaceClient {
         return workspace;
     }
 
-    public Workspace getWorkspaceById(String cheServerURL, String workspaceId) {
+    public Workspace getWorkspaceById(String cheServerURL, String workspaceId, String keycloakToken) {
         String url = CheRestEndpoints.GET_WORKSPACE_BY_ID.generateUrl(cheServerURL, workspaceId);
 
-        RestTemplate template = new RestTemplate();
+        RestTemplate template = new KeycloakRestTemplate(keycloakToken);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<String>(headers);
@@ -155,11 +150,11 @@ public class WorkspaceClient {
         return template.exchange(url, HttpMethod.GET, entity, Workspace.class).getBody();
     }
 
-    public Workspace getWorkspaceByName(String cheServerURL, String workspaceName) throws WorkspaceNotFound {
-        List<Workspace> workspaces = listWorkspaces(cheServerURL);
+    public Workspace getWorkspaceByName(String cheServerURL, String workspaceName, String keycloakToken) throws WorkspaceNotFound {
+        List<Workspace> workspaces = listWorkspaces(cheServerURL, keycloakToken);
         for (Workspace workspace : workspaces) {
             if (workspace.getConfig().getName().equals(workspaceName)) {
-                return getWorkspaceById(cheServerURL, workspace.getId());
+                return getWorkspaceById(cheServerURL, workspace.getId(), keycloakToken);
             }
         }
         throw new WorkspaceNotFound("Workspace '" + workspaceName + "' was not found");
@@ -171,9 +166,9 @@ public class WorkspaceClient {
      * @param workspaceId workspace ID
      * @throws WorkspaceNotFound if workspace does not exists
      */
-    public void deleteWorkspace(String cheServerURL, String workspaceId) throws WorkspaceNotFound {
+    public void deleteWorkspace(String cheServerURL, String workspaceId, String keycloakToken) throws WorkspaceNotFound {
         String url = CheRestEndpoints.DELETE_WORKSPACE.generateUrl(cheServerURL, workspaceId);
-        RestTemplate template = new RestTemplate();
+        RestTemplate template = new KeycloakRestTemplate(keycloakToken);
         template.delete(url);
     }
 
@@ -187,8 +182,8 @@ public class WorkspaceClient {
      * @return started workspace
      * @throws WorkspaceNotFound
      */
-    public Workspace startWorkspace(String cheServerURL, String workspaceName) throws WorkspaceNotFound {
-        List<Workspace> workspaces = listWorkspaces(cheServerURL);
+    public Workspace startWorkspace(String cheServerURL, String workspaceName, String keycloakToken) throws WorkspaceNotFound {
+        List<Workspace> workspaces = listWorkspaces(cheServerURL, keycloakToken);
 
         boolean alreadyStarted = false;
         Workspace workspaceToStart = null;
@@ -201,8 +196,8 @@ public class WorkspaceClient {
                     alreadyStarted = true;
                 }
             } else if (!WorkspaceState.STOPPED.toString().equals(workspace.getStatus())) {
-                stopWorkspace(cheServerURL, workspace.getId());
-                waitUntilWorkspaceIsStopped(cheServerURL, workspace);
+                stopWorkspace(cheServerURL, workspace.getId(), keycloakToken);
+                waitUntilWorkspaceIsStopped(cheServerURL, workspace, keycloakToken);
             }
         }
 
@@ -212,7 +207,7 @@ public class WorkspaceClient {
 
         if (!alreadyStarted) {
             String url = CheRestEndpoints.START_WORKSPACE.generateUrl(cheServerURL, workspaceToStart.getId());
-            RestTemplate template = new RestTemplate();
+            RestTemplate template = new KeycloakRestTemplate(keycloakToken);
             template.postForLocation(url, null);
         }
         return workspaceToStart;
@@ -226,8 +221,8 @@ public class WorkspaceClient {
      * @return started workspace or null if there is no running/starting
      *         workspace
      */
-    public Workspace getStartedWorkspace(String cheServerURL) {
-        List<Workspace> workspaces = listWorkspaces(cheServerURL);
+    public Workspace getStartedWorkspace(String cheServerURL, String keycloakToken) {
+        List<Workspace> workspaces = listWorkspaces(cheServerURL, keycloakToken);
 
         for (Workspace workspace : workspaces) {
             if (WorkspaceState.RUNNING.toString().equals(workspace.getStatus())
@@ -247,10 +242,10 @@ public class WorkspaceClient {
      *            workspace ID
      * @return workspace status
      */
-    public WorkspaceStatus getWorkspaceStatus(String cheServerURL, String workspaceId) {
+    public WorkspaceStatus getWorkspaceStatus(String cheServerURL, String workspaceId, String keycloakToken) {
         String url = CheRestEndpoints.CHECK_WORKSPACE.generateUrl(cheServerURL, workspaceId);
 
-        RestTemplate template = new RestTemplate();
+        RestTemplate template = new KeycloakRestTemplate(keycloakToken);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<String>(headers);
@@ -264,9 +259,9 @@ public class WorkspaceClient {
      * @param cheServerURL Che server URL
      * @param id workspace id
      */
-    public void stopWorkspace(String cheServerURL, String id) {
+    public void stopWorkspace(String cheServerURL, String id, String keycloakToken) {
         String url = CheRestEndpoints.STOP_WORKSPACE.generateUrl(cheServerURL, id);
-        RestTemplate template = new RestTemplate();
+        RestTemplate template = new KeycloakRestTemplate(keycloakToken);
         template.delete(url);
     }
 

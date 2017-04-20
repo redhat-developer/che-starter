@@ -28,6 +28,8 @@ import io.fabric8.che.starter.model.GitHubUserInfo;
 public class GitHubTokenClientTest extends TestConfig {
     private static final Logger LOG = LogManager.getLogger(GitHubTokenClientTest.class);
     private static final String GIT_HUB_TOKEN = "GIT_HUB_TOKEN";
+    private static final String KEYCLOAK_TOKEN = null;
+
 
     @Value("${che.server.url}")
     String cheServerURL;
@@ -37,7 +39,7 @@ public class GitHubTokenClientTest extends TestConfig {
 
     @Test(expected = GitHubOAthTokenException.class)
     public void setGitHubToken() throws GitHubOAthTokenException, IOException {
-        client.setGitHubOAuthToken(cheServerURL, GIT_HUB_TOKEN);
+        client.setGitHubOAuthToken(cheServerURL, GIT_HUB_TOKEN, KEYCLOAK_TOKEN);
     }
 
     @Ignore("Valid GitHub token must be provided")

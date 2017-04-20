@@ -22,6 +22,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import io.fabric8.che.starter.client.keycloak.KeycloakRestTemplate;
 import io.fabric8.che.starter.model.GitHubUserInfo;
 import io.fabric8.che.starter.model.WorspacePreferences;
 
@@ -32,11 +33,11 @@ public class WorkspacePreferencesClient {
     @Autowired
     GitHubClient client;
 
-    public void setCommitterInfo(final String cheServerUrl, final String gitHubToken) {
+    public void setCommitterInfo(final String cheServerUrl, final String gitHubToken, final String keycloakToken) {
         GitHubUserInfo userInfo = client.getUserInfo(gitHubToken);
         WorspacePreferences preferences = getPreferences(userInfo);
 
-        RestTemplate template = new RestTemplate();
+        RestTemplate template = new KeycloakRestTemplate(keycloakToken);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<WorspacePreferences> entity = new HttpEntity<WorspacePreferences>(preferences, headers);
