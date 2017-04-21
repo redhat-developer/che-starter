@@ -18,15 +18,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WorspacePreferences {
 
+    @JsonProperty("git.committer.name")
     private String commiterName;
 
+    @JsonProperty("git.committer.email")
     private String commiterEmail;
 
     public String getCommiterName() {
         return commiterName;
     }
 
-    @JsonProperty("git.committer.name")
     public void setCommitterName(String commiterName) {
         this.commiterName = commiterName;
     }
@@ -35,7 +36,6 @@ public class WorspacePreferences {
         return commiterEmail;
     }
 
-    @JsonProperty("git.committer.email")
     public void setCommitterEmail(String commiterEmail) {
         this.commiterEmail = commiterEmail;
     }
