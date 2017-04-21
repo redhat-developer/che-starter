@@ -40,6 +40,7 @@ import io.fabric8.che.starter.client.ProjectClient;
 import io.fabric8.che.starter.client.WorkspaceClient;
 import io.fabric8.che.starter.client.WorkspacePreferencesClient;
 import io.fabric8.che.starter.client.keycloak.KeycloakClient;
+import io.fabric8.che.starter.client.keycloak.KeycloakTokenValidator;
 import io.fabric8.che.starter.exception.GitHubOAthTokenException;
 import io.fabric8.che.starter.exception.KeycloakException;
 import io.fabric8.che.starter.exception.ProjectCreationException;
@@ -92,6 +93,7 @@ public class WorkspaceController {
             HttpServletRequest request)
             throws RouteNotFoundException, JsonProcessingException, IOException, KeycloakException {
 
+        KeycloakTokenValidator.validate(keycloakToken);
         String openShiftToken = keycloakClient.getOpenShiftToken(keycloakToken);
         String requestURL = request.getRequestURL().toString();
         return listWorkspaces(masterUrl, namespace, openShiftToken, repository, requestURL, keycloakToken);
@@ -116,6 +118,7 @@ public class WorkspaceController {
             throws IOException, URISyntaxException, RouteNotFoundException, StackNotFoundException,
             GitHubOAthTokenException, ProjectCreationException, KeycloakException, WorkspaceNotFound {
 
+        KeycloakTokenValidator.validate(keycloakToken);
         String openShiftToken = keycloakClient.getOpenShiftToken(keycloakToken);
         String gitHubOAuthToken = keycloakClient.getGitHubToken(keycloakToken);
         return createWorkspace(masterUrl, namespace, openShiftToken, gitHubOAuthToken, keycloakToken, params);
@@ -139,6 +142,7 @@ public class WorkspaceController {
             @ApiParam(value = "Keycloak token", required = true) @RequestHeader("Authorization") String keycloakToken)
             throws JsonProcessingException, IOException, KeycloakException, RouteNotFoundException, WorkspaceNotFound {
 
+        KeycloakTokenValidator.validate(keycloakToken);
         String openShiftToken = keycloakClient.getOpenShiftToken(keycloakToken);
         deleteWorkspace(masterUrl, namespace, openShiftToken, name, keycloakToken);
     }

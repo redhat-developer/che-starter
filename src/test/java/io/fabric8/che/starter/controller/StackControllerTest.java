@@ -88,7 +88,7 @@ public class StackControllerTest extends TestBase {
     @Test
     public void testGetStacksWithWrongToken() throws Exception {
         mockMvc.perform(get(STACK_ENDPOINT).header("Authorization", "badtoken").param("masterUrl", VERTX_SERVER)
-                .param("namespace", NAMESPACE)).andExpect(status().is(401));
+                .param("namespace", NAMESPACE)).andExpect(status().is(400));
     }
 
     @Test
