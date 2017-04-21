@@ -72,7 +72,7 @@ objects:
               failureThreshold: 3
               httpGet:
                 path: /status
-                port: 8080
+                port: 10000
                 scheme: HTTP
               initialDelaySeconds: 120
               periodSeconds: 10
@@ -82,7 +82,7 @@ objects:
               failureThreshold: 3
               httpGet:
                 path: /status
-                port: 8080
+                port: 10000
                 scheme: HTTP
               initialDelaySeconds: 60
               periodSeconds: 10
