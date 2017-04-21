@@ -62,11 +62,16 @@ public class GlobalExceptionHandler {
     public String handleKubernetesClientException(KubernetesClientException e) {
         return e.getMessage();
     }
-    
 
     @ResponseStatus(value = HttpStatus.UNAUTHORIZED, reason = "Keycloak token is invalid")
     @ExceptionHandler(KeycloakException.class)
     public String handleKeycloakException(KeycloakException e) {
+        return e.getMessage();
+    }
+
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Keycloak token must have 'Bearer ' prefix")
+    @ExceptionHandler(InvalidKeycloakTokenFormatException.class)
+    public String handleInvalidKeycloakTokenFormatException(InvalidKeycloakTokenFormatException e) {
         return e.getMessage();
     }
 

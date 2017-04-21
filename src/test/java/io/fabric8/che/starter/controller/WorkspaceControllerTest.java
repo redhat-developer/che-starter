@@ -74,7 +74,7 @@ public class WorkspaceControllerTest extends TestBase {
     @Test
     public void getWorkspaceWithWrongTokenTest() throws Exception {
         mockMvc.perform(get(WORKSPACE_ENDPOINT).header("Authorization", "wrongkeycloaktoken")
-                .param("masterUrl", VERTX_SERVER).param("namespace", NAMESPACE)).andExpect(status().is(401));
+                .param("masterUrl", VERTX_SERVER).param("namespace", NAMESPACE)).andExpect(status().is(400));
     }
 
     @Test
@@ -128,7 +128,7 @@ public class WorkspaceControllerTest extends TestBase {
         mockMvc.perform(post(WORKSPACE_ENDPOINT).header("Authorization", "wrongkeycloakttoken")
                 .header("Content-Type", "application/json").param("masterUrl", VERTX_SERVER)
                 .param("namespace", NAMESPACE).content(getCreateWorkspaceRequestBody(initWorkspaceCreateParams())))
-                .andExpect(status().is(401));
+                .andExpect(status().is(400));
     }
 
     @Test

@@ -22,7 +22,7 @@ public class TestBase {
     public static final String VERTX_SERVER = "http://localhost:33333";
     public static final String NAMESPACE = "eclipse-che";
     public static final String OPENSHIFT_TOKEN = "openshifttoken";
-    public static final String KEYCLOAK_TOKEN = "keycloaktoken";
+    public static final String KEYCLOAK_TOKEN = "Bearer keycloaktoken";
     public static final String GITHUB_TOKEN = "githubtoken";
 
     public static final String WORKSPACE_IDE_URL = "http://localhost:33333/che/vertxworkspace";
