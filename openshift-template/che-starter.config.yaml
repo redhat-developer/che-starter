@@ -7,3 +7,5 @@ data:
   oso.domain.name: tsrv.devshift.net
   oso.address: tsrv.devshift.net:8443
   kubes.certs.ca.file: /opt/che-starter/tsrv.devshift.net.cer
+  oso.tokenurl: https://sso.prod-preview.openshift.io/auth/realms/fabric8/broker/openshift-v3/token
+  github.tokenurl: https://sso.prod-preview.openshift.io/auth/realms/fabric8/broker/github/token
