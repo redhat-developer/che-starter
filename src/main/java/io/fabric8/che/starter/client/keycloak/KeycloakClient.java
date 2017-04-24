@@ -15,6 +15,7 @@ package io.fabric8.che.starter.client.keycloak;
 import java.io.IOException;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,6 +36,9 @@ public class KeycloakClient {
     private static final Logger LOG = LogManager.getLogger(KeycloakClient.class);
     private static final String ACCESS_TOKEN = "access_token";
 
+    @Value("${OSO_ADMIN_TOKEN:#{null}}")
+    private String openShiftAdminToken;
+
     @Value("${OPENSHIFT_TOKEN_URL:https://sso.prod-preview.openshift.io/auth/realms/fabric8/broker/openshift-v3/token}")
     private String openShiftTokenUrl;
 
@@ -42,6 +46,10 @@ public class KeycloakClient {
     private String gitHubTokenUrl;
 
     public String getOpenShiftToken(String keycloakToken) throws JsonProcessingException, IOException, KeycloakException {
+        if (StringUtils.isNotBlank(openShiftAdminToken)) {
+            LOG.info("Using OpenShift admin token");
+            return openShiftAdminToken;
+        }
         // {"access_token":"token","expires_in":86400,"scope":"user:full","token_type":"Bearer"}
         LOG.info("OpenShift token url - {}", openShiftTokenUrl);
         String responseBody = getResponseBody(openShiftTokenUrl, keycloakToken);
