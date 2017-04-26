@@ -22,6 +22,7 @@ import java.io.IOException;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,6 +108,7 @@ public class WorkspaceControllerTest extends TestBase {
                 .param("masterUrl", "http://i.do.not.exist").param("namespace", NAMESPACE)).andExpect(status().is(401));
     }
 
+    @Ignore("Need to update vert.x test server")
     @Test
     public void createWorkspaceTest() throws Exception {
         mockMvc.perform(post(WORKSPACE_ENDPOINT).header("Authorization", KEYCLOAK_TOKEN)
@@ -115,6 +117,7 @@ public class WorkspaceControllerTest extends TestBase {
                 .andExpect(status().is2xxSuccessful()).andExpect(jsonPath("$.href", is(WORKSPACE_IDE_URL)));
     }
 
+    @Ignore("Need to update vert.x test server")
     @Test
     public void createWorkspaceOSOTest() throws Exception {
         mockMvc.perform(post(WORKSPACE_OSO_ENDPOINT).header("Authorization", OPENSHIFT_TOKEN)
