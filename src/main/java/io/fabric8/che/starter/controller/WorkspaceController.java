@@ -112,7 +112,7 @@ public class WorkspaceController {
 
     @ApiOperation(value = "Create and start a new workspace. Stop all other workspaces (only one workspace can be running at a time). If a workspace with the imported project already exists, just start it")
     @PostMapping("/workspace")
-    public WorkspaceLink create(@RequestParam String masterUrl, @RequestParam String namespace,
+    public Workspace create(@RequestParam String masterUrl, @RequestParam String namespace,
             @RequestBody WorkspaceCreateParams params,
             @ApiParam(value = "Keycloak token", required = true) @RequestHeader("Authorization") String keycloakToken)
             throws IOException, URISyntaxException, RouteNotFoundException, StackNotFoundException,
@@ -126,7 +126,7 @@ public class WorkspaceController {
 
     @ApiOperation(value = "Create and start a new workspace. Stop all other workspaces (only one workspace can be running at a time). If a workspace with the imported project already exists, just start it")
     @PostMapping("/workspace/oso")
-    public WorkspaceLink createOnOpenShift(@RequestParam String masterUrl, @RequestParam String namespace,
+    public Workspace createOnOpenShift(@RequestParam String masterUrl, @RequestParam String namespace,
             @RequestBody WorkspaceCreateParams params,
             @ApiParam(value = "OpenShift token", required = true) @RequestHeader("Authorization") String openShiftToken)
             throws IOException, URISyntaxException, RouteNotFoundException, StackNotFoundException,
@@ -193,7 +193,7 @@ public class WorkspaceController {
      * @return create Workspace
      * @throws WorkspaceNotFound
      */
-    public WorkspaceLink createWorkspace(String masterUrl, String namespace, String openShiftToken,
+    public Workspace createWorkspace(String masterUrl, String namespace, String openShiftToken,
             String gitHubOAuthToken, String keycloakToken, WorkspaceCreateParams params)
             throws RouteNotFoundException, URISyntaxException, IOException, StackNotFoundException,
             GitHubOAthTokenException, ProjectCreationException, WorkspaceNotFound {
@@ -204,7 +204,7 @@ public class WorkspaceController {
         String workspaceName = params.getWorkspaceName();
         if (!StringUtils.isBlank(workspaceName)) {
             workspace = workspaceClient.startWorkspace(cheServerURL, workspaceName, keycloakToken);
-            return workspaceHelper.getWorkspaceIdeLink(workspace);
+            return workspace;
         }
 
         workspace = createWorkspaceFromParams(cheServerURL, keycloakToken, gitHubOAuthToken, params);
@@ -213,7 +213,7 @@ public class WorkspaceController {
         projectClient.createProject(cheServerURL, workspace, projectName, params.getRepo(), 
                 params.getBranch(), params.getStackId(), keycloakToken);
 
-        return workspaceHelper.getWorkspaceIdeLink(workspace);
+        return workspace;
     }
 
     /**
