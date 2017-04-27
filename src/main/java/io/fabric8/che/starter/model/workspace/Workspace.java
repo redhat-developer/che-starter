@@ -25,6 +25,7 @@ public class Workspace {
     private WorkspaceRuntime runtime;
     private WorkspaceConfig config;
     private List<WorkspaceLink> links;
+    private List<WorkspaceFileToOpen> filesToOpen;
 
     public String getId() {
         return id;
@@ -36,6 +37,10 @@ public class Workspace {
 
     public String getStatus() {
         return status;
+    }
+
+    public List<WorkspaceFileToOpen> getFilesToOpen() {
+        return filesToOpen;
     }
 
     public void setStatus(String status) {
@@ -66,4 +71,7 @@ public class Workspace {
         this.runtime = runtime;
     }
 
+    public void setFilesToOpen(List<WorkspaceFileToOpen> filesToOpen) {
+        this.filesToOpen = filesToOpen;
+    }
 }
