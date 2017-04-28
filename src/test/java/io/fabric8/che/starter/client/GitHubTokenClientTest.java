@@ -30,14 +30,13 @@ public class GitHubTokenClientTest extends TestConfig {
     private static final String GIT_HUB_TOKEN = "GIT_HUB_TOKEN";
     private static final String KEYCLOAK_TOKEN = null;
 
-
     @Value("${che.server.url}")
     String cheServerURL;
 
     @Autowired
     private GitHubClient client;
 
-    @Test(expected = GitHubOAthTokenException.class)
+    @Test
     public void setGitHubToken() throws GitHubOAthTokenException, IOException {
         client.setGitHubOAuthToken(cheServerURL, GIT_HUB_TOKEN, KEYCLOAK_TOKEN);
     }
