@@ -49,7 +49,6 @@ import io.fabric8.che.starter.exception.StackNotFoundException;
 import io.fabric8.che.starter.exception.WorkspaceNotFound;
 import io.fabric8.che.starter.model.request.WorkspaceCreateParams;
 import io.fabric8.che.starter.model.workspace.Workspace;
-import io.fabric8.che.starter.model.workspace.WorkspaceLink;
 import io.fabric8.che.starter.openshift.OpenShiftClientWrapper;
 import io.fabric8.che.starter.util.ProjectHelper;
 import io.fabric8.che.starter.util.WorkspaceHelper;
@@ -202,8 +201,11 @@ public class WorkspaceController {
         Workspace workspace = null;
 
         String workspaceName = params.getWorkspaceName();
-        if (!StringUtils.isBlank(workspaceName)) {
+        if (StringUtils.isNotBlank(workspaceName)) {
             workspace = workspaceClient.startWorkspace(cheServerURL, workspaceName, keycloakToken);
+            if (StringUtils.isNotBlank(gitHubOAuthToken)) {
+                tokenClient.setGitHubOAuthToken(cheServerURL, gitHubOAuthToken, keycloakToken);
+            }
             return workspace;
         }
 

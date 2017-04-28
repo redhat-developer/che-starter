@@ -24,6 +24,7 @@ public enum CheRestEndpoints {
     CREATE_PROJECT      ("/project/batch"),
     DELETE_PROJECT      ("/project/{id}"),
     SET_OAUTH_TOKEN     ("/wsmaster/api/oauth/token?oauth_provider={provider}"),
+    GET_PREFERENCES     ("/wsmaster/api/preferences"),
     UPDATE_PREFERENCES  ("/wsmaster/api/preferences");
 
     private final String endpoint;

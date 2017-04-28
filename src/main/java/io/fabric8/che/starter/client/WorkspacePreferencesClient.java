@@ -19,12 +19,13 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import io.fabric8.che.starter.client.keycloak.KeycloakRestTemplate;
 import io.fabric8.che.starter.model.GitHubUserInfo;
-import io.fabric8.che.starter.model.WorspacePreferences;
+import io.fabric8.che.starter.model.WorkspacePreferences;
 
 @Component
 public class WorkspacePreferencesClient {
@@ -35,23 +36,38 @@ public class WorkspacePreferencesClient {
 
     public void setCommitterInfo(final String cheServerUrl, final String gitHubToken, final String keycloakToken) {
         GitHubUserInfo userInfo = client.getUserInfo(gitHubToken);
-        WorspacePreferences preferences = getPreferences(userInfo);
+        WorkspacePreferences preferences = getPreferences(userInfo);
+        setCommiterInfo(cheServerUrl, keycloakToken, preferences);
+    }
 
+    public void setCommiterInfo(final String cheServerUrl, final String keycloakToken, final WorkspacePreferences preferences) {
         RestTemplate template = new KeycloakRestTemplate(keycloakToken);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<WorspacePreferences> entity = new HttpEntity<WorspacePreferences>(preferences, headers);
+        HttpEntity<WorkspacePreferences> entity = new HttpEntity<WorkspacePreferences>(preferences, headers);
         template.exchange(CheRestEndpoints.UPDATE_PREFERENCES.generateUrl(cheServerUrl), HttpMethod.PUT, entity, String.class);
     }
 
-    private WorspacePreferences getPreferences(final GitHubUserInfo userInfo) {
+    public WorkspacePreferences getCommitterInfo(final String cheServerUrl, final String keycloakToken) {
+        RestTemplate template = new KeycloakRestTemplate(keycloakToken);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> entity = new HttpEntity<String>(headers);
+
+        ResponseEntity<WorkspacePreferences> response = template.exchange(
+                CheRestEndpoints.GET_PREFERENCES.generateUrl(cheServerUrl), HttpMethod.GET, entity,
+                WorkspacePreferences.class);
+        return response.getBody();
+    }
+
+    private WorkspacePreferences getPreferences(final GitHubUserInfo userInfo) {
         String name = userInfo.getName();
         String email = userInfo.getEmail();
 
         LOG.info("Committer name: {}", name);
         LOG.info("Committer email: {}", email);
 
-        WorspacePreferences preferences = new WorspacePreferences();
+        WorkspacePreferences preferences = new WorkspacePreferences();
         preferences.setCommitterName(name);
         preferences.setCommitterEmail(email);
         return preferences;
