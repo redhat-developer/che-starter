@@ -15,8 +15,8 @@ package io.fabric8.che.starter.controller;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,7 +39,7 @@ import io.swagger.annotations.ApiParam;
 @CrossOrigin
 @RestController
 public class StackController {
-    private static final Logger LOG = LogManager.getLogger(StackController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StackController.class);
 
     @Autowired
     private StackClient stackClient;

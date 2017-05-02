@@ -18,8 +18,8 @@ import java.net.URL;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -27,7 +27,7 @@ import io.fabric8.che.starter.util.Reader;
 
 @Component
 public class CheServerTemplate {
-    private static final Logger LOG = LogManager.getLogger(CheServerTemplate.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CheServerTemplate.class);
 
     private String template;
 

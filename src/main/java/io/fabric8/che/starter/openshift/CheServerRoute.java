@@ -12,8 +12,8 @@
  */
 package io.fabric8.che.starter.openshift;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -24,7 +24,7 @@ import io.fabric8.openshift.client.OpenShiftClient;
 
 @Component
 public final class CheServerRoute {
-    private static final Logger LOG = LogManager.getLogger(CheServerRoute.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CheServerRoute.class);
     private final String HTTP = "http";
     private final String HTTPS = "https";
 

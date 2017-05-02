@@ -14,8 +14,8 @@ package io.fabric8.che.starter.client;
 
 import java.io.IOException;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -32,8 +32,8 @@ import io.fabric8.che.starter.model.Token;
 
 @Component
 public class GitHubClient {
-    private static final Logger LOG = LogManager.getLogger(GitHubClient.class);
-    
+    private static final Logger LOG = LoggerFactory.getLogger(GitHubClient.class);
+
     @Value("${GITHUB_USER_URL:https://api.github.com/user}")
     private String GIT_HUB_USER_ENDPOINT;
 

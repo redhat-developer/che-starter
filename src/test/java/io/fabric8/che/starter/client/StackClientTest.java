@@ -18,9 +18,9 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -30,7 +30,7 @@ import io.fabric8.che.starter.model.stack.Stack;
 import io.fabric8.che.starter.model.stack.StackProjectMapping;
 
 public class StackClientTest extends TestConfig {
-    private static final Logger LOG = LogManager.getLogger(StackClientTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StackClientTest.class);
     private static final String VERTX_STACK_ID = "vert.x";
     private static final String NON_EXISTING_STACK_ID = "non-existing-stack-id";
     private static final String KEYCLOAK_TOKEN = null;

@@ -44,7 +44,7 @@ public enum CheRestEndpoints {
     public String generateUrl(String cheServerUrl, String id) {
         return cheServerUrl + endpoint.replace("{id}", id);
     }
-    
+
     @Override
     public String toString() {
         return endpoint;

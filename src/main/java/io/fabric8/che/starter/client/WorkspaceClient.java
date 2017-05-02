@@ -15,8 +15,8 @@ package io.fabric8.che.starter.client;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -39,8 +39,7 @@ import io.fabric8.che.starter.util.WorkspaceHelper;
 
 @Component
 public class WorkspaceClient {
-
-    private static final Logger LOG = LogManager.getLogger(WorkspaceClient.class);
+    private static final Logger LOG = LoggerFactory.getLogger(WorkspaceClient.class);
 
     @Value("${che.workspace.start.timeout}")
     private long workspaceStartTimeout;
