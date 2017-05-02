@@ -16,8 +16,8 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +33,7 @@ import io.fabric8.che.starter.util.UrlHelper;
 
 @Component
 public class KeycloakClient {
-    private static final Logger LOG = LogManager.getLogger(KeycloakClient.class);
+    private static final Logger LOG = LoggerFactory.getLogger(KeycloakClient.class);
     private static final String ACCESS_TOKEN = "access_token";
 
     @Value("${OSO_ADMIN_TOKEN:#{null}}")

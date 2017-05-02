@@ -12,8 +12,8 @@
  */
 package io.fabric8.che.starter.client;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -29,7 +29,7 @@ import io.fabric8.che.starter.model.WorkspacePreferences;
 
 @Component
 public class WorkspacePreferencesClient {
-    private static final Logger LOG = LogManager.getLogger(WorkspacePreferencesClient.class);
+    private static final Logger LOG = LoggerFactory.getLogger(WorkspacePreferencesClient.class);
 
     @Autowired
     GitHubClient client;

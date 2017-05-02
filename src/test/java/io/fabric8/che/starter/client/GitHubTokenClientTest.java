@@ -14,10 +14,10 @@ package io.fabric8.che.starter.client;
 
 import java.io.IOException;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -26,7 +26,7 @@ import io.fabric8.che.starter.exception.GitHubOAthTokenException;
 import io.fabric8.che.starter.model.GitHubUserInfo;
 
 public class GitHubTokenClientTest extends TestConfig {
-    private static final Logger LOG = LogManager.getLogger(GitHubTokenClientTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GitHubTokenClientTest.class);
     private static final String GIT_HUB_TOKEN = "GIT_HUB_TOKEN";
     private static final String KEYCLOAK_TOKEN = null;
 

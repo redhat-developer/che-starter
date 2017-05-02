@@ -16,10 +16,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -29,7 +29,7 @@ import io.fabric8.che.starter.exception.WorkspaceNotFound;
 import io.fabric8.che.starter.model.workspace.Workspace;
 
 public class WorkspaceClientTest extends TestConfig {
-    private static final Logger LOG = LogManager.getLogger(WorkspaceClientTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(WorkspaceClientTest.class);
     private static final String GITHUB_REPO = "https://github.com/che-samples/console-java-simple";
     private static final String BRANCH = "master";
     private static final String STACK_ID = "java-default";

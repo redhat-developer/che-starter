@@ -12,8 +12,8 @@
  */
 package io.fabric8.che.starter.controller;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,7 +33,7 @@ import io.swagger.annotations.ApiParam;
 @CrossOrigin
 @RestController
 public class CheServerController {
-    private static final Logger LOG = LogManager.getLogger(CheServerController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CheServerController.class);
 
     @Autowired
     CheServerTemplate template;

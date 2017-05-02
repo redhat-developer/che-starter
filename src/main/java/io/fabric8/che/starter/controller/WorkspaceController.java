@@ -19,8 +19,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -58,7 +58,7 @@ import io.swagger.annotations.ApiParam;
 @CrossOrigin
 @RestController
 public class WorkspaceController {
-    private static final Logger LOG = LogManager.getLogger(WorkspaceController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(WorkspaceController.class);
 
     @Autowired
     OpenShiftClientWrapper openShiftClientWrapper;

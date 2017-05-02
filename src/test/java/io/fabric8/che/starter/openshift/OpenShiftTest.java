@@ -16,10 +16,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -38,7 +38,7 @@ import io.fabric8.openshift.client.ParameterValue;
 import io.fabric8.openshift.client.dsl.ClientTemplateResource;
 
 public class OpenShiftTest extends TestConfig {
-    private static final Logger LOG = LogManager.getLogger(OpenShiftTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(OpenShiftTest.class);
     private static final String CHE_OPENSHIFT_ENDPOINT = "CHE_OPENSHIFT_ENDPOINT";
 
     @Autowired
