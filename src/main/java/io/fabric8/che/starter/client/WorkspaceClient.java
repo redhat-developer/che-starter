@@ -13,7 +13,6 @@
 package io.fabric8.che.starter.client;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -42,8 +41,6 @@ import io.fabric8.che.starter.openshift.OpenShiftClientWrapper;
 import io.fabric8.che.starter.util.WorkspaceHelper;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodList;
-import io.fabric8.kubernetes.api.model.extensions.Deployment;
-import io.fabric8.kubernetes.api.model.extensions.DeploymentList;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import io.fabric8.kubernetes.client.Watch;
 import io.fabric8.kubernetes.client.Watcher;
@@ -65,15 +62,15 @@ public class WorkspaceClient {
 
     @Autowired
     private StackClient stackClient;
-    
+
     @Autowired
     OpenShiftClientWrapper openshiftClientWrapper;
-    
+
     @Value("${che.openshift.start.timeout}")
-    private String startTimeout;    
-    
+    private String startTimeout;
+
     @Value("${che.openshift.deploymentconfig}")
-    private String deploymentConfigName;        
+    private String deploymentConfigName;
 
     public void waitUntilWorkspaceIsRunning(String cheServerURL, Workspace workspace, String keycloakToken) {
         WorkspaceStatus status = getWorkspaceStatus(cheServerURL, workspace.getId(), keycloakToken);
@@ -109,14 +106,13 @@ public class WorkspaceClient {
         try (OpenShiftClient client = openshiftClientWrapper.get(masterUrl, openShiftToken)) {
             String resourceName = "che-ws-" + workspace.getId().replace("workspace", "");
             FilterWatchListDeletable<Pod, PodList, Boolean, Watch, Watcher<Pod>> pods = client.pods().inNamespace(namespace).withLabel("deployment", resourceName);
-            
+
             final CountDownLatch podCount = new CountDownLatch(pods.list().getItems().size());
-            final List<Pod> podsToDelete = pods.list().getItems();
-            
+
             pods.watch(new Watcher<Pod>() {
                 @Override
                 public void eventReceived(Action action, Pod pod) {
-                    try {                    
+                    try {
                         switch (action) {
                             case ADDED:
                             case MODIFIED:
@@ -131,20 +127,20 @@ public class WorkspaceClient {
                         LOG.error("Failed to process {} on Pod {}. Error: ",  action,  pod,  ex);
                     }
                 }
-                
+
                 @Override
                 public void onClose(KubernetesClientException ex) {}
             });
-            
+
             WorkspaceStatus status = getWorkspaceStatus(cheServerURL, workspace.getId(), keycloakToken);
             long currentTime = System.currentTimeMillis();
-    
+
             // Poll the Che server until it returns a status of 'STOPPED' for the workspace
             while (!WorkspaceState.STOPPED.toString().equals(status.getWorkspaceStatus())
                     && System.currentTimeMillis() < (currentTime + workspaceStopTimeout)) {
                 try {
                     Thread.sleep(1000);
-                    LOG.info("Polling Che server for workspace [{}] status...", workspace.getConfig().getName());
+                    LOG.info("Polling Che server for workspace '{}' status...", workspace.getConfig().getName());
                 } catch (InterruptedException e) {
                     LOG.error("Error while polling for workspace status", e);
                     break;
@@ -153,14 +149,14 @@ public class WorkspaceClient {
             }
 
             currentTime = System.currentTimeMillis();
-            
+
             try {
-                LOG.info("Waiting for all pods to be deleted for workspace [{}]", workspace.getConfig().getName());
+                LOG.info("Waiting for all pods to be deleted for workspace '{}'", workspace.getConfig().getName());
                 podCount.await(workspaceStopTimeout, TimeUnit.MILLISECONDS);
             } catch (InterruptedException ex) {
                 LOG.error("Exception while waiting for pods to be deleted", ex);
             }
-        }        
+        }
     }
 
     public List<Workspace> listWorkspaces(String cheServerUrl, String keycloakToken) {
@@ -334,7 +330,7 @@ public class WorkspaceClient {
      * Stops a running workspace.
      */
     public void stopWorkspace(String cheServerURL, Workspace workspace, String keycloakToken) {
-            LOG.info("Stopping workspace [{}]", workspace.getId());        
+            LOG.info("Stopping workspace {}", workspace.getId());        
             String url = CheRestEndpoints.STOP_WORKSPACE.generateUrl(cheServerURL, workspace.getId());
             RestTemplate template = new KeycloakRestTemplate(keycloakToken);
             template.delete(url);

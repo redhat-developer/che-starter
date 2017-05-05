@@ -24,7 +24,7 @@ public class KeycloakTokenValidator {
             throw new InvalidKeycloakTokenFormatException("Keycloak token must have 'Bearer ' prefix");
         }
     }
-    
+
     private static boolean isValid(final String keycloakToken) {
         return (StringUtils.isNotBlank(keycloakToken) && keycloakToken.startsWith(BEARER_PREFIX));
     }
