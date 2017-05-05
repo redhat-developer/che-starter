@@ -134,7 +134,7 @@ public class WorkspaceController {
         return createWorkspace(masterUrl, namespace, openShiftToken, null, null, params);
     }
 
-    @ApiOperation(value = "Delete an existing workspace.")
+    @ApiOperation(value = "Delete an existing workspace")
     @DeleteMapping("/workspace/{name}")
     public void deleteExistingWorkspace(@PathVariable String name, @RequestParam String masterUrl,
             @RequestParam String namespace,
@@ -146,7 +146,7 @@ public class WorkspaceController {
         deleteWorkspace(masterUrl, namespace, openShiftToken, name, keycloakToken);
     }
 
-    @ApiOperation(value = "Delete an existing workspace.")
+    @ApiOperation(value = "Delete an existing workspace")
     @DeleteMapping("/workspace/oso/{name}")
     public void deleteExistingWorkspaceOnOpenShift(@PathVariable String name, @RequestParam String masterUrl,
             @RequestParam String namespace,
