@@ -27,22 +27,25 @@ if [ $? -eq 0 ]; then
 
   export PROJECT_VERSION=`mvn -o help:evaluate -Dexpression=project.version | grep -e '^[[:digit:]]'`
 
-  docker build -t rhche/che-starter:nightly .
+  docker build -t rhche/che-starter:latest .
 
   if [ $? -ne 0 ]; then
     echo 'Docker Build Failed!'
     exit 2
   fi
 
-  docker login -u rhchebot -p $RHCHEBOT_DOCKER_HUB_PASSWORD -e noreply@redhat.com
-  docker push rhche/che-starter:nightly
-
   TAG=$(echo $GIT_COMMIT | cut -c1-6)
 
-  docker tag rhche/che-starter:nightly registry.devshift.net/almighty/che-starter:$TAG
+  docker login -u rhchebot -p $RHCHEBOT_DOCKER_HUB_PASSWORD -e noreply@redhat.com
+
+  docker tag rhche/che-starter:latest rhche/che-starter:$TAG
+  docker push rhche/che-starter:latest
+  docker push rhche/che-starter:$TAG
+
+  docker tag rhche/che-starter:latest registry.devshift.net/almighty/che-starter:$TAG
   docker push registry.devshift.net/almighty/che-starter:$TAG
 
-  docker tag rhche/che-starter:nightly registry.devshift.net/almighty/che-starter:latest
+  docker tag rhche/che-starter:latest registry.devshift.net/almighty/che-starter:latest
   docker push registry.devshift.net/almighty/che-starter:latest
 
 else
