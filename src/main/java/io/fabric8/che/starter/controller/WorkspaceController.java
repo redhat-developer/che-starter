@@ -216,7 +216,6 @@ public class WorkspaceController {
         projectClient.createProject(cheServerURL, workspace, projectName, params.getRepo(), 
                 params.getBranch(), params.getStackId(), masterUrl, namespace, openShiftToken, keycloakToken);
 
-
         return workspace;
     }
 
