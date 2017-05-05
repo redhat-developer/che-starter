@@ -79,7 +79,7 @@ public class WorkspaceClient {
                 && System.currentTimeMillis() < (currentTime + workspaceStartTimeout)) {
             try {
                 Thread.sleep(1000);
-                LOG.info("Polling workspace [{}] status...", workspace.getConfig().getName());
+                LOG.info("Polling workspace '{}' status...", workspace.getConfig().getName());
             } catch (InterruptedException e) {
                 LOG.error("Error while polling for workspace status", e);
                 break;
@@ -102,12 +102,16 @@ public class WorkspaceClient {
      */
     public void waitUntilWorkspaceIsStopped(String masterUrl, String namespace, String openShiftToken, 
             String cheServerURL, Workspace workspace, String keycloakToken) {
-        
+
         try (OpenShiftClient client = openshiftClientWrapper.get(masterUrl, openShiftToken)) {
             String resourceName = "che-ws-" + workspace.getId().replace("workspace", "");
+            LOG.info("Resource name {}", resourceName);
             FilterWatchListDeletable<Pod, PodList, Boolean, Watch, Watcher<Pod>> pods = client.pods().inNamespace(namespace).withLabel("deployment", resourceName);
 
-            final CountDownLatch podCount = new CountDownLatch(pods.list().getItems().size());
+            int numberOfPodsToStop = pods.list().getItems().size();
+            final CountDownLatch podCount = new CountDownLatch(numberOfPodsToStop);
+
+            LOG.info("Number of workspace pods to stop {}", numberOfPodsToStop);
 
             pods.watch(new Watcher<Pod>() {
                 @Override
@@ -119,7 +123,7 @@ public class WorkspaceClient {
                             case ERROR:
                                 break;
                             case DELETED:
-                                LOG.info("Pod {} deleted",  pod.getMetadata().getName());
+                                LOG.info("Pod {} deleted", pod.getMetadata().getName());
                                 podCount.countDown();
                                 break;
                         }
@@ -330,7 +334,7 @@ public class WorkspaceClient {
      * Stops a running workspace.
      */
     public void stopWorkspace(String cheServerURL, Workspace workspace, String keycloakToken) {
-            LOG.info("Stopping workspace {}", workspace.getId());        
+            LOG.info("Stopping workspace {}", workspace.getId());
             String url = CheRestEndpoints.STOP_WORKSPACE.generateUrl(cheServerURL, workspace.getId());
             RestTemplate template = new KeycloakRestTemplate(keycloakToken);
             template.delete(url);

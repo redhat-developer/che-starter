@@ -72,7 +72,7 @@ public class WorkspaceClientTest extends TestConfig {
         if (!workspaces.isEmpty()) {
             List<Workspace> runningWorkspaces = workspaces.stream().filter(w -> w.getStatus().equals("RUNNING"))
                     .collect(Collectors.toList());
-            if (!runningWorkspaces.isEmpty()) {                
+            if (!runningWorkspaces.isEmpty()) {
                 client.stopWorkspace(cheServerURL, runningWorkspaces.get(0), KEYCLOAK_TOKEN);
                 client.waitUntilWorkspaceIsStopped(MASTER_URL, NAMESPACE, OPENSHIFT_TOKEN, cheServerURL, runningWorkspaces.get(0), KEYCLOAK_TOKEN);        
             }
