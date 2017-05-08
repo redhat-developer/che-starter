@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -109,7 +110,7 @@ public class WorkspaceController {
         return listWorkspaces(masterUrl, namespace, openShiftToken, repository, requestURL, null);
     }
 
-    @ApiOperation(value = "Create and start a new workspace. Stop all other workspaces (only one workspace can be running at a time). If a workspace with the imported project already exists, just start it")
+    @ApiOperation(value = "Create and start a new workspace. Stop all other workspaces (only one workspace can be running at a time)")
     @PostMapping("/workspace")
     public Workspace create(@RequestParam String masterUrl, @RequestParam String namespace,
             @RequestBody WorkspaceCreateParams params,
@@ -123,7 +124,7 @@ public class WorkspaceController {
         return createWorkspace(masterUrl, namespace, openShiftToken, gitHubOAuthToken, keycloakToken, params);
     }
 
-    @ApiOperation(value = "Create and start a new workspace. Stop all other workspaces (only one workspace can be running at a time). If a workspace with the imported project already exists, just start it")
+    @ApiOperation(value = "Create and start a new workspace. Stop all other workspaces (only one workspace can be running at a time)")
     @PostMapping("/workspace/oso")
     public Workspace createOnOpenShift(@RequestParam String masterUrl, @RequestParam String namespace,
             @RequestBody WorkspaceCreateParams params,
@@ -132,6 +133,39 @@ public class WorkspaceController {
             GitHubOAthTokenException, ProjectCreationException, WorkspaceNotFound {
 
         return createWorkspace(masterUrl, namespace, openShiftToken, null, null, params);
+    }
+
+    @ApiOperation(value = "Start an existing workspace. Stop all other workspaces (only one workspace can be running at a time)")
+    @PatchMapping("/workspace/{name}")
+    public Workspace startExisting(@PathVariable String name, @RequestParam String masterUrl,
+            @RequestParam String namespace,
+            @ApiParam(value = "Keycloak token", required = true) @RequestHeader("Authorization") String keycloakToken)
+            throws IOException, URISyntaxException, RouteNotFoundException, StackNotFoundException,
+            GitHubOAthTokenException, ProjectCreationException, KeycloakException, WorkspaceNotFound {
+
+        KeycloakTokenValidator.validate(keycloakToken);
+
+        String openShiftToken = keycloakClient.getOpenShiftToken(keycloakToken);
+        String gitHubOAuthToken = keycloakClient.getGitHubToken(keycloakToken);
+        String cheServerURL = openShiftClientWrapper.getCheServerUrl(masterUrl, namespace, openShiftToken);
+
+        Workspace workspace = workspaceClient.startWorkspace(cheServerURL, name, masterUrl, namespace, openShiftToken, keycloakToken);
+        if (StringUtils.isNotBlank(gitHubOAuthToken)) {
+            tokenClient.setGitHubOAuthToken(cheServerURL, gitHubOAuthToken, keycloakToken);
+        }
+        return workspace;
+    }
+
+    @ApiOperation(value = "Start an existing workspace. Stop all other workspaces (only one workspace can be running at a time)")
+    @PatchMapping("/workspace/oso/{name}")
+    public Workspace startExistingOnOpenShift(@PathVariable String name, @RequestParam String masterUrl,
+            @RequestParam String namespace,
+            @ApiParam(value = "OpenShift token", required = true) @RequestHeader("Authorization") String openShiftToken)
+            throws IOException, URISyntaxException, RouteNotFoundException, StackNotFoundException,
+            GitHubOAthTokenException, ProjectCreationException, WorkspaceNotFound {
+
+        String cheServerURL = openShiftClientWrapper.getCheServerUrl(masterUrl, namespace, openShiftToken);
+        return workspaceClient.startWorkspace(cheServerURL, name, masterUrl, namespace, openShiftToken, null);
     }
 
     @ApiOperation(value = "Delete an existing workspace")
@@ -199,18 +233,7 @@ public class WorkspaceController {
             GitHubOAthTokenException, ProjectCreationException, WorkspaceNotFound {
 
         String cheServerURL = openShiftClientWrapper.getCheServerUrl(masterUrl, namespace, openShiftToken);
-        Workspace workspace = null;
-
-        String workspaceName = params.getWorkspaceName();
-        if (StringUtils.isNotBlank(workspaceName)) {
-            workspace = workspaceClient.startWorkspace(cheServerURL, workspaceName, masterUrl, namespace, openShiftToken, keycloakToken);
-            if (StringUtils.isNotBlank(gitHubOAuthToken)) {
-                tokenClient.setGitHubOAuthToken(cheServerURL, gitHubOAuthToken, keycloakToken);
-            }
-            return workspace;
-        }
-
-        workspace = createWorkspaceFromParams(cheServerURL, keycloakToken, gitHubOAuthToken, params);
+        Workspace workspace = createWorkspaceFromParams(cheServerURL, keycloakToken, gitHubOAuthToken, params);
 
         String projectName = projectHelper.getProjectNameFromGitRepository(params.getRepo());
         projectClient.createProject(cheServerURL, workspace, projectName, params.getRepo(), 
