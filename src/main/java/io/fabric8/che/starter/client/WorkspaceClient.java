@@ -257,7 +257,7 @@ public class WorkspaceClient {
      * @return started workspace
      * @throws WorkspaceNotFound
      */
-    public Workspace startWorkspace(String cheServerURL, String workspaceName, String masterUrl, String namespace, 
+    public Workspace startWorkspace(String cheServerURL, String workspaceName, String masterUrl, String namespace,
             String openShiftToken, String keycloakToken) throws WorkspaceNotFound {
         List<Workspace> workspaces = listWorkspaces(cheServerURL, keycloakToken);
 
