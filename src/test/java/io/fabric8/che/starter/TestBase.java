@@ -32,7 +32,7 @@ public class TestBase {
     protected static final String WORKSPACE_DESCRIPTION = "https://github.com/mlabuda/vertx-with-che.git#master#WI13";
     protected static final String PROJECT_ID = "/vertx-with-che";
     protected static final String WORKSPACE_STACK_ID = "vert.x";
-    protected static final String WORKSPACE_NAME = "chevertxwsid13";
+    protected static final String WORKSPACE_NAME = "vertxworkspace";
 
     public String getCreateWorkspaceRequestBody(WorkspaceCreateParams workspaceParams) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
