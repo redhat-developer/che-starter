@@ -19,9 +19,9 @@ import org.junit.Test;
 
 public class UrlHelperTest {
     private static final String TOKEN = "kjhKJhLKJHSLKJDHDSKJAHLKAHSdshjs";
-    private static final String RESPONSE_BODY = "access_token=" + TOKEN + "&scope=scope";
-    private static final String ACCESS_TOKEN = "access_token";
     private static final String SCOPE = "scope";
+    private static final String RESPONSE_BODY = "access_token=" + TOKEN + "&scope=" + SCOPE;
+    private static final String ACCESS_TOKEN = "access_token";
 
     @Test
     public void processQuery() {
