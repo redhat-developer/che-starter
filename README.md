@@ -1,3 +1,7 @@
+
+[![Build Status](https://ci.centos.org/buildStatus/icon?job=devtools-che-starter-build-che-credentials-master)](https://ci.centos.org/job/devtools-che-starter-build-che-credentials-master)
+
+
 che-starter
 ===========
 
