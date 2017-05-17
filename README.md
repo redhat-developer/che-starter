@@ -68,9 +68,7 @@ CI Jobs
 -------
 1. https://ci.centos.org/job/devtools-che-starter/
 
-2. https://ci.centos.org/job/devtools-che-starter-build-master/
-
-3. https://ci.centos.org/job/devtools-che-starter-build-che-credentials-master/
+2. https://ci.centos.org/job/devtools-che-starter-build-che-credentials-master/
 
 On success, the second job will push the che-starter image to [Docker Hub](https://hub.docker.com/r/rhche/che-starter/). Another copy is pushed to the local CentOS CI registry. The CentOS CI Registry hosted image can then be used by other components in the CentOS CI services, either as triggers or as a point of integration.
 
