@@ -16,14 +16,14 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CheServerInfo {
-    private String url;
+    private boolean isRunning;
 
-    public String getUrl() {
-        return url;
+    public boolean isRunning() {
+        return isRunning;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setRunning(boolean isRunning) {
+        this.isRunning = isRunning;
     }
 
 }

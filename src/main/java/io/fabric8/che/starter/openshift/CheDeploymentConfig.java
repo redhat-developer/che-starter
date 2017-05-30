@@ -46,6 +46,22 @@ public final class CheDeploymentConfig {
         }
     }
 
+    public boolean isDeploymentAvailable(OpenShiftClient client, String namespace) {
+        DeploymentConfig deploymentConfig = getDeploymentConfig(client, namespace).get();
+        if (deploymentConfig == null) {
+            return false;
+        }
+        List<DeploymentCondition> conditions = deploymentConfig.getStatus().getConditions();
+        if (!conditions.isEmpty()) {
+            for (DeploymentCondition condition : conditions) {
+                if (condition.getType().equals("Available") && condition.getStatus().equals("True")) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     private ClientDeployableScalableResource<DeploymentConfig, DoneableDeploymentConfig> getDeploymentConfig(
             OpenShiftClient client, String namespace) {
         return client.deploymentConfigs().inNamespace(namespace).withName(deploymentConfigName);
@@ -94,22 +110,6 @@ public final class CheDeploymentConfig {
             }
             executor.shutdown();
         }
-    }
-
-    private boolean isDeploymentAvailable(OpenShiftClient client, String namespace) {
-        DeploymentConfig deploymentConfig = getDeploymentConfig(client, namespace).get();
-        if (deploymentConfig == null) {
-            return false;
-        }
-        List<DeploymentCondition> conditions = deploymentConfig.getStatus().getConditions();
-        if (!conditions.isEmpty()) {
-            for (DeploymentCondition condition : conditions) {
-                if (condition.getType().equals("Available") && condition.getStatus().equals("True")) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     private boolean waitUntilReady(BlockingQueue<Object> queue) {
