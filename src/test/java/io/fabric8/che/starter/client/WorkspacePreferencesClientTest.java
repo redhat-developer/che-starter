@@ -15,6 +15,7 @@ package io.fabric8.che.starter.client;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import io.fabric8.che.starter.TestConfig;
 import io.fabric8.che.starter.model.WorkspacePreferences;
 
+@Ignore("Ignored due to https://github.com/redhat-developer/che-starter/issues/185")
 public class WorkspacePreferencesClientTest extends TestConfig {
     private static final String KEYCLOAK_TOKEN = null;
     private static final String COMMITTER_NAME = "Ilya Buziuk";

@@ -18,6 +18,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +30,7 @@ import io.fabric8.che.starter.exception.StackNotFoundException;
 import io.fabric8.che.starter.model.stack.Stack;
 import io.fabric8.che.starter.model.stack.StackProjectMapping;
 
+@Ignore("Ignored due to https://github.com/redhat-developer/che-starter/issues/185")
 public class StackClientTest extends TestConfig {
     private static final Logger LOG = LoggerFactory.getLogger(StackClientTest.class);
     private static final String VERTX_STACK_ID = "vert.x";
