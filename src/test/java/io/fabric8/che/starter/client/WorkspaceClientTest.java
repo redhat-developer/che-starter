@@ -28,6 +28,7 @@ import io.fabric8.che.starter.exception.StackNotFoundException;
 import io.fabric8.che.starter.exception.WorkspaceNotFound;
 import io.fabric8.che.starter.model.workspace.Workspace;
 
+@Ignore("Ignored due to https://github.com/redhat-developer/che-starter/issues/185")
 public class WorkspaceClientTest extends TestConfig {
     private static final Logger LOG = LoggerFactory.getLogger(WorkspaceClientTest.class);
     private static final String GITHUB_REPO = "https://github.com/che-samples/console-java-simple";
