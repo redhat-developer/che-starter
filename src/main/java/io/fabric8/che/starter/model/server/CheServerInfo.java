@@ -10,13 +10,16 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package io.fabric8.che.starter.model.response;
+package io.fabric8.che.starter.model.server;
+
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CheServerInfo {
     private boolean isRunning;
+    private List<CheServerLink> links;
 
     public boolean isRunning() {
         return isRunning;
@@ -24,6 +27,14 @@ public class CheServerInfo {
 
     public void setRunning(boolean isRunning) {
         this.isRunning = isRunning;
+    }
+
+    public List<CheServerLink> getLinks() {
+        return links;
+    }
+
+    public void setLinks(List<CheServerLink> links) {
+        this.links = links;
     }
 
 }
