@@ -25,7 +25,6 @@ import io.fabric8.che.starter.TestConfig;
 import io.fabric8.che.starter.exception.GitHubOAthTokenException;
 import io.fabric8.che.starter.model.GitHubUserInfo;
 
-@Ignore("Ignored due to https://github.com/redhat-developer/che-starter/issues/185")
 public class GitHubTokenClientTest extends TestConfig {
     private static final Logger LOG = LoggerFactory.getLogger(GitHubTokenClientTest.class);
     private static final String GIT_HUB_TOKEN = "GIT_HUB_TOKEN";
