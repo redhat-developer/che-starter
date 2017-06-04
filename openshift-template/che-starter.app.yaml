@@ -70,6 +70,10 @@ objects:
                 configMapKeyRef:
                   name: che-starter
                   key: kubes.certs.ca.file
+            - name: ROUTER_DEFAULT_SERVER_TIMEOUT
+              value: 180s
+            - name: ROUTER_DEFAULT_CLIENT_TIMEOUT
+              value: 180s
             name: che-starter
             image: ${IMAGE}:${IMAGE_TAG}
             livenessProbe:
