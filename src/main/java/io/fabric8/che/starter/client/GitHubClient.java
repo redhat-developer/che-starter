@@ -47,7 +47,7 @@ public class GitHubClient {
      */
     public void setGitHubOAuthToken(final String cheServerURL, final String gitHubToken, final String keycloakToken)
             throws IOException, GitHubOAthTokenException {
-        String url = cheServerURL + CheRestEndpoints.SET_OAUTH_TOKEN.getEndpoint().replace("{provider}", "github");
+        String url = cheServerURL + CheRestEndpoints.SET_OAUTH_TOKEN_V1.getEndpoint().replace("{provider}", "github");
 
         Token token = new Token();
         token.setToken(gitHubToken);
@@ -60,8 +60,12 @@ public class GitHubClient {
         try {
             template.postForLocation(url, entity);
         } catch (Exception e) {
-            LOG.error("Error setting GitHub OAuth token on Che Server: {}", cheServerURL);
-            throw new GitHubOAthTokenException("Error setting GitHub OAuth token", e);
+            LOG.warn("Error setting GitHub OAuth token on Che Server: {}, trying new version of API", cheServerURL);
+            try {
+                setGitHubOAuthTokenVersion2(cheServerURL, template, entity);
+            } catch (Exception ex) {
+                throw new GitHubOAthTokenException("Error setting GitHub OAuth token", ex);
+            }
         }
     }
 
@@ -74,4 +78,10 @@ public class GitHubClient {
         ResponseEntity<GitHubUserInfo> response = template.exchange(GIT_HUB_USER_ENDPOINT, HttpMethod.GET, entity, GitHubUserInfo.class);
         return response.getBody();
     }
+
+    private void setGitHubOAuthTokenVersion2(String cheServerURL, RestTemplate template, HttpEntity<Token> entity) {
+        String url = cheServerURL + CheRestEndpoints.SET_OAUTH_TOKEN_V2.getEndpoint();
+        template.postForLocation(url, entity);
+    }
+
 }
