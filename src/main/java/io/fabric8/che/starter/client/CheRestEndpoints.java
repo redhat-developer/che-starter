@@ -23,7 +23,8 @@ public enum CheRestEndpoints {
     LIST_STACKS         ("/api/stack?maxItems=1000"),
     CREATE_PROJECT      ("/project/batch"),
     DELETE_PROJECT      ("/project/{id}"),
-    SET_OAUTH_TOKEN     ("/wsmaster/api/oauth/token?oauth_provider={provider}"),
+    SET_OAUTH_TOKEN_V1  ("/wsmaster/api/oauth/token?oauth_provider={provider}"),
+    SET_OAUTH_TOKEN_V2  ("/wsmaster/api/token/github"),
     GET_PREFERENCES     ("/wsmaster/api/preferences"),
     UPDATE_PREFERENCES  ("/wsmaster/api/preferences");
 
