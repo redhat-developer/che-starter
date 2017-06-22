@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.RestClientException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -278,15 +279,19 @@ public class WorkspaceController {
     public List<Workspace> listWorkspaces(final String masterURL, final String namespace, final String openShiftToken,
             final String repository, final String requestUrl, final String keycloakToken) throws RouteNotFoundException {
         String cheServerURL = openShiftClientWrapper.getCheServerUrl(masterURL, namespace, openShiftToken);
-
         List<Workspace> workspaces;
-        if (!StringUtils.isBlank(repository)) {
-            LOG.info("Fetching workspaces for repositoriy: {}", repository);
-            workspaces = workspaceClient.listWorkspacesPerRepository(cheServerURL, repository, keycloakToken);
-        } else {
-            workspaces = workspaceClient.listWorkspaces(cheServerURL, keycloakToken);
+        try {
+            if (!StringUtils.isBlank(repository)) {
+                LOG.info("Fetching workspaces for repositoriy: {}", repository);
+                workspaces = workspaceClient.listWorkspacesPerRepository(cheServerURL, repository, keycloakToken);
+            } else {
+                workspaces = workspaceClient.listWorkspaces(cheServerURL, keycloakToken);
+            }
+            workspaceHelper.addWorkspaceStartLink(workspaces, requestUrl);
+        } catch (RestClientException e) {
+            throw new RestClientException(
+                    "Error while getting the list of workspaces against che server route: " + cheServerURL, e);
         }
-        workspaceHelper.addWorkspaceStartLink(workspaces, requestUrl);
         return workspaces;
     }
 }
