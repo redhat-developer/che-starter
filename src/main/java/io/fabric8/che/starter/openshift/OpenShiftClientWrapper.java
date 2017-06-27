@@ -38,6 +38,9 @@ public class OpenShiftClientWrapper {
     @Value("${KUBERNETES_CERTS_CA_FILE:#{null}}")
     private String caCertFile;
 
+    @Value("${FABRIC8_PLATFORM_DEV_MODE:false}")
+    private boolean fabric8PlatformDevMode;
+
     /**
      * Gets OpenShift client. When using, you are responsible for closing it.
      * 
@@ -58,6 +61,11 @@ public class OpenShiftClientWrapper {
      * @return OpenShift client
      */
     public OpenShiftClient get(String masterUrl, String token) {
+        if (fabric8PlatformDevMode) {
+            LOG.info("Using default OpenShift Client for 'fabric8-platform' deployment on minishift");
+            return new DefaultOpenShiftClient();
+        }
+
         LOG.info("Certificate file: {}", caCertFile);
         Config config = (StringUtils.isBlank(caCertFile))
                 ? new ConfigBuilder().withMasterUrl(masterUrl).withOauthToken(token).build()
