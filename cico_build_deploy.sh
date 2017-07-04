@@ -34,7 +34,7 @@ if [ $? -eq 0 ]; then
     exit 2
   fi
 
-  TAG=$(echo $GIT_COMMIT | cut -c1-6)
+  TAG=$(echo $GIT_COMMIT | cut -c1-7)
 
   docker login -u rhchebot -p $RHCHEBOT_DOCKER_HUB_PASSWORD -e noreply@redhat.com
 
