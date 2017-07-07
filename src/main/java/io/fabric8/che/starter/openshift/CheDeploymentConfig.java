@@ -43,6 +43,7 @@ public final class CheDeploymentConfig {
         if (!isDeploymentAvailable(client, namespace)) {
             deploymentConfig.scale(1, false);
             waitUntilDeploymentConfigIsAvailable(client, namespace);
+            waitHAProxyConfigChange();
         }
     }
 
@@ -101,6 +102,7 @@ public final class CheDeploymentConfig {
                 poller.cancel(true);
             }
         }, Integer.valueOf(startTimeout), TimeUnit.MILLISECONDS);
+
         try {
             while (!waitUntilReady(queue)) {
             }
@@ -124,6 +126,26 @@ public final class CheDeploymentConfig {
             return false;
         } catch (InterruptedException ex) {
             return true;
+        }
+    }
+
+    /**
+     * 503 Service Unavailable is returned when che-server is idled and
+     * che-starter performs request against it. This might be coupled with the
+     * fact that HAProxy configuration needs to be changed and reloaded on
+     * OpenShift, which may take some time. This method is a hack - waiting 3
+     * seconds after che-server deployment is available before continuing
+     * request execution
+     * 
+     * @see <a href=
+     *      "https://github.com/redhat-developer/rh-che/issues/115">issue</a>
+     * @see <a href="https://youtu.be/xgLY3HCshZc">demo of the problem</a>
+     */
+    private void waitHAProxyConfigChange() {
+        try {
+            TimeUnit.SECONDS.sleep(3);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 }
