@@ -33,7 +33,7 @@ There are several ways for running the project:
     $ java -jar target/che-starter-1.0-SNAPSHOT.jar
 ````
 
-To tell it which application properties file to use (located in the src/main/resources directory) specify the spring.profiles.active parameter, like so:
+To tell it which application properties file to use (located in the `src/main/resources` directory) specify the `spring.profiles.active` parameter, like so:
 
 ```bash
     $ java -Dspring.profiles.active=local -jar target/che-starter-1.0-SNAPSHOT.jar 
@@ -50,7 +50,7 @@ docker run -p 10000:10000 -t rhche/che-starter
 
 Profiles
 --------
-There are two available profiles, local and test. To select which profile to use, add the -Dspring.profiles.active property to the command line:
+There are two available profiles, local and test. To select which profile to use, add the `-Dspring.profiles.active` property to the command line:
 
 ```bash
     $ java -Dspring.profiles.active=local -jar target/che-starter-1.0-SNAPSHOT.jar
@@ -96,7 +96,7 @@ Many of the services available via the Swagger interface require setting `master
 ````
 - Copy the URL excluding the path component, this will be used as the `masterUrl`. For example, a console address of https://192.168.42.64:8443/console/ would mean the masterUrl value is https://192.168.42.64:8443/.
 
-- The namespace is the project name in Openshift in which the Che server is deployed (e.g. "username-che").  Logging in as the developer user (described next) will list the user's projects.
+- The namespace is the project name in Openshift in which the Che server is deployed (e.g. `username-che`). Logging in as the developer user (described next) will list the user's projects.
 
 - In order to obtain the Authorization token use the following command:
 
