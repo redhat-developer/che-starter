@@ -43,6 +43,7 @@
         <licenseMavenPluginVersion>1.11</licenseMavenPluginVersion>
         <vertx.server.version>v1.4</vertx.server.version>
         <logstash.logback.encoder.version>4.9</logstash.logback.encoder.version>
+        <jjwt.version>0.7.0</jjwt.version>
     </properties>
 
     <dependencies>
@@ -103,6 +104,12 @@
             <groupId>io.fabric8</groupId>
             <artifactId>openshift-client</artifactId>
             <version>${io.fabric8.client.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>${jjwt.version}</version>
         </dependency>
 
         <dependency>
