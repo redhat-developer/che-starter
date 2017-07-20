@@ -28,8 +28,8 @@ public final class StackProjectMapping {
             put("java-centos", "maven").
             put("vert.x", "maven").
             put("spring-boot", "maven").
-            put("WildFly Swarm", "maven").
-            put("CentOS nodejs", "node-js").
+            put("wildfly-swarm", "maven").
+            put("nodejs4", "node-js").
             build();
 
     private StackProjectMapping() {

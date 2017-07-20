@@ -16,10 +16,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WorkspaceCommand {
-
     private String commandLine;
     private String name;
     private String type;
+    private WorkspaceCommandAttributes attributes;
 
     public String getCommandLine() {
         return commandLine;
@@ -43,6 +43,14 @@ public class WorkspaceCommand {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public WorkspaceCommandAttributes getAttributes() {
+        return attributes;
+    }
+
+    public void setAttributes(WorkspaceCommandAttributes attributes) {
+        this.attributes = attributes;
     }
 
 }
