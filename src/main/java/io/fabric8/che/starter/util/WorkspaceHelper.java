@@ -12,18 +12,28 @@
  */
 package io.fabric8.che.starter.util;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import io.fabric8.che.starter.model.project.Project;
 import io.fabric8.che.starter.model.workspace.Workspace;
+import io.fabric8.che.starter.model.workspace.WorkspaceFileToOpen;
 import io.fabric8.che.starter.model.workspace.WorkspaceLink;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Component
 public class WorkspaceHelper {
+
+    private static final Logger LOG = LogManager.getLogger(WorkspaceHelper.class);
+
     public static final String WORKSPACE_START_IDE_URL = "ide start url";
     public static final String WORKSPACE_IDE_URL = "ide url";
     public static final String HTTP_METHOD_PATCH = "PATCH";
@@ -58,6 +68,7 @@ public class WorkspaceHelper {
     public void addWorkspaceStartLink(final Workspace workspace, final String requestURL) {
         String workspaceId = workspace.getId();
         String href = generateHrefForWorkspaceStartLink(requestURL, workspaceId);
+        href = appendOpenFileAction(workspace, href);
 
         WorkspaceLink startingLink = new WorkspaceLink();
         startingLink.setHref(href);
@@ -65,6 +76,26 @@ public class WorkspaceHelper {
         startingLink.setRel(WORKSPACE_START_IDE_URL);
 
         workspace.getLinks().add(startingLink);
+    }
+
+    protected String appendOpenFileAction(final Workspace workspace, String href) {
+        try {
+            List<WorkspaceFileToOpen> filesToOpenList = workspace.getFilesToOpen();
+            if (filesToOpenList == null || filesToOpenList.size() <= 0) {
+                return href;
+            }
+
+            UriComponentsBuilder uribuilder = UriComponentsBuilder.fromUriString(href);
+            for (WorkspaceFileToOpen fileToOpen : filesToOpenList) {
+                uribuilder.queryParam("action", URLEncoder.encode("openFile:file=" + fileToOpen.getFilePath() + ";line="
+                                                                      + fileToOpen.getLine(), UTF_8.toString()));
+            }
+            return uribuilder.build().toUriString();
+
+        } catch (UnsupportedEncodingException e) {
+            LOG.error("couldn't encode openfiles actions url parameters with UTF-8 ... ignoring", e);
+        }
+        return href;
     }
 
     public WorkspaceLink getWorkspaceIdeLink(final Workspace workspace) {

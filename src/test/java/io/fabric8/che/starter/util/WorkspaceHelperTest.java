@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import io.fabric8.che.starter.TestConfig;
 import io.fabric8.che.starter.model.workspace.Workspace;
+import io.fabric8.che.starter.model.workspace.WorkspaceFileToOpen;
 import io.fabric8.che.starter.model.workspace.WorkspaceLink;
 
 public class WorkspaceHelperTest extends TestConfig {
@@ -49,6 +50,69 @@ public class WorkspaceHelperTest extends TestConfig {
         assertEquals(WorkspaceHelper.HTTP_METHOD_PATCH, workspaceLink.getMethod());
         assertEquals(WorkspaceHelper.WORKSPACE_START_IDE_URL, workspaceLink.getRel());
         assertEquals(REQUEST_URL + "/" + workspaceId, workspaceLink.getHref());
+    }
+
+    @Test
+    public void checkStartWorkspaceLinkWith1FileToOpen() {
+        // having that
+        Workspace workspace = new Workspace();
+        String workspaceId = workspaceHelper.generateId();
+        workspace.setId(workspaceId);
+        workspace.setLinks(new ArrayList<>());
+
+        List<WorkspaceFileToOpen> list = new ArrayList<WorkspaceFileToOpen>();
+        list.add(new WorkspaceFileToOpen().withFilePath("myProject/pom.xml")//
+                                          .withLine(50));
+        workspace.setFilesToOpen(list);
+
+        workspaceHelper.addWorkspaceStartLink(workspace, REQUEST_URL);
+
+        List<WorkspaceLink> links = workspace.getLinks();
+        assertEquals(links.size(), 1);
+
+        WorkspaceLink workspaceLink = links.get(0);
+
+        assertEquals(WorkspaceHelper.HTTP_METHOD_PATCH, workspaceLink.getMethod());
+        assertEquals(WorkspaceHelper.WORKSPACE_START_IDE_URL, workspaceLink.getRel());
+        assertEquals(//
+        REQUEST_URL + "/" //
+            + workspaceId //
+            + "?" //
+            + "action=openFile%3Afile%3DmyProject%2Fpom.xml%3Bline%3D50" //
+        , workspaceLink.getHref());
+    }
+
+    @Test
+    public void checkStartWorkspaceLinkWith2FilesToOpen() {
+        Workspace workspace = new Workspace();
+        String workspaceId = workspaceHelper.generateId();
+        workspace.setId(workspaceId);
+        workspace.setLinks(new ArrayList<>());
+
+        List<WorkspaceFileToOpen> list = new ArrayList<WorkspaceFileToOpen>();
+        list.add(new WorkspaceFileToOpen().withFilePath("myProject/pom.xml")//
+                                          .withLine(50));
+        list.add(new WorkspaceFileToOpen().withFilePath("myProject/package.json")//
+                                          .withLine(60));
+        workspace.setFilesToOpen(list);
+
+        workspaceHelper.addWorkspaceStartLink(workspace, REQUEST_URL);
+
+        List<WorkspaceLink> links = workspace.getLinks();
+        assertEquals(links.size(), 1);
+
+        WorkspaceLink workspaceLink = links.get(0);
+
+        assertEquals(WorkspaceHelper.HTTP_METHOD_PATCH, workspaceLink.getMethod());
+        assertEquals(WorkspaceHelper.WORKSPACE_START_IDE_URL, workspaceLink.getRel());
+        assertEquals(//
+        REQUEST_URL + "/" //
+            + workspaceId //
+            + "?" //
+            + "action=openFile%3Afile%3DmyProject%2Fpom.xml%3Bline%3D50" //
+            + "&" //
+            + "action=openFile%3Afile%3DmyProject%2Fpackage.json%3Bline%3D60"
+        , workspaceLink.getHref());
     }
 
 }
