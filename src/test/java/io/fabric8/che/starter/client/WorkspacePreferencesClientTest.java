@@ -15,6 +15,9 @@ package io.fabric8.che.starter.client;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import javax.annotation.PostConstruct;
+
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,14 +27,20 @@ import io.fabric8.che.starter.model.WorkspacePreferences;
 
 public class WorkspacePreferencesClientTest extends TestConfig {
     private static final String KEYCLOAK_TOKEN = null;
-    private static final String COMMITTER_NAME = "Ilya Buziuk";
-    private static final String COMMITTER_EMAIL = "ilyabuziuk@gmail.com";
+    private String committerName;
+    private String committerEmail;
 
     @Value("${che.server.url}")
     String cheServerUrl;
 
     @Autowired
     WorkspacePreferencesClient client;
+
+    @PostConstruct
+    public void init() {
+        this.committerName = generateCommitterName();
+        this.committerEmail = generateCommitterEmail();
+    }
 
     @Test
     public void setCommitterInfo() throws Exception {
@@ -43,15 +52,23 @@ public class WorkspacePreferencesClientTest extends TestConfig {
         WorkspacePreferences committerInfo = client.getCommitterInfo(cheServerUrl, KEYCLOAK_TOKEN);
 
         assertNotNull(committerInfo);
-        assertEquals(committerInfo.getCommiterName(), COMMITTER_NAME);
-        assertEquals(committerInfo.getCommiterEmail(), COMMITTER_EMAIL);
+        assertEquals(committerInfo.getCommiterName(), committerName);
+        assertEquals(committerInfo.getCommiterEmail(), committerEmail);
     }
 
     private WorkspacePreferences getTestPreferences() {
         WorkspacePreferences preferences = new WorkspacePreferences();
-        preferences.setCommitterName(COMMITTER_NAME);
-        preferences.setCommitterEmail(COMMITTER_EMAIL);
+        preferences.setCommitterName(committerName);
+        preferences.setCommitterEmail(committerEmail);
         return preferences;
+    }
+
+    private String generateCommitterEmail() {
+        return RandomStringUtils.random(10, true, true) + "@redhat.com";
+    }
+
+    private String generateCommitterName() {
+        return "John " + RandomStringUtils.random(10, true, true);
     }
 
 }
