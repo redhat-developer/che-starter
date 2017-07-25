@@ -32,15 +32,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import io.fabric8.che.starter.client.GitHubClient;
 import io.fabric8.che.starter.client.ProjectClient;
 import io.fabric8.che.starter.client.WorkspaceClient;
 import io.fabric8.che.starter.client.WorkspacePreferencesClient;
+import io.fabric8.che.starter.client.github.GitHubClient;
 import io.fabric8.che.starter.client.keycloak.KeycloakClient;
 import io.fabric8.che.starter.client.keycloak.KeycloakTokenValidator;
 import io.fabric8.che.starter.exception.GitHubOAthTokenException;
@@ -268,7 +267,7 @@ public class WorkspaceController {
             tokenClient.setGitHubOAuthToken(cheServerURL, githubToken, keycloakToken);
             try {
                 workspacePreferencesClient.setCommitterInfo(cheServerURL, githubToken, keycloakToken);
-            } catch (HttpServerErrorException e) {
+            } catch (Exception e) {
                 LOG.warn("Unable to set committer info in Che Git preferences");
             }
         }

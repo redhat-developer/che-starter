@@ -10,7 +10,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package io.fabric8.che.starter.client;
+package io.fabric8.che.starter.client.github;
 
 import java.io.IOException;
 
@@ -22,12 +22,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import io.fabric8.che.starter.TestConfig;
+import io.fabric8.che.starter.client.github.GitHubClient;
 import io.fabric8.che.starter.exception.GitHubOAthTokenException;
-import io.fabric8.che.starter.model.GitHubUserInfo;
+import io.fabric8.che.starter.model.github.GitHubEmail;
+import io.fabric8.che.starter.model.github.GitHubUserInfo;
 
 public class GitHubTokenClientTest extends TestConfig {
     private static final Logger LOG = LoggerFactory.getLogger(GitHubTokenClientTest.class);
-    private static final String GIT_HUB_TOKEN = "GIT_HUB_TOKEN";
+    private static final String GIT_HUB_TOKEN = "dummy_token";
     private static final String KEYCLOAK_TOKEN = null;
 
     @Value("${che.server.url}")
@@ -45,8 +47,16 @@ public class GitHubTokenClientTest extends TestConfig {
     @Test
     public void getUserInfo() {
         GitHubUserInfo userInfo = client.getUserInfo(GIT_HUB_TOKEN);
-        LOG.info(userInfo.getName());
-        LOG.info(userInfo.getEmail());
+        LOG.info("Committer Name {}", userInfo.getName());
+        LOG.info("Committer Email {}", userInfo.getEmail());
+    }
+
+    @Ignore("Valid GitHub token must be provided")
+    @Test
+    public void getPrimaryEmail() {
+        GitHubEmail primaryEmail = client.getPrimaryEmail(GIT_HUB_TOKEN);
+        String email = primaryEmail.getEmail();
+        LOG.info("Primary email {}", email);
     }
 
 }

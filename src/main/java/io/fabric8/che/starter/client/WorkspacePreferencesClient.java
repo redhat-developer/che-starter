@@ -23,9 +23,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import io.fabric8.che.starter.client.github.GitHubClient;
 import io.fabric8.che.starter.client.keycloak.KeycloakRestTemplate;
-import io.fabric8.che.starter.model.GitHubUserInfo;
 import io.fabric8.che.starter.model.WorkspacePreferences;
+import io.fabric8.che.starter.model.github.GitHubUserInfo;
 
 @Component
 public class WorkspacePreferencesClient {
