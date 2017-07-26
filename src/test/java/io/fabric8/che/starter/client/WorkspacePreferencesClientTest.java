@@ -24,11 +24,16 @@ import org.springframework.beans.factory.annotation.Value;
 
 import io.fabric8.che.starter.TestConfig;
 import io.fabric8.che.starter.model.WorkspacePreferences;
+import io.fabric8.che.starter.model.github.GitHubUserInfo;
 
 public class WorkspacePreferencesClientTest extends TestConfig {
     private static final String KEYCLOAK_TOKEN = null;
+    private static final String GITHUB_LOGIN = "johndoe";
+    private static final String GITHUB_EMAIL = "johndoe@gmail.com";
+
     private String committerName;
     private String committerEmail;
+    private GitHubUserInfo gitHubUserInfo;
 
     @Value("${che.server.url}")
     String cheServerUrl;
@@ -40,12 +45,28 @@ public class WorkspacePreferencesClientTest extends TestConfig {
     public void init() {
         this.committerName = generateCommitterName();
         this.committerEmail = generateCommitterEmail();
+
+        this.gitHubUserInfo = new GitHubUserInfo();
+        this.gitHubUserInfo.setEmail(GITHUB_EMAIL);
+        this.gitHubUserInfo.setLogin(GITHUB_LOGIN);
     }
 
     @Test
     public void setCommitterInfo() throws Exception {
         client.setCommiterInfo(cheServerUrl, KEYCLOAK_TOKEN, getTestPreferences());
         checkCommitterInfoSetCorrectly();
+    }
+
+    /**
+     * @see <a href=
+     *      "https://github.com/redhat-developer/che-starter/issues/205">
+     *      Need to use `login` as committer name if `name` is blank</a>
+     */
+    @Test
+    public void getCommitterInfoWhenNameIsBlank() {
+        WorkspacePreferences preferences = client.getPreferences(gitHubUserInfo);
+        assertEquals(GITHUB_EMAIL, preferences.getCommiterEmail());
+        assertEquals(GITHUB_LOGIN, preferences.getCommiterName());
     }
 
     private void checkCommitterInfoSetCorrectly() {

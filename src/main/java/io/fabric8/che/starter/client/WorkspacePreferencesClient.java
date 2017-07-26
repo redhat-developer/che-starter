@@ -12,6 +12,7 @@
  */
 package io.fabric8.che.starter.client;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,9 +62,15 @@ public class WorkspacePreferencesClient {
         return response.getBody();
     }
 
-    private WorkspacePreferences getPreferences(final GitHubUserInfo userInfo) {
+    public WorkspacePreferences getPreferences(final GitHubUserInfo userInfo) {
         String name = userInfo.getName();
         String email = userInfo.getEmail();
+
+        if (StringUtils.isBlank(name)) {
+            String login = userInfo.getLogin();
+            LOG.warn("'name' field is blank, using 'login' {} as committer name in 'Git' preferences", login);
+            name = login;
+        }
 
         LOG.info("Committer name: {}", name);
         LOG.info("Committer email: {}", email);
