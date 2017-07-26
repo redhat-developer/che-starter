@@ -18,6 +18,7 @@ import static org.junit.Assert.assertNotNull;
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,6 +53,7 @@ public class WorkspacePreferencesClientTest extends TestConfig {
     }
 
     @Test
+    @Ignore("all the tenant projects from the free-int cluster were deleted to free up resources")
     public void setCommitterInfo() throws Exception {
         client.setCommiterInfo(cheServerUrl, KEYCLOAK_TOKEN, getTestPreferences());
         checkCommitterInfoSetCorrectly();
@@ -59,8 +61,8 @@ public class WorkspacePreferencesClientTest extends TestConfig {
 
     /**
      * @see <a href=
-     *      "https://github.com/redhat-developer/che-starter/issues/205">
-     *      Need to use `login` as committer name if `name` is blank</a>
+     *      "https://github.com/redhat-developer/che-starter/issues/205"> Need
+     *      to use `login` as committer name if `name` is blank</a>
      */
     @Test
     public void getCommitterInfoWhenNameIsBlank() {
