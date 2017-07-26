@@ -30,6 +30,7 @@ import io.fabric8.che.starter.exception.StackNotFoundException;
 import io.fabric8.che.starter.model.stack.Stack;
 import io.fabric8.che.starter.model.stack.StackProjectMapping;
 
+@Ignore("all the tenant projects from the free-int cluster were deleted to free up resources")
 public class StackClientTest extends TestConfig {
     private static final Logger LOG = LoggerFactory.getLogger(StackClientTest.class);
     private static final String VERTX_STACK_ID = "vert.x";

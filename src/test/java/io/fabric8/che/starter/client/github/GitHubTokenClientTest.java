@@ -39,6 +39,7 @@ public class GitHubTokenClientTest extends TestConfig {
     private GitHubClient client;
 
     @Test
+    @Ignore("all the tenant projects from the free-int cluster were deleted to free up resources")
     public void setGitHubToken() throws GitHubOAthTokenException, IOException {
         client.setGitHubOAuthToken(cheServerURL, GIT_HUB_TOKEN, KEYCLOAK_TOKEN);
     }
