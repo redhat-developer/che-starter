@@ -28,7 +28,6 @@ import io.fabric8.che.starter.exception.StackNotFoundException;
 import io.fabric8.che.starter.exception.WorkspaceNotFound;
 import io.fabric8.che.starter.model.workspace.Workspace;
 
-@Ignore("all the tenant projects from the free-int cluster were deleted to free up resources")
 public class WorkspaceClientTest extends TestConfig {
     private static final Logger LOG = LoggerFactory.getLogger(WorkspaceClientTest.class);
     private static final String GITHUB_REPO = "https://github.com/che-samples/console-java-simple";
@@ -45,7 +44,7 @@ public class WorkspaceClientTest extends TestConfig {
 
     @Autowired
     private WorkspaceClient client;
-    
+
     @Test
     public void listWorkspaces() {
         List<Workspace> workspaces = this.client.listWorkspaces(cheServerURL, KEYCLOAK_TOKEN);
@@ -53,7 +52,6 @@ public class WorkspaceClientTest extends TestConfig {
         workspaces.forEach(w -> LOG.info("workspace ID: {}", w.getId()));
     }
 
-    
     @Test
     @Ignore("Ignored due to issue with running a workspace on remote OS test instance")
     public void createAndDeleteWorkspace() throws IOException, StackNotFoundException, WorkspaceNotFound {

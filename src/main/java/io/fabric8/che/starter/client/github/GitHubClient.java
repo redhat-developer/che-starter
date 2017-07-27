@@ -78,7 +78,7 @@ public class GitHubClient {
 
     /**
      * Get {@link GitHubUserInfo} using GitHub public API. If there is no public
-     * email specified - fetch "primary" email using `/user/email` endpoint
+     * email specified - fetch "primary" email using `/user/emails` endpoint
      * 
      * @param gitHubToken
      * @return GitHub committer info - 'name' and 'email'
