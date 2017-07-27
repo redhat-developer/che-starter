@@ -37,6 +37,7 @@ import io.fabric8.openshift.client.OpenShiftClient;
 import io.fabric8.openshift.client.ParameterValue;
 import io.fabric8.openshift.client.dsl.ClientTemplateResource;
 
+@Ignore("Test is run against local minishift cluster and requires additional setup")
 public class OpenShiftTest extends TestConfig {
     private static final Logger LOG = LoggerFactory.getLogger(OpenShiftTest.class);
     private static final String CHE_OPENSHIFT_ENDPOINT = "CHE_OPENSHIFT_ENDPOINT";
@@ -65,7 +66,6 @@ public class OpenShiftTest extends TestConfig {
     @Value("${che.openshift.password}")
     private String password;
 
-    @Ignore("Test is run against local minishift cluster and requires additional setup")
     @Test
     public void createCheServer() throws Exception {
         OpenShiftClient openShiftClient = null;

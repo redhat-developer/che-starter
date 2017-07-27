@@ -18,7 +18,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +29,6 @@ import io.fabric8.che.starter.exception.StackNotFoundException;
 import io.fabric8.che.starter.model.stack.Stack;
 import io.fabric8.che.starter.model.stack.StackProjectMapping;
 
-@Ignore("all the tenant projects from the free-int cluster were deleted to free up resources")
 public class StackClientTest extends TestConfig {
     private static final Logger LOG = LoggerFactory.getLogger(StackClientTest.class);
     private static final String VERTX_STACK_ID = "vert.x";
@@ -82,14 +80,12 @@ public class StackClientTest extends TestConfig {
     }
 
     @Test
-    @Ignore("Need to update che-server test environment on free int cluster")
     public void getWildflySwarmStack() throws StackNotFoundException {
         Stack wildflySwarm = client.getStack(cheServerUrl, WILDFLY_SWARM_STACK_ID, KEYCLOAK_TOKEN);
         LOG.info("'wildfly-swarm' stack is found: {}", wildflySwarm);
     }
 
     @Test
-    @Ignore("Need to update che-server test environment on free int cluster")
     public void getNodeJsStack() throws StackNotFoundException {
         Stack nodeJs = client.getStack(cheServerUrl, NODE_JS_STACK_ID, KEYCLOAK_TOKEN);
         LOG.info("'nodejs4' stack is found: {}", nodeJs);

@@ -21,7 +21,6 @@ public class KeycloakTokenValidatorTest extends TestConfig {
     private static final String VALID_TOKEN = "Bearer token";
     private static final String INVALID_TOKEN = "token";
 
-
     @Test
     public void processValidToken() throws KeycloakException {
         KeycloakTokenValidator.validate(VALID_TOKEN);
