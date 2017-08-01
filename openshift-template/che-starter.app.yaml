@@ -132,7 +132,6 @@ objects:
     name: che-starter
     creationTimestamp: null
   spec:
-    host: che-starter.$(minishift ip).nip.io
     to:
       kind: Service
       name: che-starter
