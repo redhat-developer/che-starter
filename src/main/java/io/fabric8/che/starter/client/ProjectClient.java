@@ -67,24 +67,30 @@ public class ProjectClient {
         LOG.info("Creating project against workspace agent URL: {}", url);
 
         String projectType = stackClient.getProjectTypeByStackId(stack);
+
+        LOG.info("Stack: {}", stack);
         LOG.info("Project type: {}", projectType);
 
+        try {
+            Project project = createProject(projectName, repo, branch, projectType, url, keycloakToken);
+            LOG.info("Successfully created project {}", project.getName());
+        } catch (Exception e) {
+            LOG.info("Error occurred while creating project {}", projectName);
+            throw new ProjectCreationException("Error occurred while creating project " + projectName, e);
+        }
+    }
+
+    private Project createProject(String projectName, String repo, String branch, String projectType, String url,
+            String keycloakToken) {
         Project project = initProject(projectName, repo, branch, projectType);
 
         RestTemplate template = new KeycloakRestTemplate(keycloakToken);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<Project[]> entity = new HttpEntity<Project[]>(new Project[] { project }, headers);
-
         ResponseEntity<Project[]> response = template.exchange(url, HttpMethod.POST, entity, Project[].class);
 
-        if (response.getBody().length > 0) {
-            Project p = response.getBody()[0];
-            LOG.info("Successfully created project {}", p.getName());
-        } else {
-            LOG.info("Error occurred while creating project {}", projectName);
-            throw new ProjectCreationException("Error occurred while creating project " + projectName);
-        }
+        return response.getBody()[0];
     }
 
     /**
@@ -119,7 +125,7 @@ public class ProjectClient {
                 deleteProject(cheServerURL, workspaceToDelete, project.getName(), keycloakToken);
             }
         }
-        
+
         workspaceClient.stopWorkspace(cheServerURL, workspaceToDelete, keycloakToken);
         workspaceClient.waitUntilWorkspaceIsStopped(masterUrl, namespace, openShiftToken, cheServerURL, workspaceToDelete, keycloakToken);
         
