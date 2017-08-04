@@ -88,7 +88,7 @@ public class WorkspaceClient {
         }
         LOG.info("Workspace '{}' is running", workspace.getConfig().getName());
     }
-    
+
     /**
      * This method blocks execution until the specified workspace has been stopped and its resources
      * made available again.

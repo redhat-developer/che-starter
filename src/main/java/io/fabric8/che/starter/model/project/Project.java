@@ -27,7 +27,6 @@ public class Project {
 
     private String name;
     private String type;
-    private String projectType;
     private String description;
     private String path;
     private Source source;
@@ -46,14 +45,6 @@ public class Project {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getProjectType() {
-        return projectType;
-    }
-
-    public void setProjectType(String type) {
-        this.projectType = type;
     }
 
     public String getDescription() {

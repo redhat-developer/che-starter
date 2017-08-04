@@ -44,7 +44,7 @@ public class ProjectClient {
 
     @Autowired
     private StackClient stackClient;
-    
+
     @Autowired
     private WorkspaceClient workspaceClient;
 
@@ -128,7 +128,7 @@ public class ProjectClient {
 
         workspaceClient.stopWorkspace(cheServerURL, workspaceToDelete, keycloakToken);
         workspaceClient.waitUntilWorkspaceIsStopped(masterUrl, namespace, openShiftToken, cheServerURL, workspaceToDelete, keycloakToken);
-        
+
         workspaceClient.deleteWorkspace(cheServerURL, workspaceToDelete.getId(), keycloakToken);
 
         if (runningWorkspace != null && !runningWorkspace.getConfig().getName().equals(workspaceName)) {
@@ -151,7 +151,6 @@ public class ProjectClient {
         source.setType("git");
         source.setLocation(repo);
         project.setSource(source);
-        project.setProjectType(projectType);
         project.setType(projectType);
         project.setDescription("Created via che-starter API");
         project.setPath("/" + name);
