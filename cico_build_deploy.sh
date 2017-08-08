@@ -12,7 +12,7 @@
 # http://www.eclipse.org/legal/epl-v10.html
 # #L%
 ###
-cat jenkins-env | grep -e RHCHEBOT_DOCKER_HUB_PASSWORD -e GIT > inherit-env
+cat jenkins-env | grep -e RHCHEBOT_DOCKER_HUB_PASSWORD -e GIT -e DEVSHIFT > inherit-env
 . inherit-env
 
 yum -y update
@@ -42,11 +42,19 @@ if [ $? -eq 0 ]; then
   docker push rhche/che-starter:latest
   docker push rhche/che-starter:$TAG
 
-  docker tag rhche/che-starter:latest registry.devshift.net/almighty/che-starter:$TAG
-  docker push registry.devshift.net/almighty/che-starter:$TAG
+  REGISTRY="push.registry.devshift.net"
 
-  docker tag rhche/che-starter:latest registry.devshift.net/almighty/che-starter:latest
-  docker push registry.devshift.net/almighty/che-starter:latest
+  if [ -n "${DEVSHIFT_USERNAME}" -a -n "${DEVSHIFT_PASSWORD}" ]; then
+    docker login -u ${DEVSHIFT_USERNAME} -p ${DEVSHIFT_PASSWORD} ${REGISTRY}
+  else
+      echo "Could not login, missing credentials for the registry"
+  fi
+
+  docker tag rhche/che-starter:latest ${REGISTRY}/almighty/che-starter:$TAG
+  docker push ${REGISTRY}/almighty/che-starter:$TAG
+
+  docker tag rhche/che-starter:latest ${REGISTRY}/almighty/che-starter:latest
+  docker push ${REGISTRY}/almighty/che-starter:latest
 
 else
   echo 'Build Failed!'
