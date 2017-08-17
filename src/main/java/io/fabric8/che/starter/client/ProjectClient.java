@@ -12,9 +12,7 @@
  */
 package io.fabric8.che.starter.client;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +24,6 @@ import org.springframework.web.client.RestTemplate;
 import io.fabric8.che.starter.client.keycloak.KeycloakRestTemplate;
 import io.fabric8.che.starter.exception.WorkspaceNotFound;
 import io.fabric8.che.starter.model.project.Project;
-import io.fabric8.che.starter.model.project.Source;
 import io.fabric8.che.starter.model.workspace.Workspace;
 
 @Component

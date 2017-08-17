@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import io.fabric8.che.starter.exception.RouteNotFoundException;
 import io.fabric8.che.starter.model.server.CheServerInfo;
 import io.fabric8.che.starter.openshift.CheDeploymentConfig;
 import io.fabric8.che.starter.util.CheServerHelper;
@@ -34,7 +35,7 @@ public class CheServerClient {
     }
 
     @Async
-    public void startCheServer(OpenShiftClient client, String namespace) {
+    public void startCheServer(OpenShiftClient client, String namespace) throws RouteNotFoundException {
         cheDeploymentConfig.deployCheIfSuspended(client, namespace);
     }
 
