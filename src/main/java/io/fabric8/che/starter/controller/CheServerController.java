@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import io.fabric8.che.starter.client.CheServerClient;
 import io.fabric8.che.starter.client.keycloak.KeycloakClient;
 import io.fabric8.che.starter.client.keycloak.KeycloakTokenValidator;
+import io.fabric8.che.starter.exception.RouteNotFoundException;
 import io.fabric8.che.starter.model.server.CheServerInfo;
 import io.fabric8.che.starter.openshift.OpenShiftClientWrapper;
 import io.fabric8.openshift.client.OpenShiftClient;
@@ -88,7 +89,7 @@ public class CheServerController {
     }
 
     private CheServerInfo startServer(String masterUrl, String openShiftToken, String namespace, HttpServletResponse response,
-            HttpServletRequest request) {
+            HttpServletRequest request) throws RouteNotFoundException {
         OpenShiftClient openShiftClient = openShiftClientWrapper.get(masterUrl, openShiftToken);
         String requestURL = request.getRequestURL().toString();
 
