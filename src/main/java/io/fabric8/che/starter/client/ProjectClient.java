@@ -12,9 +12,6 @@
  */
 package io.fabric8.che.starter.client;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -22,17 +19,11 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import io.fabric8.che.starter.client.keycloak.KeycloakRestTemplate;
-import io.fabric8.che.starter.exception.ProjectCreationException;
 import io.fabric8.che.starter.exception.WorkspaceNotFound;
 import io.fabric8.che.starter.model.project.Project;
 import io.fabric8.che.starter.model.project.Source;
@@ -43,55 +34,7 @@ public class ProjectClient {
     private static final Logger LOG = LoggerFactory.getLogger(ProjectClient.class);
 
     @Autowired
-    private StackClient stackClient;
-
-    @Autowired
     private WorkspaceClient workspaceClient;
-
-    /**
-     * Starts a workspace, wait for it and import project
-     */
-    @Async
-    public void createProject(String cheServerURL, Workspace workspace, String projectName, String repo, String branch, String stack, 
-            String masterUrl, String namespace, String openShiftToken, String keycloakToken)
-            throws IOException, ProjectCreationException, WorkspaceNotFound, URISyntaxException, MalformedURLException {
-
-        workspaceClient.startWorkspace(cheServerURL, workspace.getConfig().getName(), masterUrl, namespace, openShiftToken, keycloakToken);
-        workspaceClient.waitUntilWorkspaceIsRunning(cheServerURL, workspace, keycloakToken);
-        Workspace startedWorkspace = workspaceClient.getWorkspaceById(cheServerURL, workspace.getId(), keycloakToken);
-
-        String wsAgentUrl = getWsAgentUrl(startedWorkspace);
-
-        // Next we create a new project against workspace agent API Url
-        String url = CheRestEndpoints.CREATE_PROJECT.generateUrl(wsAgentUrl);
-        LOG.info("Creating project against workspace agent URL: {}", url);
-
-        String projectType = stackClient.getProjectTypeByStackId(stack);
-
-        LOG.info("Stack: {}", stack);
-        LOG.info("Project type: {}", projectType);
-
-        try {
-            Project project = createProject(projectName, repo, branch, projectType, url, keycloakToken);
-            LOG.info("Successfully created project {}", project.getName());
-        } catch (Exception e) {
-            LOG.info("Error occurred while creating project {}", projectName);
-            throw new ProjectCreationException("Error occurred while creating project " + projectName, e);
-        }
-    }
-
-    private Project createProject(String projectName, String repo, String branch, String projectType, String url,
-            String keycloakToken) {
-        Project project = initProject(projectName, repo, branch, projectType);
-
-        RestTemplate template = new KeycloakRestTemplate(keycloakToken);
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<Project[]> entity = new HttpEntity<Project[]>(new Project[] { project }, headers);
-        ResponseEntity<Project[]> response = template.exchange(url, HttpMethod.POST, entity, Project[].class);
-
-        return response.getBody()[0];
-    }
 
     /**
      * Delete a project from workspace. Workspace must be running to delete a
@@ -141,22 +84,4 @@ public class ProjectClient {
         return workspace.getRuntime().getDevMachine().getRuntime().getServers().get("4401/tcp").getUrl();
     }
 
-    private Project initProject(String name, String repo, String branch, String projectType) {
-        Project project = new Project();
-        project.setName(name);
-        Source source = new Source();
-        Map<String, String> sourceParams = source.getParameters();
-        sourceParams.put("branch", branch);
-        sourceParams.put("keepVcs", "true");
-        source.setType("git");
-        source.setLocation(repo);
-        project.setSource(source);
-        project.setType(projectType);
-        project.setDescription("Created via che-starter API");
-        project.setPath("/" + name);
-        List<String> mixins = new ArrayList<>();
-        mixins.add("git");
-        project.setMixins(mixins);
-        return project;
-    }
 }

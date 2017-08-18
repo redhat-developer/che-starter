@@ -21,7 +21,6 @@ public enum CheRestEndpoints {
     LIST_WORKSPACES     ("/api/workspace"),
     STOP_WORKSPACE      ("/api/workspace/{id}/runtime"),
     LIST_STACKS         ("/api/stack?maxItems=1000"),
-    CREATE_PROJECT      ("/project/batch"),
     DELETE_PROJECT      ("/project/{id}"),
     SET_OAUTH_TOKEN_V1  ("/wsmaster/api/oauth/token?oauth_provider={provider}"),
     SET_OAUTH_TOKEN_V2  ("/wsmaster/api/token/github"),
