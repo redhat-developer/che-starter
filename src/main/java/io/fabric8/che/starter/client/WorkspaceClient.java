@@ -13,6 +13,8 @@
 package io.fabric8.che.starter.client;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -27,17 +29,20 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import io.fabric8.che.starter.client.keycloak.KeycloakRestTemplate;
 import io.fabric8.che.starter.exception.StackNotFoundException;
 import io.fabric8.che.starter.exception.WorkspaceNotFound;
+import io.fabric8.che.starter.model.project.Project;
 import io.fabric8.che.starter.model.workspace.Workspace;
 import io.fabric8.che.starter.model.workspace.WorkspaceConfig;
 import io.fabric8.che.starter.model.workspace.WorkspaceState;
 import io.fabric8.che.starter.model.workspace.WorkspaceStatus;
 import io.fabric8.che.starter.openshift.OpenShiftClientWrapper;
+import io.fabric8.che.starter.util.ProjectHelper;
 import io.fabric8.che.starter.util.WorkspaceHelper;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodList;
@@ -62,6 +67,9 @@ public class WorkspaceClient {
 
     @Autowired
     private StackClient stackClient;
+
+    @Autowired
+    ProjectHelper projectHelper;
 
     @Autowired
     OpenShiftClientWrapper openshiftClientWrapper;
@@ -193,13 +201,22 @@ public class WorkspaceClient {
      * @return
      * @throws StackNotFoundException
      * @throws IOException
+     * @throws URISyntaxException 
      */
     public Workspace createWorkspace(String cheServerURL, String keycloakToken, String stackId, String repo,
-            String branch, String description) throws StackNotFoundException, IOException {
-        // The first step is to create the workspace
+            String branch, String description) throws StackNotFoundException, IOException, URISyntaxException {
         String url = CheRestEndpoints.CREATE_WORKSPACE.generateUrl(cheServerURL);
-
         WorkspaceConfig wsConfig = stackClient.getStack(cheServerURL, stackId, keycloakToken).getWorkspaceConfig();
+
+        String projectName = projectHelper.getProjectNameFromGitRepository(repo);
+        String projectType = stackClient.getProjectTypeByStackId(stackId);
+
+        LOG.info("Stack: {}", stackId);
+        LOG.info("Project type: {}", projectType);
+
+        Project project = projectHelper.initProject(projectName, repo, branch, projectType);
+
+        wsConfig.setProjects(Collections.singletonList(project));
         wsConfig.setName(workspaceHelper.generateName());
         wsConfig.setDescription(description);
 
@@ -290,6 +307,12 @@ public class WorkspaceClient {
             template.postForLocation(url, null);
         }
         return workspaceToStart;
+    }
+
+    @Async
+    public Workspace startWorkspaceAsync(String cheServerURL, String workspaceName, String masterUrl, String namespace,
+            String openShiftToken, String keycloakToken) throws WorkspaceNotFound {
+        return startWorkspace(cheServerURL, workspaceName, masterUrl, namespace, openShiftToken, keycloakToken);
     }
 
     /**

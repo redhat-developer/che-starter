@@ -51,7 +51,6 @@ import io.fabric8.che.starter.exception.WorkspaceNotFound;
 import io.fabric8.che.starter.model.request.WorkspaceCreateParams;
 import io.fabric8.che.starter.model.workspace.Workspace;
 import io.fabric8.che.starter.openshift.OpenShiftClientWrapper;
-import io.fabric8.che.starter.util.ProjectHelper;
 import io.fabric8.che.starter.util.WorkspaceHelper;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -70,9 +69,6 @@ public class WorkspaceController {
     @Autowired
     ProjectClient projectClient;
 
-    @Autowired
-    ProjectHelper projectHelper;
-    
     @Autowired
     KeycloakClient keycloakClient;
 
@@ -235,9 +231,8 @@ public class WorkspaceController {
         String cheServerURL = openShiftClientWrapper.getCheServerUrl(masterUrl, namespace, openShiftToken);
         Workspace workspace = createWorkspaceFromParams(cheServerURL, keycloakToken, gitHubOAuthToken, params);
 
-        String projectName = projectHelper.getProjectNameFromGitRepository(params.getRepo());
-        projectClient.createProject(cheServerURL, workspace, projectName, params.getRepo(), 
-                params.getBranch(), params.getStackId(), masterUrl, namespace, openShiftToken, keycloakToken);
+        String workspaceName = workspace.getConfig().getName();
+        workspaceClient.startWorkspaceAsync(cheServerURL, workspaceName, masterUrl, namespace, openShiftToken, keycloakToken);
 
         return workspace;
     }
@@ -256,9 +251,10 @@ public class WorkspaceController {
      * @throws GitHubOAthTokenException
      * 
      * @return created workspace
+     * @throws URISyntaxException 
      */
     private Workspace createWorkspaceFromParams(String cheServerURL, String keycloakToken, String githubToken,
-            WorkspaceCreateParams params) throws StackNotFoundException, IOException, GitHubOAthTokenException {
+            WorkspaceCreateParams params) throws StackNotFoundException, IOException, GitHubOAthTokenException, URISyntaxException {
 
         Workspace workspace = workspaceClient.createWorkspace(cheServerURL, keycloakToken, params.getStackId(),
                 params.getRepo(), params.getBranch(), params.getDescription());

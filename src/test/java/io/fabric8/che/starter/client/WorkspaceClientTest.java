@@ -13,6 +13,7 @@
 package io.fabric8.che.starter.client;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,7 +55,7 @@ public class WorkspaceClientTest extends TestConfig {
 
     @Test
     @Ignore("Ignored due to issue with running a workspace on remote OS test instance")
-    public void createAndDeleteWorkspace() throws IOException, StackNotFoundException, WorkspaceNotFound {
+    public void createAndDeleteWorkspace() throws IOException, StackNotFoundException, WorkspaceNotFound, URISyntaxException {
         Workspace workspace = client.createWorkspace(cheServerURL, null, STACK_ID, GITHUB_REPO, BRANCH, DESCRIPTION);
         client.waitUntilWorkspaceIsRunning(cheServerURL, workspace, KEYCLOAK_TOKEN);
         

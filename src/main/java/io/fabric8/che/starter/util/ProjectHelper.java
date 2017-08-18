@@ -16,15 +16,40 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+
+import io.fabric8.che.starter.model.project.Project;
+import io.fabric8.che.starter.model.project.Source;
 
 @Component
 public class ProjectHelper {
     private static final String GIT_EXTENSION = ".git";
     private static final String GIT_PROTOCOL = "git@";
     private static final String HTTPS_PROTOCOL = "https://";
+
+    public Project initProject(String name, String repo, String branch, String projectType) {
+        Project project = new Project();
+        project.setName(name);
+        Source source = new Source();
+        Map<String, String> sourceParams = source.getParameters();
+        sourceParams.put("branch", branch);
+        sourceParams.put("keepVcs", "true");
+        source.setType("git");
+        source.setLocation(repo);
+        project.setSource(source);
+        project.setType(projectType);
+        project.setDescription("Created via che-starter API");
+        project.setPath("/" + name);
+        List<String> mixins = new ArrayList<>();
+        mixins.add("git");
+        project.setMixins(mixins);
+        return project;
+    }
 
     public String getProjectNameFromGitRepository(final String repositoryUrl)
             throws URISyntaxException, MalformedURLException {
