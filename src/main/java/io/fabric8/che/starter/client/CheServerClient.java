@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import io.fabric8.che.starter.exception.RouteNotFoundException;
 import io.fabric8.che.starter.model.server.CheServerInfo;
 import io.fabric8.che.starter.openshift.CheDeploymentConfig;
+import io.fabric8.che.starter.openshift.CheServerRouteChecker;
 import io.fabric8.che.starter.util.CheServerHelper;
 import io.fabric8.openshift.client.OpenShiftClient;
 
@@ -28,9 +29,20 @@ public class CheServerClient {
     @Autowired
     CheDeploymentConfig cheDeploymentConfig;
 
+    @Autowired
+    private CheServerRouteChecker cheServerRouteChecker;
+
     public CheServerInfo getCheServerInfo(OpenShiftClient client, String namespace, String requestURL) {
-        boolean isRunning = cheDeploymentConfig.isDeploymentAvailable(client, namespace);
-        CheServerInfo info = CheServerHelper.generateCheServerInfo(isRunning, requestURL);
+        boolean isCheServerReadyToHandleRequests;
+        boolean isDeploymentAvailable = cheDeploymentConfig.isDeploymentAvailable(client, namespace);
+
+        if (isDeploymentAvailable) {
+            isCheServerReadyToHandleRequests = cheServerRouteChecker.isRouteAccessible(client, namespace);
+        } else {
+            isCheServerReadyToHandleRequests = false;
+        }
+
+        CheServerInfo info = CheServerHelper.generateCheServerInfo(isCheServerReadyToHandleRequests, requestURL);
         return info;
     }
 

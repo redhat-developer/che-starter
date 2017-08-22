@@ -12,8 +12,6 @@
  */
 package io.fabric8.che.starter.openshift;
 
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -22,8 +20,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -37,10 +33,9 @@ import io.fabric8.openshift.client.dsl.ClientDeployableScalableResource;
 
 @Component
 public final class CheDeploymentConfig {
-    private static final Logger LOG = LoggerFactory.getLogger(CheDeploymentConfig.class);
 
     @Autowired
-    private CheServerRoute route;
+    private CheServerRouteChecker cheServerRouteChecker;
 
     @Value("${che.openshift.deploymentconfig}")
     private String deploymentConfigName;
@@ -53,7 +48,7 @@ public final class CheDeploymentConfig {
         if (!isDeploymentAvailable(client, namespace)) {
             deploymentConfig.scale(1, false);
             waitUntilDeploymentConfigIsAvailable(client, namespace);
-            waitUntilRouteIsAccessible(client, namespace);
+            cheServerRouteChecker.waitUntilRouteIsAccessible(client, namespace);
             waitHAProxyConfigChange();
         }
     }
@@ -138,42 +133,6 @@ public final class CheDeploymentConfig {
         } catch (InterruptedException ex) {
             return true;
         }
-    }
-
-    
-    /**
-     * @see <a href="https://bugzilla.redhat.com/show_bug.cgi?id=1481603">The endpoints value always be delayed</a>
-     * 
-     * @param client
-     * @param namespace
-     * @throws RouteNotFoundException
-     */
-    private void waitUntilRouteIsAccessible(final OpenShiftClient client, String namespace) throws RouteNotFoundException {
-        String routeURL = route.getUrl(client, namespace);
-        LOG.info("Waiting untill Che server route is accessible: {}", routeURL);
-
-        long start = System.currentTimeMillis();
-        long end = start + Long.valueOf(startTimeout);
-        while (System.currentTimeMillis() < end) {
-            if (isRouteAccessible(routeURL)) {
-                break;
-            }
-        }
-    }
-
-    private boolean isRouteAccessible(final String routeURL) {
-        try {
-            URL url = new URL(routeURL);
-            HttpURLConnection http = (HttpURLConnection) url.openConnection();
-            int statusCode = http.getResponseCode();
-            return isValid(statusCode);
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    private boolean isValid(int statusCode) {
-        return (403 == statusCode || 200 == statusCode || 500 == statusCode || 302 == statusCode);
     }
 
     /**
