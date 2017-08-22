@@ -53,7 +53,7 @@ public class WorkspacePreferencesClientTest extends TestConfig {
 
     @Test
     public void setCommitterInfo() throws Exception {
-        client.setCommiterInfo(cheServerUrl, KEYCLOAK_TOKEN, getTestPreferences());
+        client.setCommitterInfo(cheServerUrl, KEYCLOAK_TOKEN, getTestPreferences());
         checkCommitterInfoSetCorrectly();
     }
 

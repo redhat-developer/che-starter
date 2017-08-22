@@ -39,10 +39,10 @@ public class WorkspacePreferencesClient {
     public void setCommitterInfo(final String cheServerUrl, final String gitHubToken, final String keycloakToken) {
         GitHubUserInfo userInfo = client.getUserInfo(gitHubToken);
         WorkspacePreferences preferences = getPreferences(userInfo);
-        setCommiterInfo(cheServerUrl, keycloakToken, preferences);
+        setCommitterInfo(cheServerUrl, keycloakToken, preferences);
     }
 
-    public void setCommiterInfo(final String cheServerUrl, final String keycloakToken, final WorkspacePreferences preferences) {
+    public void setCommitterInfo(final String cheServerUrl, final String keycloakToken, final WorkspacePreferences preferences) {
         RestTemplate template = new KeycloakRestTemplate(keycloakToken);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
