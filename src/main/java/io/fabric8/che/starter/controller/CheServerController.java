@@ -55,7 +55,7 @@ public class CheServerController {
         String openShiftToken = keycloakClient.getOpenShiftToken(keycloakToken);
         OpenShiftClient openShiftClient = openShiftClientWrapper.get(masterUrl, openShiftToken);
         String requestURL = request.getRequestURL().toString();
-        return cheServerClient.getCheServerInfo(openShiftClient, namespace, requestURL);
+        return cheServerClient.getCheServerInfo(openShiftClient, namespace, requestURL, keycloakToken);
     }
 
     @ApiOperation(value = "Get Che server info")
@@ -65,7 +65,7 @@ public class CheServerController {
 
         OpenShiftClient openShiftClient = openShiftClientWrapper.get(masterUrl, openShiftToken);
         String requestURL = request.getRequestURL().toString();
-        return cheServerClient.getCheServerInfo(openShiftClient, namespace, requestURL);
+        return cheServerClient.getCheServerInfo(openShiftClient, namespace, requestURL, null);
     }
 
     @ApiOperation(value = "Start Che Server")
@@ -75,7 +75,7 @@ public class CheServerController {
 
         KeycloakTokenValidator.validate(keycloakToken);
         String openShiftToken = keycloakClient.getOpenShiftToken(keycloakToken);
-        CheServerInfo info = startServer(masterUrl, openShiftToken, namespace, response, request);
+        CheServerInfo info = startServer(masterUrl, openShiftToken, keycloakToken, namespace, response, request);
         return info;
     }
 
@@ -84,16 +84,16 @@ public class CheServerController {
     public CheServerInfo startCheServerOnOpenShift(@RequestParam String masterUrl, @RequestParam String namespace,
             @ApiParam(value = "OpenShift token", required = true) @RequestHeader("Authorization") String openShiftToken, HttpServletResponse response, HttpServletRequest request) throws Exception {
 
-        CheServerInfo info = startServer(masterUrl, openShiftToken, namespace, response, request);
+        CheServerInfo info = startServer(masterUrl, openShiftToken, null, namespace, response, request);
         return info;
     }
 
-    private CheServerInfo startServer(String masterUrl, String openShiftToken, String namespace, HttpServletResponse response,
+    private CheServerInfo startServer(String masterUrl, String openShiftToken, String keycloakToken, String namespace, HttpServletResponse response,
             HttpServletRequest request) throws RouteNotFoundException {
         OpenShiftClient openShiftClient = openShiftClientWrapper.get(masterUrl, openShiftToken);
         String requestURL = request.getRequestURL().toString();
 
-        CheServerInfo cheServerInfo = cheServerClient.getCheServerInfo(openShiftClient, namespace, requestURL);
+        CheServerInfo cheServerInfo = cheServerClient.getCheServerInfo(openShiftClient, namespace, requestURL, keycloakToken);
         if (!cheServerInfo.isRunning()) {
             cheServerClient.startCheServer(openShiftClient, namespace);
             response.setStatus(HttpServletResponse.SC_ACCEPTED);
