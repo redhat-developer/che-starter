@@ -32,12 +32,12 @@ public class CheServerClient {
     @Autowired
     private CheServerRouteChecker cheServerRouteChecker;
 
-    public CheServerInfo getCheServerInfo(OpenShiftClient client, String namespace, String requestURL) {
+    public CheServerInfo getCheServerInfo(OpenShiftClient client, String namespace, String requestURL, String keycloakToken) {
         boolean isCheServerReadyToHandleRequests;
         boolean isDeploymentAvailable = cheDeploymentConfig.isDeploymentAvailable(client, namespace);
 
         if (isDeploymentAvailable) {
-            isCheServerReadyToHandleRequests = cheServerRouteChecker.isRouteAccessible(client, namespace);
+            isCheServerReadyToHandleRequests = cheServerRouteChecker.isRouteAccessible(client, namespace, keycloakToken);
         } else {
             isCheServerReadyToHandleRequests = false;
         }

@@ -48,7 +48,7 @@ public final class CheDeploymentConfig {
         if (!isDeploymentAvailable(client, namespace)) {
             deploymentConfig.scale(1, false);
             waitUntilDeploymentConfigIsAvailable(client, namespace);
-            cheServerRouteChecker.waitUntilRouteIsAccessible(client, namespace);
+            cheServerRouteChecker.waitUntilRouteIsAccessible(client, namespace, null);
             waitHAProxyConfigChange();
         }
     }

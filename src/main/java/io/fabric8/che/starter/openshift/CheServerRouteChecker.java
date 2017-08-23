@@ -15,6 +15,7 @@ package io.fabric8.che.starter.openshift;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,25 +43,28 @@ public class CheServerRouteChecker {
      * @param namespace
      * @throws RouteNotFoundException
      */
-    public void waitUntilRouteIsAccessible(final OpenShiftClient client, final String namespace) throws RouteNotFoundException {
+    public void waitUntilRouteIsAccessible(final OpenShiftClient client, final String namespace, final String keycloakToken) throws RouteNotFoundException {
         long start = System.currentTimeMillis();
         long end = start + Long.valueOf(startTimeout);
         while (System.currentTimeMillis() < end) {
-            if (isRouteAccessible(client, namespace)) {
+            if (isRouteAccessible(client, namespace, keycloakToken)) {
                 break;
             }
         }
     }
 
-    public boolean isRouteAccessible(final OpenShiftClient client, final String namespace) {
+    public boolean isRouteAccessible(final OpenShiftClient client, final String namespace, final String keycloakToken) {
         try {
             String routeURL = route.getUrl(client, namespace);
-            String listStacksURL = CheRestEndpoints.LIST_STACKS.generateUrl(routeURL);
-            URL url = new URL(listStacksURL);
-            HttpURLConnection http = (HttpURLConnection) url.openConnection();
-            int statusCode = http.getResponseCode();
+            String listWorkspacesURL = CheRestEndpoints.LIST_WORKSPACES.generateUrl(routeURL);
+            URL url = new URL(listWorkspacesURL);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            if (StringUtils.isNotBlank(keycloakToken)) {
+                connection.setRequestProperty("Authorization", keycloakToken);
+            }
+            int statusCode = connection.getResponseCode();
             boolean isRouteAccessible = isValid(statusCode);
-            LOG.info("Che server endpoint '{}' is accessible: {}", listStacksURL, isRouteAccessible);
+            LOG.info("Che server endpoint '{}' is accessible: {}", listWorkspacesURL, isRouteAccessible);
             return isRouteAccessible;
         } catch (Exception e) {
             return false;
