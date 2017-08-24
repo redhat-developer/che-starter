@@ -139,7 +139,7 @@ public final class CheDeploymentConfig {
      * 503 Service Unavailable is returned when che-server is idled and
      * che-starter performs request against it. This might be coupled with the
      * fact that HAProxy configuration needs to be changed and reloaded on
-     * OpenShift, which may take some time. This method is a hack - waiting 15
+     * OpenShift, which may take some time. This method is a hack - waiting 60
      * seconds after che-server deployment is available before continuing
      * request execution
      * 
@@ -149,7 +149,7 @@ public final class CheDeploymentConfig {
      */
     private void waitHAProxyConfigChange() {
         try {
-            TimeUnit.SECONDS.sleep(15);
+            TimeUnit.SECONDS.sleep(60);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
