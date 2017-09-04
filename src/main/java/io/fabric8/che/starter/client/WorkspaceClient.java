@@ -217,7 +217,7 @@ public class WorkspaceClient {
         Project project = projectHelper.initProject(projectName, repo, branch, projectType);
 
         wsConfig.setProjects(Collections.singletonList(project));
-        wsConfig.setName(workspaceHelper.generateName());
+        wsConfig.setName(workspaceHelper.generateName(projectName));
         wsConfig.setDescription(description);
 
         RestTemplate template = new KeycloakRestTemplate(keycloakToken);
