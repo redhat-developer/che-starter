@@ -27,6 +27,7 @@ public class WorkspaceHelper {
     public static final String WORKSPACE_START_IDE_URL = "ide start url";
     public static final String WORKSPACE_IDE_URL = "ide url";
     public static final String HTTP_METHOD_PATCH = "PATCH";
+    public static final int RANDOM_POSTFIX_LENGTH = 8;
 
     public List<Workspace> filterByRepository(final List<Workspace> workspaces, final String repository) {
         return workspaces.stream().filter(w -> {
@@ -83,8 +84,14 @@ public class WorkspaceHelper {
         return RandomStringUtils.random(16, true, true).toLowerCase();
     }
 
-    public String generateName() {
-        return RandomStringUtils.random(8, true, true).toLowerCase();
+    /**
+     * Generates workspace name based on projectName with random postfix e.g. 'che-starter-f8zbl2is'
+     * @param projectName
+     * @return workspace name
+     * @see https://github.com/openshiftio/openshift.io/issues/446
+     */
+    public String generateName(final String projectName) {
+        return projectName + "-" + RandomStringUtils.random(RANDOM_POSTFIX_LENGTH, true, true).toLowerCase();
     }
 
     private String generateHrefForWorkspaceStartLink(final String requestURL, final String workspaceId) {
