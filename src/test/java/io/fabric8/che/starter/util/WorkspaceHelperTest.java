@@ -27,7 +27,8 @@ import io.fabric8.che.starter.model.workspace.WorkspaceLink;
 
 public class WorkspaceHelperTest extends TestConfig {
     private static final String REQUEST_URL = "http://localhost:10000/workspace";
-    private static final String TEST_PROJECT_NAME = "test-project";
+    private static final String TEST_PROJECT_SHORT_NAME = "test-project";
+    private static final String TEST_PROJECT_LONG_NAME = "training-courses-management-system";
 
     @Autowired
     WorkspaceHelper workspaceHelper;
@@ -55,11 +56,13 @@ public class WorkspaceHelperTest extends TestConfig {
 
     @Test
     public void generateWorkspaceName() {
-        String workspaceName = workspaceHelper.generateName(TEST_PROJECT_NAME);
-        String[] split = workspaceName.split("-");
-        String randomPostfix = split[split.length - 1];
-        assertEquals(randomPostfix.length(), WorkspaceHelper.RANDOM_POSTFIX_LENGTH);
-        assertTrue(randomPostfix.matches("^[a-z0-9]+$"));
+        String workspaceNameForShortNamedProject = workspaceHelper.generateName(TEST_PROJECT_SHORT_NAME);
+        assertTrue(workspaceNameForShortNamedProject.startsWith(TEST_PROJECT_SHORT_NAME));
+        assertTrue(workspaceNameForShortNamedProject.matches("[a-zA-Z0-9][-_.a-zA-Z0-9]{1,18}[a-zA-Z0-9]"));
+
+        String workspaceNameForLongNamedProject = workspaceHelper.generateName(TEST_PROJECT_LONG_NAME);
+        assertEquals(workspaceNameForLongNamedProject.length(), WorkspaceHelper.RANDOM_POSTFIX_LENGTH);
+        assertTrue(workspaceNameForLongNamedProject.matches("[a-zA-Z0-9][-_.a-zA-Z0-9]{1,18}[a-zA-Z0-9]"));
     }
 
 }

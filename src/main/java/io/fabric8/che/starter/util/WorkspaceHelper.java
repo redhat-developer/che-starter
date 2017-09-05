@@ -27,7 +27,7 @@ public class WorkspaceHelper {
     public static final String WORKSPACE_START_IDE_URL = "ide start url";
     public static final String WORKSPACE_IDE_URL = "ide url";
     public static final String HTTP_METHOD_PATCH = "PATCH";
-    public static final int RANDOM_POSTFIX_LENGTH = 8;
+    public static final int RANDOM_POSTFIX_LENGTH = 5;
 
     public List<Workspace> filterByRepository(final List<Workspace> workspaces, final String repository) {
         return workspaces.stream().filter(w -> {
@@ -89,9 +89,13 @@ public class WorkspaceHelper {
      * @param projectName
      * @return workspace name
      * @see https://github.com/openshiftio/openshift.io/issues/446
+     * @see https://github.com/eclipse/che/issues/6130 
      */
     public String generateName(final String projectName) {
-        return projectName + "-" + RandomStringUtils.random(RANDOM_POSTFIX_LENGTH, true, true).toLowerCase();
+        String randomPostfix = RandomStringUtils.random(RANDOM_POSTFIX_LENGTH, true, true).toLowerCase();
+        String workspaceName = projectName + "-" + randomPostfix;
+        // hot fix for workspace validator - currently max length for workspace name is 20 chars
+        return (workspaceName.length() <= 20) ? workspaceName : randomPostfix;
     }
 
     private String generateHrefForWorkspaceStartLink(final String requestURL, final String workspaceId) {
