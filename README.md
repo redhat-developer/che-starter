@@ -105,7 +105,7 @@ Many of the services available via the Swagger interface require setting `master
     oc whoami -t
 ````
 
-The output of this command (which looks like a random string of characters and numbers) is the authorization token.
+The output of this command (which looks like a random alphanumeric string) is the authorization token.
 
 Code Conventions
 ----------------
