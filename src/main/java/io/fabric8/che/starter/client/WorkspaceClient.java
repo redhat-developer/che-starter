@@ -16,8 +16,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,13 +42,6 @@ import io.fabric8.che.starter.model.workspace.WorkspaceStatus;
 import io.fabric8.che.starter.openshift.OpenShiftClientWrapper;
 import io.fabric8.che.starter.util.ProjectHelper;
 import io.fabric8.che.starter.util.WorkspaceHelper;
-import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.api.model.PodList;
-import io.fabric8.kubernetes.client.KubernetesClientException;
-import io.fabric8.kubernetes.client.Watch;
-import io.fabric8.kubernetes.client.Watcher;
-import io.fabric8.kubernetes.client.dsl.FilterWatchListDeletable;
-import io.fabric8.openshift.client.OpenShiftClient;
 
 @Component
 public class WorkspaceClient {
@@ -108,70 +99,23 @@ public class WorkspaceClient {
      * @param workspace The workspace to stop
      * @param keycloakToken The KeyCloak token
      */
-    public void waitUntilWorkspaceIsStopped(String masterUrl, String namespace, String openShiftToken, 
+    public void waitUntilWorkspaceIsStopped(String masterUrl, String namespace, String openShiftToken,
             String cheServerURL, Workspace workspace, String keycloakToken) {
+        WorkspaceStatus status = getWorkspaceStatus(cheServerURL, workspace.getId(), keycloakToken);
+        long currentTime = System.currentTimeMillis();
 
-        try (OpenShiftClient client = openshiftClientWrapper.get(masterUrl, openShiftToken)) {
-            String resourceName = "che-ws-" + workspace.getId().replace("workspace", "");
-            LOG.info("Resource name {}", resourceName);
-            FilterWatchListDeletable<Pod, PodList, Boolean, Watch, Watcher<Pod>> pods = client.pods().inNamespace(namespace).withLabel("deployment", resourceName);
-
-            int numberOfPodsToStop = pods.list().getItems().size();
-            LOG.info("Number of workspace pods to stop {}", numberOfPodsToStop);
-
-            if (numberOfPodsToStop > 0) {
-                final CountDownLatch podCount = new CountDownLatch(numberOfPodsToStop);
-                pods.watch(new Watcher<Pod>() {
-                    @Override
-                    public void eventReceived(Action action, Pod pod) {
-                        try {
-                            switch (action) {
-                                case ADDED:
-                                case MODIFIED:
-                                case ERROR:
-                                    break;
-                                case DELETED:
-                                    LOG.info("Pod {} deleted", pod.getMetadata().getName());
-                                    podCount.countDown();
-                                    break;
-                            }
-                        } catch (Exception ex) {
-                            LOG.error("Failed to process {} on Pod {}. Error: ", action, pod, ex);
-                        }
-                    }
-
-                    @Override
-                    public void onClose(KubernetesClientException ex) {
-                    }
-                });
-
-                WorkspaceStatus status = getWorkspaceStatus(cheServerURL, workspace.getId(), keycloakToken);
-                long currentTime = System.currentTimeMillis();
-
-                // Poll the Che server until it returns a status of 'STOPPED' for the workspace
-                while (!WorkspaceState.STOPPED.toString().equals(status.getWorkspaceStatus())
-                       && System.currentTimeMillis() < (currentTime + workspaceStopTimeout)) {
-                    try {
-                        Thread.sleep(1000);
-                        LOG.info("Polling Che server for workspace '{}' status...", workspace.getConfig().getName());
-                    } catch (InterruptedException e) {
-                        LOG.error("Error while polling for workspace status", e);
-                        break;
-                    }
-                    status = getWorkspaceStatus(cheServerURL, workspace.getId(), keycloakToken);
-                }
-
-                currentTime = System.currentTimeMillis();
-
-                try {
-                    LOG.info("Waiting for all pods to be deleted for workspace '{}'", workspace.getConfig().getName());
-                    podCount.await(workspaceStopTimeout, TimeUnit.MILLISECONDS);
-                } catch (InterruptedException ex) {
-                    LOG.error("Exception while waiting for pods to be deleted", ex);
-                }
+        // Poll the Che server until it returns a status of 'STOPPED' for the workspace
+        while (!WorkspaceState.STOPPED.toString().equals(status.getWorkspaceStatus())
+                && System.currentTimeMillis() < (currentTime + workspaceStopTimeout)) {
+            try {
+                Thread.sleep(1000);
+                LOG.info("Polling Che server for workspace '{}' status...", workspace.getConfig().getName());
+            } catch (InterruptedException e) {
+                LOG.error("Error while polling for workspace status", e);
+                break;
             }
+            status = getWorkspaceStatus(cheServerURL, workspace.getId(), keycloakToken);
         }
-
     }
 
     public List<Workspace> listWorkspaces(String cheServerUrl, String keycloakToken) {
