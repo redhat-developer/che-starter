@@ -13,7 +13,6 @@
 package io.fabric8.che.starter.client.keycloak;
 
 import java.io.IOException;
-import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -29,7 +28,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.fabric8.che.starter.exception.KeycloakException;
-import io.fabric8.che.starter.util.UrlHelper;
 
 @Component
 public class KeycloakClient {
@@ -42,7 +40,7 @@ public class KeycloakClient {
     @Value("${OPENSHIFT_TOKEN_URL:https://sso.prod-preview.openshift.io/auth/realms/fabric8/broker/openshift-v3/token}")
     private String openShiftTokenUrl;
 
-    @Value("${GITHUB_TOKEN_URL:https://sso.prod-preview.openshift.io/auth/realms/fabric8/broker/github/token}")
+    @Value("${GITHUB_TOKEN_URL:https://auth.prod-preview.openshift.io/api/token?for=https://github.com}")
     private String gitHubTokenUrl;
 
     public String getOpenShiftToken(String keycloakToken) throws JsonProcessingException, IOException, KeycloakException {
@@ -50,28 +48,28 @@ public class KeycloakClient {
             LOG.info("Using OpenShift admin token");
             return openShiftAdminToken;
         }
-        // {"access_token":"token","expires_in":86400,"scope":"user:full","token_type":"Bearer"}
         LOG.info("OpenShift token url - {}", openShiftTokenUrl);
-        String responseBody = getResponseBody(openShiftTokenUrl, keycloakToken);
+        // {"access_token":"token","expires_in":86400,"scope":"user:full","token_type":"Bearer"}
+        String token = getAccessToken(openShiftTokenUrl, keycloakToken);
+        return token;
+    }
+
+    public String getGitHubToken(String keycloakToken) throws KeycloakException, JsonProcessingException, IOException {
+        LOG.info("GitHub token url - {}", gitHubTokenUrl);
+        // {"access_token":"token","scope":"admin:repo_hook,gist,read:org,repo,user","token_type":"bearer"}
+        String token = getAccessToken(gitHubTokenUrl, keycloakToken);
+        return token;
+    }
+
+    private String getAccessToken(String endpoint, String keycloakToken) throws KeycloakException, JsonProcessingException, IOException {
+        String responseBody = getResponseBody(endpoint, keycloakToken);
         ObjectMapper mapper = new ObjectMapper();
         JsonNode json = mapper.readTree(responseBody);
         JsonNode accessToken = json.get(ACCESS_TOKEN);
         if (accessToken == null) {
-            throw new KeycloakException("Unable to obtain OpenShift token");
+            throw new KeycloakException("Unable to obtain token from endpoint: " + endpoint);
         }
         return accessToken.asText();
-    }
-
-    public String getGitHubToken(String keycloakToken) throws KeycloakException {
-        // access_token=token&scope=scope
-        LOG.info("GitHub token url - {}", gitHubTokenUrl);
-        String responseBody = getResponseBody(gitHubTokenUrl, keycloakToken);
-        Map<String, String> parameter = UrlHelper.splitQuery(responseBody);
-        String token = parameter.get(ACCESS_TOKEN);
-        if (token == null) {
-            throw new KeycloakException("Unable to obtain GitHub token");
-        }
-        return token;
     }
 
     private String getResponseBody(String endpoint, String keycloakToken) {
