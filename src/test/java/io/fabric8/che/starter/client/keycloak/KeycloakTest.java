@@ -28,20 +28,20 @@ import io.fabric8.che.starter.exception.KeycloakException;
 @Ignore("Valid keycloak token must be provided")
 public class KeycloakTest extends TestConfig {
     private static final Logger LOG = LoggerFactory.getLogger(KeycloakTest.class);
-    private static final String AUTH_HEADER = "Bearer <ACCESS_TOKEN>";
+    private static final String KEYCLOAK_TOKEN = "Bearer <KEYCLOAK TOKEN>";
 
     @Autowired
     KeycloakClient keycloakClient;
 
     @Test
-    public void getGitHubToken() throws KeycloakException {
-        String gitHubToken = keycloakClient.getGitHubToken(AUTH_HEADER);
+    public void getGitHubToken() throws KeycloakException, JsonProcessingException, IOException {
+        String gitHubToken = keycloakClient.getGitHubToken(KEYCLOAK_TOKEN);
         LOG.info("GitHub Token: {}", gitHubToken);
     }
 
     @Test
     public void getOpenShiftToken() throws JsonProcessingException, IOException, KeycloakException {
-        String openShiftToken = keycloakClient.getOpenShiftToken(AUTH_HEADER);
+        String openShiftToken = keycloakClient.getOpenShiftToken(KEYCLOAK_TOKEN);
         LOG.info("OpenShift Token: {}", openShiftToken);
     }
 
