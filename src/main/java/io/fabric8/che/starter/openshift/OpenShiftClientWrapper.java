@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import io.fabric8.che.starter.exception.RouteNotFoundException;
+import io.fabric8.che.starter.multi.tenant.MultiTenantNamespaces;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.ConfigBuilder;
 import io.fabric8.openshift.client.DefaultOpenShiftClient;
@@ -35,11 +36,17 @@ public class OpenShiftClientWrapper {
     @Autowired
     private CheDeploymentConfig dc;
 
+    @Autowired
+    private MultiTenantNamespaces multiTenantNamespaces;
+
     @Value("${KUBERNETES_CERTS_CA_FILE:#{null}}")
     private String caCertFile;
 
     @Value("${FABRIC8_PLATFORM_DEV_MODE:false}")
     private boolean fabric8PlatformDevMode;
+
+    @Value("${MULTI_TENANT_CHE_SERVER_URL:https://che-ibuziuk-che.glusterpoc37aws.devshift.net}")
+    private String multiTenantCheServerURL;
 
     /**
      * Gets OpenShift client. When using, you are responsible for closing it.
@@ -83,6 +90,9 @@ public class OpenShiftClientWrapper {
      * @throws RouteNotFoundException 
      */
     public String getCheServerUrl(String masterUrl, String namespace, String token) throws RouteNotFoundException {
+        if (multiTenantNamespaces.contains(namespace)) {
+            return multiTenantCheServerURL;
+        }
         try (OpenShiftClient openShiftClient = this.get(masterUrl, token)) {
             dc.deployCheIfSuspended(openShiftClient, namespace);
             String routeURL = route.getUrl(openShiftClient, namespace);

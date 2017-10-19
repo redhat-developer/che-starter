@@ -27,6 +27,7 @@ import io.jsonwebtoken.Jwts;
 public class KeycloakTokenParser {
     private static final String TOKEN_PREFIX = "Bearer ";
 
+    @SuppressWarnings("rawtypes")
     public String getIdentityId(final String keycloakToken) throws JsonProcessingException, IOException {
         String jwt = keycloakToken.replaceFirst(TOKEN_PREFIX, "");
         String tokenWithoutSignature = getJWSWithoutSignature(jwt);
