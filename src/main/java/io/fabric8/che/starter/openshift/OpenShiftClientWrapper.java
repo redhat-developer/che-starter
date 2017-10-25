@@ -45,7 +45,7 @@ public class OpenShiftClientWrapper {
     @Value("${FABRIC8_PLATFORM_DEV_MODE:false}")
     private boolean fabric8PlatformDevMode;
 
-    @Value("${MULTI_TENANT_CHE_SERVER_URL:https://che-ibuziuk-che.glusterpoc37aws.devshift.net}")
+    @Value("${MULTI_TENANT_CHE_SERVER_URL:https://che-multi-tenant-che.glusterpoc37aws.devshift.net}")
     private String multiTenantCheServerURL;
 
     /**
