@@ -28,6 +28,5 @@ oc new-project che-starter
 * Deploy che-starter via templates from `openshift-template` folder:
 
 ```bash
-oc apply -f che-starter.config.yaml
 oc process -f che-starter.app.yaml | oc apply -f -
 ````
