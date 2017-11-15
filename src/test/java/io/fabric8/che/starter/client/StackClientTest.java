@@ -35,7 +35,7 @@ public class StackClientTest extends TestConfig {
     private static final String JAVA_CENTOS_STACK_ID = "java-centos";
     private static final String SPRING_BOOT_STACK_ID = "spring-boot";
     private static final String WILDFLY_SWARM_STACK_ID = "wildfly-swarm";
-    private static final String NODE_JS_STACK_ID = "nodejs4";
+    private static final String NODE_JS_STACK_ID = "nodejs-centos";
     private static final String NON_EXISTING_STACK_ID = "non-existing-stack-id";
     private static final String KEYCLOAK_TOKEN = null;
 

@@ -29,7 +29,7 @@ public final class StackProjectMapping {
             put("vert.x", "maven").
             put("spring-boot", "maven").
             put("wildfly-swarm", "maven").
-            put("nodejs4", "node-js").
+            put("nodejs-centos", "node-js").
             build();
 
     private StackProjectMapping() {
