@@ -26,13 +26,26 @@ import io.jsonwebtoken.Jwts;
 @Component
 public class KeycloakTokenParser {
     private static final String TOKEN_PREFIX = "Bearer ";
+    private static final String SESSION_STATE = "session_state";
+
 
     @SuppressWarnings("rawtypes")
     public String getIdentityId(final String keycloakToken) throws JsonProcessingException, IOException {
+        Jwt<Header, Claims> jwt = getJwt(keycloakToken);
+        return jwt.getBody().getSubject();
+    }
+
+    @SuppressWarnings("rawtypes")
+    public String getSessionState(final String keycloakToken) throws JsonProcessingException, IOException {
+       Jwt<Header, Claims> jwt = getJwt(keycloakToken);
+       return jwt.getBody().get(SESSION_STATE).toString();
+    }
+
+    @SuppressWarnings("rawtypes")
+    private Jwt<Header, Claims> getJwt(final String keycloakToken) {
         String jwt = keycloakToken.replaceFirst(TOKEN_PREFIX, "");
         String tokenWithoutSignature = getJWSWithoutSignature(jwt);
-        Jwt<Header, Claims> untrusted = Jwts.parser().parseClaimsJwt(tokenWithoutSignature);
-        return untrusted.getBody().getSubject();
+        return Jwts.parser().parseClaimsJwt(tokenWithoutSignature);
     }
 
     /**

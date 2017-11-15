@@ -44,6 +44,7 @@
         <vertx.server.version>v1.5</vertx.server.version>
         <logstash.logback.encoder.version>4.9</logstash.logback.encoder.version>
         <jjwt.version>0.7.0</jjwt.version>
+        <unleash.client.java.version>2.1.4</unleash.client.java.version>
     </properties>
 
     <dependencies>
@@ -135,6 +136,12 @@
             <groupId>net.logstash.logback</groupId>
             <artifactId>logstash-logback-encoder</artifactId>
             <version>${logstash.logback.encoder.version}</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>no.finn.unleash</groupId>
+            <artifactId>unleash-client-java</artifactId>
+            <version>${unleash.client.java.version}</version>
         </dependency>
 
     </dependencies>
