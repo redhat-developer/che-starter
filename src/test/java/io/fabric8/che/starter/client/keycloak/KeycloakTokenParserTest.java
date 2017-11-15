@@ -28,17 +28,19 @@ import io.fabric8.che.starter.TestConfig;
 /**
  * PAYLOAD:DATA used in the test:
  *
- * {
-        "sub": "1234567890",
-        "name": "John Doe",
-        "admin": true
-    }
+ *   {
+ *     "sub": "1234567890",
+ *     "name": "John Doe",
+ *     "admin": true,
+ *     "session_state" : "test_session_state"
+ *   }
  * @see <a href="https://jwt.io/">https://jwt.io/</a>
  */
 public class KeycloakTokenParserTest extends TestConfig {
     private static final Logger LOG = LoggerFactory.getLogger(KeycloakTokenParserTest.class);
-    private static final String AUTH_HEADER = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ";
+    private static final String AUTH_HEADER = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsInNlc3Npb25fc3RhdGUiOiJ0ZXN0X3Nlc3Npb25fc3RhdGUifQ.wkfRZ0jBtlrS0m4rEl4M7oaa_7hWVe3xlGhjh-1uTtk";
     private static final String SUB = "1234567890";
+    private static final String TEST_SESSION_STATE = "test_session_state";
 
     @Autowired
     KeycloakTokenParser parser;
@@ -48,5 +50,12 @@ public class KeycloakTokenParserTest extends TestConfig {
         String identityId = parser.getIdentityId(AUTH_HEADER);
         LOG.info("Identity ID: {}", identityId);
         assertEquals(identityId, SUB);
+    }
+
+    @Test
+    public void getSessionState() throws JsonProcessingException, IOException {
+        String sessionState = parser.getSessionState(AUTH_HEADER);
+        LOG.info("Session State: {}", sessionState);
+        assertEquals(sessionState, TEST_SESSION_STATE);
     }
 }
