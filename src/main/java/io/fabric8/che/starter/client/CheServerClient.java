@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 
 import io.fabric8.che.starter.exception.RouteNotFoundException;
 import io.fabric8.che.starter.model.server.CheServerInfo;
-import io.fabric8.che.starter.multi.tenant.MultiTenantNamespaces;
+import io.fabric8.che.starter.multi.tenant.MultiTenantToggle;
 import io.fabric8.che.starter.openshift.CheDeploymentConfig;
 import io.fabric8.che.starter.openshift.CheServerRouteChecker;
 import io.fabric8.che.starter.util.CheServerHelper;
@@ -31,13 +31,13 @@ public class CheServerClient {
     CheDeploymentConfig cheDeploymentConfig;
     
     @Autowired
-    MultiTenantNamespaces multiTenantNamespaces;
+    MultiTenantToggle toggle;
 
     @Autowired
     private CheServerRouteChecker cheServerRouteChecker;
 
     public CheServerInfo getCheServerInfo(OpenShiftClient client, String namespace, String requestURL, String keycloakToken) {
-        if (multiTenantNamespaces.contains(namespace)) {
+        if (toggle.isMultiTenant(keycloakToken)) {
             // multi-tenant che-server is supposed to be always accesible
             return CheServerHelper.generateCheServerInfo(true, requestURL);
         }
@@ -56,8 +56,8 @@ public class CheServerClient {
     }
 
     @Async
-    public void startCheServer(OpenShiftClient client, String namespace) throws RouteNotFoundException {
-        if (multiTenantNamespaces.contains(namespace)) {
+    public void startCheServer(OpenShiftClient client, String namespace, String keycloakToken) throws RouteNotFoundException {
+        if (toggle.isMultiTenant(keycloakToken)) {
             return; // che-starter is not supposed to start multi-tenant che-server
         }
         cheDeploymentConfig.deployCheIfSuspended(client, namespace);

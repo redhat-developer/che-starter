@@ -95,7 +95,7 @@ public class CheServerController {
 
         CheServerInfo cheServerInfo = cheServerClient.getCheServerInfo(openShiftClient, namespace, requestURL, keycloakToken);
         if (!cheServerInfo.isRunning()) {
-            cheServerClient.startCheServer(openShiftClient, namespace);
+            cheServerClient.startCheServer(openShiftClient, namespace, keycloakToken);
             response.setStatus(HttpServletResponse.SC_ACCEPTED);
         }
         return cheServerInfo;
