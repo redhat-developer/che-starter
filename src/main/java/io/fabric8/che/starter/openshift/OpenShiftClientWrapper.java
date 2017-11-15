@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import io.fabric8.che.starter.exception.RouteNotFoundException;
-import io.fabric8.che.starter.multi.tenant.MultiTenantNamespaces;
+import io.fabric8.che.starter.multi.tenant.MultiTenantToggle;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.ConfigBuilder;
 import io.fabric8.openshift.client.DefaultOpenShiftClient;
@@ -37,7 +37,7 @@ public class OpenShiftClientWrapper {
     private CheDeploymentConfig dc;
 
     @Autowired
-    private MultiTenantNamespaces multiTenantNamespaces;
+    private MultiTenantToggle toggle;
 
     @Value("${KUBERNETES_CERTS_CA_FILE:#{null}}")
     private String caCertFile;
@@ -45,7 +45,7 @@ public class OpenShiftClientWrapper {
     @Value("${FABRIC8_PLATFORM_DEV_MODE:false}")
     private boolean fabric8PlatformDevMode;
 
-    @Value("${MULTI_TENANT_CHE_SERVER_URL:http://che-multi-tenant-che.glusterpoc37aws.devshift.net}")
+    @Value("${MULTI_TENANT_CHE_SERVER_URL:https://che.prod-preview.openshift.io}")
     private String multiTenantCheServerURL;
 
     /**
@@ -85,15 +85,15 @@ public class OpenShiftClientWrapper {
      * 
      * @param masterUrl URL of OpenShift master
      * @param namespace user's namespace
-     * @param token authorization token
+     * @param osoToken authorization token
      * @return URL of Che server 
      * @throws RouteNotFoundException 
      */
-    public String getCheServerUrl(String masterUrl, String namespace, String token) throws RouteNotFoundException {
-        if (multiTenantNamespaces.contains(namespace)) {
+    public String getCheServerUrl(String masterUrl, String namespace, String osoToken, String keycloakToken) throws RouteNotFoundException {
+        if (toggle.isMultiTenant(keycloakToken)) {
             return multiTenantCheServerURL;
         }
-        try (OpenShiftClient openShiftClient = this.get(masterUrl, token)) {
+        try (OpenShiftClient openShiftClient = this.get(masterUrl, osoToken)) {
             dc.deployCheIfSuspended(openShiftClient, namespace);
             String routeURL = route.getUrl(openShiftClient, namespace);
             LOG.info("Che server route URL {}", routeURL);

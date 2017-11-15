@@ -143,7 +143,7 @@ public class WorkspaceController {
 
         String openShiftToken = keycloakClient.getOpenShiftToken(keycloakToken);
         String gitHubOAuthToken = keycloakClient.getGitHubToken(keycloakToken);
-        String cheServerURL = openShiftClientWrapper.getCheServerUrl(masterUrl, namespace, openShiftToken);
+        String cheServerURL = openShiftClientWrapper.getCheServerUrl(masterUrl, namespace, openShiftToken, keycloakToken);
 
         Workspace workspace = workspaceClient.startWorkspace(cheServerURL, name, masterUrl, namespace, openShiftToken, keycloakToken);
         if (StringUtils.isNotBlank(gitHubOAuthToken)) {
@@ -160,7 +160,7 @@ public class WorkspaceController {
             throws IOException, URISyntaxException, RouteNotFoundException, StackNotFoundException,
             GitHubOAthTokenException, ProjectCreationException, WorkspaceNotFound {
 
-        String cheServerURL = openShiftClientWrapper.getCheServerUrl(masterUrl, namespace, openShiftToken);
+        String cheServerURL = openShiftClientWrapper.getCheServerUrl(masterUrl, namespace, openShiftToken, null);
         return workspaceClient.startWorkspace(cheServerURL, name, masterUrl, namespace, openShiftToken, null);
     }
 
@@ -206,7 +206,7 @@ public class WorkspaceController {
 
     public void deleteWorkspace(String masterUrl, String namespace, String openShiftToken, String workspaceName, String keycloakToken)
             throws RouteNotFoundException, WorkspaceNotFound {
-        String cheServerURL = openShiftClientWrapper.getCheServerUrl(masterUrl, namespace, openShiftToken);
+        String cheServerURL = openShiftClientWrapper.getCheServerUrl(masterUrl, namespace, openShiftToken, keycloakToken);
 
         projectClient.deleteAllProjectsAndWorkspace(cheServerURL, workspaceName, masterUrl, namespace, openShiftToken, keycloakToken);
     }
@@ -228,7 +228,7 @@ public class WorkspaceController {
             throws RouteNotFoundException, URISyntaxException, IOException, StackNotFoundException,
             GitHubOAthTokenException, ProjectCreationException, WorkspaceNotFound {
 
-        String cheServerURL = openShiftClientWrapper.getCheServerUrl(masterUrl, namespace, openShiftToken);
+        String cheServerURL = openShiftClientWrapper.getCheServerUrl(masterUrl, namespace, openShiftToken, keycloakToken);
         Workspace workspace = createWorkspaceFromParams(cheServerURL, keycloakToken, gitHubOAuthToken, params);
 
         String workspaceName = workspace.getConfig().getName();
@@ -273,7 +273,7 @@ public class WorkspaceController {
 
     public List<Workspace> listWorkspaces(final String masterURL, final String namespace, final String openShiftToken,
             final String repository, final String requestUrl, final String keycloakToken) throws RouteNotFoundException {
-        String cheServerURL = openShiftClientWrapper.getCheServerUrl(masterURL, namespace, openShiftToken);
+        String cheServerURL = openShiftClientWrapper.getCheServerUrl(masterURL, namespace, openShiftToken, keycloakToken);
         List<Workspace> workspaces;
         try {
             if (!StringUtils.isBlank(repository)) {

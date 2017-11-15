@@ -70,7 +70,7 @@ public class StackController {
         LOG.info("Getting stacks from masterUrl {}", masterUrl);
         LOG.info("Getting stacks from namespace {}", namespace);
 
-        String cheServerUrl = openShiftClientWrapper.getCheServerUrl(masterUrl, namespace, openShiftToken);
+        String cheServerUrl = openShiftClientWrapper.getCheServerUrl(masterUrl, namespace, openShiftToken, keycloakToken);
         return stackClient.listStacks(cheServerUrl, keycloakToken);
     }
 
