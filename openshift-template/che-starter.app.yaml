@@ -70,6 +70,11 @@ objects:
                 configMapKeyRef:
                   name: che-starter
                   key: kubes.certs.ca.file
+            - name: MULTI_TENANT_CHE_SERVER_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: che-starter
+                  key: multi.tenant.che.server.url
             name: che-starter
             image: ${IMAGE}:${IMAGE_TAG}
             livenessProbe:
