@@ -170,6 +170,7 @@
                     <excludes>
                         <exclude>test-output/**</exclude>
                         <exclude>target/**</exclude>
+                        <exclude>.idea/**</exclude>
                         <exclude>**/*.json</exclude>
                         <exclude>src/main/resources/checkstyle.xml</exclude>
                     </excludes>
