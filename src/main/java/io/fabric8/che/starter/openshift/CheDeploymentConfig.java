@@ -53,6 +53,11 @@ public final class CheDeploymentConfig {
         }
     }
 
+    public boolean deploymentExists(OpenShiftClient client, String namespace) {
+        DeploymentConfig dc = getDeploymentConfig(client, namespace).get();
+        return (dc != null);
+    }
+
     public boolean isDeploymentAvailable(OpenShiftClient client, String namespace) {
         DeploymentConfig deploymentConfig = getDeploymentConfig(client, namespace).get();
         if (deploymentConfig == null) {
