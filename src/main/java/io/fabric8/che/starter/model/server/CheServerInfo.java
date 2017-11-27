@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class CheServerInfo {
     private boolean isRunning;
     private List<CheServerLink> links;
+    private boolean isMultiTenant;
 
     public boolean isRunning() {
         return isRunning;
@@ -35,6 +36,14 @@ public class CheServerInfo {
 
     public void setLinks(List<CheServerLink> links) {
         this.links = links;
+    }
+
+    public boolean isMultiTenant() {
+        return isMultiTenant;
+    }
+
+    public void setMultiTenant(boolean isMultiTenant) {
+        this.isMultiTenant = isMultiTenant;
     }
 
 }

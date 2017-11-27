@@ -18,8 +18,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import io.fabric8.che.starter.exception.MultiTenantMigrationException;
 import io.fabric8.che.starter.exception.RouteNotFoundException;
 import io.fabric8.che.starter.model.server.CheServerInfo;
+import io.fabric8.che.starter.multi.tenant.MigrationCongigMap;
+import io.fabric8.che.starter.multi.tenant.MigrationPod;
 import io.fabric8.che.starter.multi.tenant.MultiTenantToggle;
 import io.fabric8.che.starter.multi.tenant.TenantUpdater;
 import io.fabric8.che.starter.openshift.CheDeploymentConfig;
@@ -32,7 +35,7 @@ public class CheServerClient {
 
     @Autowired
     private CheDeploymentConfig cheDeploymentConfig;
-    
+
     @Autowired
     private MultiTenantToggle toggle;
 
@@ -42,25 +45,32 @@ public class CheServerClient {
     @Autowired
     private TenantUpdater tenanUpdater;
 
-    public CheServerInfo getCheServerInfo(OpenShiftClient client, String namespace, String requestURL, String keycloakToken) {
-        if (toggle.isMultiTenant(keycloakToken)) {
-            if (cheDeploymentConfig.deploymentExists(client, namespace)) {
-                // user is supposed to be multi-tenant but still has single-tenant che-server in the namespace,
-                // so tenant needs to be updated
-                tenanUpdater.update(keycloakToken);
-                // wait 10 seconds to make sure that che deployment would be deleted
-                try {
-                    TimeUnit.SECONDS.sleep(10);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-                return CheServerHelper.generateCheServerInfo(false, requestURL);
-            } else {
-                // multi-tenant che-server is supposed to be always accessible
-                return CheServerHelper.generateCheServerInfo(true, requestURL);
-            }
-        }
+    @Autowired
+    MigrationCongigMap migrationCongigMap;
 
+    @Autowired
+    MigrationPod migrationPod;
+
+    public CheServerInfo getCheServerInfo(OpenShiftClient client, String namespace, String requestURL,
+            String keycloakToken) throws MultiTenantMigrationException {
+        if (toggle.isMultiTenant(keycloakToken)) {
+            return getCheServerInfoForMultiTenant(client, namespace, requestURL, keycloakToken);
+        } else {
+            return getCheServerInfoForSingleTenant(client, namespace, requestURL, keycloakToken);
+        }
+    }
+
+    @Async
+    public void startCheServer(OpenShiftClient client, String namespace, String keycloakToken)
+            throws RouteNotFoundException {
+        if (toggle.isMultiTenant(keycloakToken)) {
+            return; // che-starter is not supposed to start multi-tenant che-server
+        }
+        cheDeploymentConfig.deployCheIfSuspended(client, namespace);
+    }
+
+    private CheServerInfo getCheServerInfoForSingleTenant(OpenShiftClient client, String namespace, String requestURL,
+            String keycloakToken) {
         boolean isCheServerReadyToHandleRequests;
         boolean isDeploymentAvailable = cheDeploymentConfig.isDeploymentAvailable(client, namespace);
 
@@ -70,16 +80,34 @@ public class CheServerClient {
             isCheServerReadyToHandleRequests = false;
         }
 
-        CheServerInfo info = CheServerHelper.generateCheServerInfo(isCheServerReadyToHandleRequests, requestURL);
+        CheServerInfo info = CheServerHelper.generateCheServerInfo(isCheServerReadyToHandleRequests, requestURL, false);
         return info;
     }
 
-    @Async
-    public void startCheServer(OpenShiftClient client, String namespace, String keycloakToken) throws RouteNotFoundException {
-        if (toggle.isMultiTenant(keycloakToken)) {
-            return; // che-starter is not supposed to start multi-tenant che-server
+    private CheServerInfo getCheServerInfoForMultiTenant(OpenShiftClient client, String namespace, String requestURL,
+            String keycloakToken) {
+        if (cheDeploymentConfig.deploymentExists(client, namespace) && !migrationCongigMap.exists(client, namespace)) {
+            // user is supposed to be multi-tenant but still has single-tenant che-server in *-che namespace,
+            // and does not have 'migration' cm, so update tenant must be called
+            tenanUpdater.update(keycloakToken);
+            // wait 10 seconds to be sure that 'migration' cm would be created - indication that migration has started
+            try {
+                TimeUnit.SECONDS.sleep(10);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            // migration has just started
+            return CheServerHelper.generateCheServerInfo(false, requestURL, true);
+        } else if (migrationPod.isRunning(client, namespace)) {
+            // migration is in progress
+            return CheServerHelper.generateCheServerInfo(false, requestURL, true);
+        } else if (migrationPod.isTerminated(client, namespace)) {
+            // migration has been already done
+            return CheServerHelper.generateCheServerInfo(true, requestURL, true);
+        } else {
+            // Should only happen if migration pod have been removed manually
+            return CheServerHelper.generateCheServerInfo(true, requestURL, true);
         }
-        cheDeploymentConfig.deployCheIfSuspended(client, namespace);
     }
 
 }
