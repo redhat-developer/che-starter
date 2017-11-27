@@ -24,11 +24,12 @@ public final class CheServerHelper {
     private CheServerHelper() {
     }
 
-    public static CheServerInfo generateCheServerInfo(boolean isRunning, String requestURL) {
+    public static CheServerInfo generateCheServerInfo(boolean isRunning, String requestURL, boolean isMultiTenant) {
         CheServerInfo info = new CheServerInfo();
         info.setRunning(isRunning);
         CheServerLink statusLink = CheServerHelper.generateStatusLink(requestURL);
         info.setLinks(Collections.singletonList(statusLink));
+        info.setMultiTenant(isMultiTenant);
         return info;
     }
 

@@ -92,4 +92,10 @@ public class GlobalExceptionHandler {
     public String handleWorkspaceNotFoundException(WorkspaceNotFound e) {
         return e.getMessage();
     }
+
+    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR, reason = "Migration to multi-tenant Che server has failed")
+    @ExceptionHandler(MultiTenantMigrationException.class)
+    public String handleMultiTenantMigrationException(WorkspaceNotFound e) {
+        return e.getMessage();
+    }
 }
