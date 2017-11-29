@@ -45,6 +45,7 @@
         <logstash.logback.encoder.version>4.9</logstash.logback.encoder.version>
         <jjwt.version>0.7.0</jjwt.version>
         <unleash.client.java.version>2.1.4</unleash.client.java.version>
+        <org.apache.httpcomponents.version>4.5.3</org.apache.httpcomponents.version>
     </properties>
 
     <dependencies>
@@ -143,6 +144,12 @@
             <artifactId>unleash-client-java</artifactId>
             <version>${unleash.client.java.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+           <version>${org.apache.httpcomponents.version}</version>
+       </dependency>
 
     </dependencies>
 

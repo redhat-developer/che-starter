@@ -98,7 +98,8 @@ public class CheServerClient {
             }
             // migration has just started
             return CheServerHelper.generateCheServerInfo(false, requestURL, true);
-        } else if (migrationPod.isRunning(client, namespace)) {
+        } else if (migrationPod.exists(client, namespace)
+                && (!migrationPod.isReady(client, namespace) || migrationPod.isRunning(client, namespace))) {
             // migration is in progress
             return CheServerHelper.generateCheServerInfo(false, requestURL, true);
         } else if (migrationPod.isTerminated(client, namespace)) {

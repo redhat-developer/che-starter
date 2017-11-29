@@ -33,6 +33,19 @@ public class MigrationPod {
     @Autowired
     MigrationCongigMap migrationCongigMap;
 
+    public boolean exists(final OpenShiftClient client, final String namespace) {
+        Pod pod = getPod(client, namespace);
+        return (pod != null);
+    }
+
+    public boolean isReady(final OpenShiftClient client, final String namespace) {
+        Pod pod = getPod(client, namespace);
+        if (pod != null) {
+            return pod.getStatus().getContainerStatuses().get(0).getReady();
+        }
+        return false;
+    }
+
     public boolean isRunning(final OpenShiftClient client, final String namespace) {
         Pod pod = getPod(client, namespace);
         if (pod != null) {
