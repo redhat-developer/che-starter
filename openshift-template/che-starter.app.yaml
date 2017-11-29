@@ -75,6 +75,11 @@ objects:
                 configMapKeyRef:
                   name: che-starter
                   key: multi.tenant.che.server.url
+            - name: UPDATE_TENANT_ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  name: che-starter
+                  key: update.tenant.endpoint
             name: che-starter
             image: ${IMAGE}:${IMAGE_TAG}
             livenessProbe:
