@@ -13,14 +13,20 @@
 package io.fabric8.che.starter;
 
 import static springfox.documentation.builders.PathSelectors.regex;
+
+import java.util.concurrent.Executor;
+
 import static com.google.common.base.Predicates.or;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.AsyncConfigurerSupport;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
+import io.fabric8.che.starter.mdc.MdcTaskDecorator;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.spi.DocumentationType;
@@ -31,10 +37,19 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @ServletComponentScan
 @EnableSwagger2
 @EnableAsync
-public class Application {
+public class Application extends AsyncConfigurerSupport {
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
+    }
+
+    @Override
+    public Executor getAsyncExecutor() {
+      ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+      // Using a TaskDecorator to copy MDC data (req_id / identity_id) to @Async threads
+      executor.setTaskDecorator(new MdcTaskDecorator());
+      executor.initialize();
+      return executor;
     }
 
     @SuppressWarnings("unchecked")

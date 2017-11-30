@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import io.fabric8.che.starter.exception.MultiTenantMigrationException;
 import io.fabric8.kubernetes.api.model.ContainerStateRunning;
 import io.fabric8.kubernetes.api.model.ContainerStateTerminated;
 import io.fabric8.kubernetes.api.model.Pod;
@@ -31,7 +32,7 @@ public class MigrationPod {
     private static final String REQUEST_ID_ANNOTATION = "request-id";
 
     @Autowired
-    MigrationCongigMap migrationCongigMap;
+    MigrationConfigMap migrationCongigMap;
 
     public boolean exists(final OpenShiftClient client, final String namespace) {
         Pod pod = getPod(client, namespace);
@@ -77,8 +78,11 @@ public class MigrationPod {
                 }
             }
             return migrationPod;
+        } catch (MultiTenantMigrationException e) {
+            LOG.debug("Migration ConfigMap does not exist: {}", e.getMessage());
+            return null;
         } catch (Exception e) {
-            LOG.error("Error occured during migration to multi-tenant Che server", e);
+            LOG.error("Exception occured during workspaces migration to multi-tenant Che server: {}", e);
             return null;
         }
     }
