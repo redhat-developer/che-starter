@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 import io.fabric8.che.starter.exception.MultiTenantMigrationException;
 import io.fabric8.che.starter.exception.RouteNotFoundException;
 import io.fabric8.che.starter.model.server.CheServerInfo;
-import io.fabric8.che.starter.multi.tenant.MigrationCongigMap;
+import io.fabric8.che.starter.multi.tenant.MigrationConfigMap;
 import io.fabric8.che.starter.multi.tenant.MigrationPod;
 import io.fabric8.che.starter.multi.tenant.MultiTenantToggle;
 import io.fabric8.che.starter.multi.tenant.TenantUpdater;
@@ -46,7 +46,7 @@ public class CheServerClient {
     private TenantUpdater tenanUpdater;
 
     @Autowired
-    MigrationCongigMap migrationCongigMap;
+    MigrationConfigMap migrationCongigMap;
 
     @Autowired
     MigrationPod migrationPod;

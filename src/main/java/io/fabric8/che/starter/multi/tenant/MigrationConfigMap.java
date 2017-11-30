@@ -19,7 +19,7 @@ import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.openshift.client.OpenShiftClient;
 
 @Component
-public class MigrationCongigMap {
+public class MigrationConfigMap {
     private static final String REQUEST_ID = "request-id";
     private static final String MIGRATION_CONFIG_MAP_NAME = "migration";
 

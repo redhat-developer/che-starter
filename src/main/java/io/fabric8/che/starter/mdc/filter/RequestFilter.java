@@ -10,22 +10,27 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package io.fabric8.che.starter.listener;
+package io.fabric8.che.starter.mdc.filter;
 
-import javax.servlet.ServletRequestEvent;
-import javax.servlet.ServletRequestListener;
-import javax.servlet.annotation.WebListener;
+import java.io.IOException;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.GenericFilterBean;
 
 import io.fabric8.che.starter.client.keycloak.KeycloakTokenParser;
 
-@WebListener
-public class RequestListener implements ServletRequestListener {
+@Component
+public class RequestFilter extends GenericFilterBean {
     private static final String REQUEST_ID_HEADER = "X-Request-Id";
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String REQUEST_ID_MDC_KEY = "req_id";
@@ -36,21 +41,22 @@ public class RequestListener implements ServletRequestListener {
     KeycloakTokenParser keycloakTokenParser;
 
     @Override
-    public void requestInitialized(ServletRequestEvent event) {
-        HttpServletRequest request = (HttpServletRequest) event.getServletRequest();
-        String requestId = request.getHeader(REQUEST_ID_HEADER);
-        requestId = (StringUtils.isBlank(requestId)) ? generateRequestId() : requestId;
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
+        try {
+            HttpServletRequest req = (HttpServletRequest) request;
+            String requestId = req.getHeader(REQUEST_ID_HEADER);
+            requestId = (StringUtils.isBlank(requestId)) ? generateRequestId() : requestId;
 
-        String keycloakToken = request.getHeader(AUTHORIZATION_HEADER);
-        String identityId = getIdentityId(keycloakToken);
+            String keycloakToken = req.getHeader(AUTHORIZATION_HEADER);
+            String identityId = getIdentityId(keycloakToken);
 
-        MDC.put(REQUEST_ID_MDC_KEY, requestId);
-        MDC.put(IDENTITY_ID_MDC_KEY, identityId);
-    }
-
-    @Override
-    public void requestDestroyed(ServletRequestEvent event) {
-        MDC.clear();
+            MDC.put(REQUEST_ID_MDC_KEY, requestId);
+            MDC.put(IDENTITY_ID_MDC_KEY, identityId);
+            chain.doFilter(request, response);
+        } finally {
+            MDC.clear();
+        }
     }
 
     private String getIdentityId(final String keycloakToken) {
