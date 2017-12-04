@@ -142,13 +142,11 @@ public class WorkspaceController {
         KeycloakTokenValidator.validate(keycloakToken);
 
         String openShiftToken = keycloakClient.getOpenShiftToken(keycloakToken);
-        String gitHubOAuthToken = keycloakClient.getGitHubToken(keycloakToken);
+        String gitHubToken = keycloakClient.getGitHubToken(keycloakToken);
         String cheServerURL = openShiftClientWrapper.getCheServerUrl(masterUrl, namespace, openShiftToken, keycloakToken);
 
         Workspace workspace = workspaceClient.startWorkspace(cheServerURL, name, masterUrl, namespace, openShiftToken, keycloakToken);
-        if (StringUtils.isNotBlank(gitHubOAuthToken)) {
-            tokenClient.setGitHubOAuthToken(cheServerURL, gitHubOAuthToken, keycloakToken);
-        }
+        setGitHubOAthTokenAndCommitterInfo(cheServerURL, gitHubToken, keycloakToken);
         return workspace;
     }
 
@@ -253,22 +251,25 @@ public class WorkspaceController {
      * @return created workspace
      * @throws URISyntaxException 
      */
-    private Workspace createWorkspaceFromParams(String cheServerURL, String keycloakToken, String githubToken,
+    private Workspace createWorkspaceFromParams(String cheServerURL, String keycloakToken, String gitHubToken,
             WorkspaceCreateParams params) throws StackNotFoundException, IOException, GitHubOAthTokenException, URISyntaxException {
 
         Workspace workspace = workspaceClient.createWorkspace(cheServerURL, keycloakToken, params.getStackId(),
                 params.getRepo(), params.getBranch(), params.getDescription());
+        setGitHubOAthTokenAndCommitterInfo(cheServerURL, gitHubToken, keycloakToken);
+        return workspace;
+    }
 
-        if (!StringUtils.isBlank(githubToken)) {
-            tokenClient.setGitHubOAuthToken(cheServerURL, githubToken, keycloakToken);
+    private void setGitHubOAthTokenAndCommitterInfo(String cheServerURL, String gitHubToken, String keycloakToken)
+            throws IOException, GitHubOAthTokenException {
+        if (!StringUtils.isBlank(gitHubToken)) {
+            tokenClient.setGitHubOAuthToken(cheServerURL, gitHubToken, keycloakToken);
             try {
-                workspacePreferencesClient.setCommitterInfo(cheServerURL, githubToken, keycloakToken);
+                workspacePreferencesClient.setCommitterInfo(cheServerURL, gitHubToken, keycloakToken);
             } catch (Exception e) {
                 LOG.warn("Unable to set committer info in Che Git preferences");
             }
         }
-
-        return workspace;
     }
 
     public List<Workspace> listWorkspaces(final String masterURL, final String namespace, final String openShiftToken,
