@@ -19,10 +19,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 
 import io.fabric8.che.starter.TestConfig;
-import io.fabric8.che.starter.client.github.GitHubClient;
 import io.fabric8.che.starter.exception.GitHubOAthTokenException;
 import io.fabric8.che.starter.model.github.GitHubEmail;
 import io.fabric8.che.starter.model.github.GitHubUserInfo;
@@ -32,15 +30,12 @@ public class GitHubTokenClientTest extends TestConfig {
     private static final String GIT_HUB_TOKEN = "dummy_token";
     private static final String KEYCLOAK_TOKEN = null;
 
-    @Value("${che.server.url}")
-    String cheServerURL;
-
     @Autowired
     private GitHubClient client;
 
     @Test
     public void setGitHubToken() throws GitHubOAthTokenException, IOException {
-        client.setGitHubOAuthToken(cheServerURL, GIT_HUB_TOKEN, KEYCLOAK_TOKEN);
+        client.setGitHubOAuthToken(GIT_HUB_TOKEN, KEYCLOAK_TOKEN);
     }
 
     @Ignore("Valid GitHub token must be provided")

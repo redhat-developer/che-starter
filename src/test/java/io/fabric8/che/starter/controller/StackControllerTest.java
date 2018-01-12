@@ -34,10 +34,10 @@ import io.fabric8.che.starter.TestBase;
 @RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
 @SpringBootTest(properties = { "OPENSHIFT_TOKEN_URL=http://localhost:33333/keycloak/token/openshift",
-        "GITHUB_TOKEN_URL=http://localhost:33333/keycloak/token/github" })
+        "GITHUB_TOKEN_URL=http://localhost:33333/keycloak/token/github",
+        "MULTI_TENANT_CHE_SERVER_URL=http://localhost:33333"})
 public class StackControllerTest extends TestBase {
 
-    private static final String STACK_OSO_ENDPOINT = "/stack/oso";
     private static final String STACK_ENDPOINT = "/stack";
 
     @Autowired
@@ -54,31 +54,6 @@ public class StackControllerTest extends TestBase {
     }
 
     @Test
-    public void testGetStacksOSO() throws Exception {
-        mockMvc.perform(get(STACK_OSO_ENDPOINT).header("Authorization", OPENSHIFT_TOKEN)
-                .param("masterUrl", VERTX_SERVER).param("namespace", NAMESPACE)).andExpect(status().is2xxSuccessful())
-                .andExpect(jsonPath("$[1].id", is("java-default"))).andExpect(jsonPath("$[0].id", is("vert.x")));
-    }
-
-    @Test
-    public void testGetStacksOSOWithWrongToken() throws Exception {
-        mockMvc.perform(get(STACK_OSO_ENDPOINT).header("Authorization", "badtoken").param("masterUrl", VERTX_SERVER)
-                .param("namespace", NAMESPACE)).andExpect(status().is(401));
-    }
-
-    @Test
-    public void testGetStacksOSOWithWrongNamespace() throws Exception {
-        mockMvc.perform(get(STACK_OSO_ENDPOINT).header("Authorization", OPENSHIFT_TOKEN)
-                .param("masterUrl", VERTX_SERVER).param("namespace", "noexisting")).andExpect(status().is(401));
-    }
-
-    @Test
-    public void testGetStacksOSOWithWrongMasterURL() throws Exception {
-        mockMvc.perform(get(STACK_OSO_ENDPOINT).header("Authorization", OPENSHIFT_TOKEN)
-                .param("masterUrl", "http://i.do.not.exist").param("namespace", NAMESPACE)).andExpect(status().is(401));
-    }
-
-    @Test
     public void testGetStacks() throws Exception {
         mockMvc.perform(get(STACK_ENDPOINT).header("Authorization", KEYCLOAK_TOKEN).param("masterUrl", VERTX_SERVER)
                 .param("namespace", NAMESPACE)).andExpect(status().is2xxSuccessful())
@@ -91,15 +66,23 @@ public class StackControllerTest extends TestBase {
                 .param("namespace", NAMESPACE)).andExpect(status().is(400));
     }
 
+    /*
+     * Deprecated - namespace is not required anymore for multi-tenant che server
+     */
+    @Deprecated
     @Test
     public void testGetStacksWithWrongNamespace() throws Exception {
         mockMvc.perform(get(STACK_ENDPOINT).header("Authorization", KEYCLOAK_TOKEN).param("masterUrl", VERTX_SERVER)
-                .param("namespace", "noexisting")).andExpect(status().is(401));
+                .param("namespace", "noexisting")).andExpect(status().is(200));
     }
 
+    /*
+     * Deprecated - masterURL is not required anymore for multi-tenant che server
+     */
+    @Deprecated
     @Test
     public void testGetStacksWithWrongMasterURL() throws Exception {
         mockMvc.perform(get(STACK_ENDPOINT).header("Authorization", KEYCLOAK_TOKEN)
-                .param("masterUrl", "http://i.do.not.exist").param("namespace", NAMESPACE)).andExpect(status().is(401));
+                .param("masterUrl", "http://i.do.not.exist").param("namespace", NAMESPACE)).andExpect(status().is(200));
     }
 }

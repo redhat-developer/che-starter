@@ -37,11 +37,11 @@ import io.fabric8.che.starter.model.request.WorkspaceCreateParams;
 @AutoConfigureMockMvc
 @SpringBootTest(properties = { "OPENSHIFT_TOKEN_URL=http://localhost:33333/keycloak/token/openshift",
         "GITHUB_TOKEN_URL=http://localhost:33333/keycloak/token/github",
-        "GITHUB_USER_URL=http://localhost:33333/github/user"})
+        "GITHUB_USER_URL=http://localhost:33333/github/user",
+        "MULTI_TENANT_CHE_SERVER_URL=http://localhost:33333"})
 public class WorkspaceControllerTest extends TestBase {
 
     private static final String WORKSPACE_ENDPOINT = "/workspace";
-    private static final String WORKSPACE_OSO_ENDPOINT = "/workspace/oso";
 
     @Autowired
     private MockMvc mockMvc;
@@ -64,60 +64,34 @@ public class WorkspaceControllerTest extends TestBase {
     }
 
     @Test
-    public void getWorkspacesOSOTest() throws Exception {
-        mockMvc.perform(get(WORKSPACE_OSO_ENDPOINT).header("Authorization", OPENSHIFT_TOKEN)
-                .param("masterUrl", VERTX_SERVER).param("namespace", NAMESPACE))
-                .andExpect(jsonPath("$[0].id", is("chevertxwsid13"))).andExpect(status().is2xxSuccessful())
-                .andExpect(jsonPath("$[0].status", is("RUNNING")));
-    }
-
-    @Test
     public void getWorkspaceWithWrongTokenTest() throws Exception {
         mockMvc.perform(get(WORKSPACE_ENDPOINT).header("Authorization", "wrongkeycloaktoken")
                 .param("masterUrl", VERTX_SERVER).param("namespace", NAMESPACE)).andExpect(status().is(400));
     }
 
-    @Test
-    public void getWorkspaceOSOWithWrongTokenTest() throws Exception {
-        mockMvc.perform(get(WORKSPACE_OSO_ENDPOINT).header("Authorization", "wrongopenshifttoken")
-                .param("masterUrl", VERTX_SERVER).param("namespace", NAMESPACE)).andExpect(status().is(401));
-    }
-
+    /*
+     * Deprecated - namespace is not required anymore for multi-tenant che server
+     */
+    @Deprecated
     @Test
     public void getWorkspacesWithWrongNamespaceTest() throws Exception {
         mockMvc.perform(get(WORKSPACE_ENDPOINT).header("Authorization", KEYCLOAK_TOKEN).param("masterUrl", VERTX_SERVER)
-                .param("namespace", "noexisting")).andExpect(status().is(401));
+                .param("namespace", "noexisting")).andExpect(status().is(200));
     }
 
-    @Test
-    public void getWorkspacesOSOWithWrongNamespaceTest() throws Exception {
-        mockMvc.perform(get(WORKSPACE_OSO_ENDPOINT).header("Authorization", OPENSHIFT_TOKEN)
-                .param("masterUrl", VERTX_SERVER).param("namespace", "noexisting")).andExpect(status().is(401));
-    }
-
+    /*
+     * Deprecated - masterURL is not required anymore for multi-tenant che server
+     */
+    @Deprecated
     @Test
     public void getWorkspacesWithWrongMasterURLTest() throws Exception {
         mockMvc.perform(get(WORKSPACE_ENDPOINT).header("Authorization", KEYCLOAK_TOKEN)
-                .param("masterUrl", "http://i.do.not.exist").param("namespace", NAMESPACE)).andExpect(status().is(401));
-    }
-
-    @Test
-    public void getWorkspacesOSOWithWrongMasterURLTest() throws Exception {
-        mockMvc.perform(get(WORKSPACE_OSO_ENDPOINT).header("Authorization", OPENSHIFT_TOKEN)
-                .param("masterUrl", "http://i.do.not.exist").param("namespace", NAMESPACE)).andExpect(status().is(401));
+                .param("masterUrl", "http://i.do.not.exist").param("namespace", NAMESPACE)).andExpect(status().is(200));
     }
 
     @Test
     public void createWorkspaceTest() throws Exception {
         mockMvc.perform(post(WORKSPACE_ENDPOINT).header("Authorization", KEYCLOAK_TOKEN)
-                .header("Content-Type", "application/json").param("masterUrl", VERTX_SERVER)
-                .param("namespace", NAMESPACE).content(getCreateWorkspaceRequestBody(initWorkspaceCreateParams())))
-                .andExpect(status().is2xxSuccessful()).andExpect(jsonPath("$.config.name", is(WORKSPACE_NAME)));
-    }
-
-    @Test
-    public void createWorkspaceOSOTest() throws Exception {
-        mockMvc.perform(post(WORKSPACE_OSO_ENDPOINT).header("Authorization", OPENSHIFT_TOKEN)
                 .header("Content-Type", "application/json").param("masterUrl", VERTX_SERVER)
                 .param("namespace", NAMESPACE).content(getCreateWorkspaceRequestBody(initWorkspaceCreateParams())))
                 .andExpect(status().is2xxSuccessful()).andExpect(jsonPath("$.config.name", is(WORKSPACE_NAME)));
@@ -131,44 +105,28 @@ public class WorkspaceControllerTest extends TestBase {
                 .andExpect(status().is(400));
     }
 
-    @Test
-    public void createWorkspaceOSOWithWrongTokenTest() throws Exception {
-        mockMvc.perform(post(WORKSPACE_OSO_ENDPOINT).header("Authorization", "wrongopenshifttoken")
-                .header("Content-Type", "application/json").param("masterUrl", VERTX_SERVER)
-                .param("namespace", NAMESPACE).content(getCreateWorkspaceRequestBody(initWorkspaceCreateParams())))
-                .andExpect(status().is(401));
-    }
-
+    /*
+     * Deprecated - namespace is not required anymore for multi-tenant che server
+     */
+    @Deprecated
     @Test
     public void createWorkspaceWithWrongNamespaceTest() throws Exception {
         mockMvc.perform(post(WORKSPACE_ENDPOINT).header("Authorization", KEYCLOAK_TOKEN)
                 .header("Content-Type", "application/json").param("masterUrl", VERTX_SERVER)
                 .param("namespace", "idonotexists").content(getCreateWorkspaceRequestBody(initWorkspaceCreateParams())))
-                .andExpect(status().is(401));
+                .andExpect(status().is(200));
     }
 
-    @Test
-    public void createWorkspaceOSOWithWrongNamespaceTest() throws Exception {
-        mockMvc.perform(post(WORKSPACE_OSO_ENDPOINT).header("Authorization", OPENSHIFT_TOKEN)
-                .header("Content-Type", "application/json").param("masterUrl", VERTX_SERVER)
-                .param("namespace", "idonotexists").content(getCreateWorkspaceRequestBody(initWorkspaceCreateParams())))
-                .andExpect(status().is(401));
-    }
-
+    /*
+     * Deprecated - masterURL is not required anymore for multi-tenant che server
+     */
+    @Deprecated
     @Test
     public void createWorkspaceWithWrongMasterURLTest() throws Exception {
         mockMvc.perform(post(WORKSPACE_ENDPOINT).header("Authorization", KEYCLOAK_TOKEN)
                 .header("Content-Type", "application/json").param("masterUrl", "http://i.do.not.exist")
                 .param("namespace", NAMESPACE).content(getCreateWorkspaceRequestBody(initWorkspaceCreateParams())))
-                .andExpect(status().is(401));
-    }
-
-    @Test
-    public void createWorkspaceOSOWithWrongMasterURLTest() throws Exception {
-        mockMvc.perform(post(WORKSPACE_OSO_ENDPOINT).header("Authorization", OPENSHIFT_TOKEN)
-                .header("Content-Type", "application/json").param("masterUrl", "http://i.do.not.exist")
-                .param("namespace", NAMESPACE).content(getCreateWorkspaceRequestBody(initWorkspaceCreateParams())))
-                .andExpect(status().is(401));
+                .andExpect(status().is(200));
     }
 
     @Test
@@ -176,16 +134,6 @@ public class WorkspaceControllerTest extends TestBase {
         WorkspaceCreateParams workspaceParams = initWorkspaceCreateParams();
         workspaceParams.setRepo("incorrecturl");
         mockMvc.perform(post(WORKSPACE_ENDPOINT).header("Authorization", KEYCLOAK_TOKEN)
-                .header("Content-Type", "application/json").param("masterUrl", VERTX_SERVER)
-                .param("namespace", NAMESPACE).content(getCreateWorkspaceRequestBody(workspaceParams)))
-                .andExpect(status().is(400));
-    }
-
-    @Test
-    public void createWorkspaceOSOWithWrongRepoParamTest() throws Exception {
-        WorkspaceCreateParams workspaceParams = initWorkspaceCreateParams();
-        workspaceParams.setRepo("incorrecturl");
-        mockMvc.perform(post(WORKSPACE_OSO_ENDPOINT).header("Authorization", OPENSHIFT_TOKEN)
                 .header("Content-Type", "application/json").param("masterUrl", VERTX_SERVER)
                 .param("namespace", NAMESPACE).content(getCreateWorkspaceRequestBody(workspaceParams)))
                 .andExpect(status().is(400));
@@ -204,16 +152,4 @@ public class WorkspaceControllerTest extends TestBase {
                 .andExpect(status().is(404));
     }
 
-    @Test
-    public void createWorkspaceOSOWithNonexistingStackParamTest() throws Exception {
-        WorkspaceCreateParams workspaceParams = initWorkspaceCreateParams();
-        workspaceParams.setStackId("nada");
-        // Need to also modify description, which is ID of a workspace to avoid
-        // getting already existing WS
-        workspaceParams.setDescription("https://github.com/mlabuda/vertx-with-che.git#master#WI0");
-        mockMvc.perform(post(WORKSPACE_OSO_ENDPOINT).header("Authorization", OPENSHIFT_TOKEN)
-                .header("Content-Type", "application/json").param("masterUrl", VERTX_SERVER)
-                .param("namespace", NAMESPACE).content(getCreateWorkspaceRequestBody(workspaceParams)))
-                .andExpect(status().is(404));
-    }
 }

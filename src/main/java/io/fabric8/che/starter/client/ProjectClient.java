@@ -17,6 +17,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -30,51 +31,52 @@ import io.fabric8.che.starter.model.workspace.Workspace;
 public class ProjectClient {
     private static final Logger LOG = LoggerFactory.getLogger(ProjectClient.class);
 
+    @Value("${MULTI_TENANT_CHE_SERVER_URL:https://che.prod-preview.openshift.io}")
+    private String multiTenantCheServerURL;
+
     @Autowired
     private WorkspaceClient workspaceClient;
+
+    @Async
+    public void deleteAllProjectsAndWorkspace(String workspaceName, String keycloakToken) throws WorkspaceNotFound {
+        Workspace runningWorkspace = workspaceClient.getStartedWorkspace(keycloakToken);
+
+        Workspace workspaceToDelete = workspaceClient.startWorkspace(workspaceName, keycloakToken);
+        workspaceClient.waitUntilWorkspaceIsRunning(workspaceToDelete, keycloakToken);
+        workspaceToDelete = workspaceClient.getWorkspaceById(workspaceToDelete.getId(), keycloakToken);
+
+        List<Project> projectsToDelete = workspaceToDelete.getConfig().getProjects();
+        if (projectsToDelete != null && !projectsToDelete.isEmpty()) {
+            for (Project project : projectsToDelete) {
+                deleteProject(workspaceToDelete, project.getName(), keycloakToken);
+            }
+        }
+
+        workspaceClient.stopWorkspace(workspaceToDelete, keycloakToken);
+        workspaceClient.waitUntilWorkspaceIsStopped(workspaceToDelete, keycloakToken);
+        workspaceClient.deleteWorkspace(workspaceToDelete.getId(), keycloakToken);
+
+        if (runningWorkspace != null && !runningWorkspace.getConfig().getName().equals(workspaceName)) {
+            workspaceClient.startWorkspace(runningWorkspace.getConfig().getName(), keycloakToken);
+
+        }
+    }
 
     /**
      * Delete a project from workspace. Workspace must be running to delete a
      * project.
      * 
-     * @param cheServerURL
      * @param workspaceName
      * @param projectName
+     * @param keycloakToken
      */
-    public void deleteProject(String cheServerURL, Workspace workspace, String projectName, String keycloakToken) {
+    public void deleteProject(Workspace workspace, String projectName, String keycloakToken) {
         String wsAgentUrl = getWsAgentUrl(workspace);
 
         String deleteProjectURL = CheRestEndpoints.DELETE_PROJECT.generateUrl(wsAgentUrl, projectName);
         LOG.info("Deleting project {}", projectName);
         RestTemplate template = new KeycloakRestTemplate(keycloakToken);
         template.delete(deleteProjectURL);
-    }
-
-    @Async
-    public void deleteAllProjectsAndWorkspace(String cheServerURL, String workspaceName, String masterUrl, String namespace, String openShiftToken, 
-            String keycloakToken) throws WorkspaceNotFound {
-        Workspace runningWorkspace = workspaceClient.getStartedWorkspace(cheServerURL, keycloakToken);
-
-        Workspace workspaceToDelete = workspaceClient.startWorkspace(cheServerURL, workspaceName, masterUrl, namespace, openShiftToken, keycloakToken);
-        workspaceClient.waitUntilWorkspaceIsRunning(cheServerURL, workspaceToDelete, keycloakToken);
-        workspaceToDelete = workspaceClient.getWorkspaceById(cheServerURL, workspaceToDelete.getId(), keycloakToken);
-
-        List<Project> projectsToDelete = workspaceToDelete.getConfig().getProjects();
-        if (projectsToDelete != null && !projectsToDelete.isEmpty()) {
-            for (Project project : projectsToDelete) {
-                deleteProject(cheServerURL, workspaceToDelete, project.getName(), keycloakToken);
-            }
-        }
-
-        workspaceClient.stopWorkspace(cheServerURL, workspaceToDelete, keycloakToken);
-        workspaceClient.waitUntilWorkspaceIsStopped(masterUrl, namespace, openShiftToken, cheServerURL, workspaceToDelete, keycloakToken);
-
-        workspaceClient.deleteWorkspace(cheServerURL, workspaceToDelete.getId(), keycloakToken);
-
-        if (runningWorkspace != null && !runningWorkspace.getConfig().getName().equals(workspaceName)) {
-            workspaceClient.startWorkspace(cheServerURL, runningWorkspace.getConfig().getName(), masterUrl, namespace, openShiftToken, keycloakToken);
-
-        }
     }
 
     private String getWsAgentUrl(final Workspace workspace) {
