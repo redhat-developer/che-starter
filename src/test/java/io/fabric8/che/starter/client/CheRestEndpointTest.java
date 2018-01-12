@@ -19,17 +19,17 @@ import io.fabric8.che.starter.TestConfig;
 import static org.junit.Assert.assertEquals;
 
 public class CheRestEndpointTest extends TestConfig {
-    private static final String WORKSPACE_ID = "quwieuqoweuqo";
+    private static final String WORKSPACE_ID = "test_workspace_id";
 
-    @Value("${che.server.url}")
-    String cheServerUrl;
+    @Value("${MULTI_TENANT_CHE_SERVER_URL}")
+    private String multiTenantCheServerURL;
 
     @Test
     public void generateUrlsFromEndpoints() {
-        String createWorkspceUrl = CheRestEndpoints.CREATE_WORKSPACE.generateUrl(cheServerUrl);
-        assertEquals(createWorkspceUrl, cheServerUrl + "/api/workspace");
-        String deleteWorkspaceUrl = CheRestEndpoints.DELETE_WORKSPACE.generateUrl(cheServerUrl, WORKSPACE_ID);
-        assertEquals(deleteWorkspaceUrl, cheServerUrl + "/api/workspace/" + WORKSPACE_ID);
+        String createWorkspceUrl = CheRestEndpoints.CREATE_WORKSPACE.generateUrl(multiTenantCheServerURL);
+        assertEquals(createWorkspceUrl, multiTenantCheServerURL + "/api/workspace");
+        String deleteWorkspaceUrl = CheRestEndpoints.DELETE_WORKSPACE.generateUrl(multiTenantCheServerURL, WORKSPACE_ID);
+        assertEquals(deleteWorkspaceUrl, multiTenantCheServerURL + "/api/workspace/" + WORKSPACE_ID);
     }
 
 }

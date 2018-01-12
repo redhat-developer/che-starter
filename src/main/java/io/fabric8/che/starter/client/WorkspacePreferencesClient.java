@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -33,31 +34,34 @@ import io.fabric8.che.starter.model.github.GitHubUserInfo;
 public class WorkspacePreferencesClient {
     private static final Logger LOG = LoggerFactory.getLogger(WorkspacePreferencesClient.class);
 
-    @Autowired
-    GitHubClient client;
+    @Value("${MULTI_TENANT_CHE_SERVER_URL:https://che.prod-preview.openshift.io}")
+    private String multiTenantCheServerURL;
 
-    public void setCommitterInfo(final String cheServerUrl, final String gitHubToken, final String keycloakToken) {
-        GitHubUserInfo userInfo = client.getUserInfo(gitHubToken);
+    @Autowired
+    GitHubClient gitHubClient;
+
+    public void setCommitterInfo(final String gitHubToken, final String keycloakToken) {
+        GitHubUserInfo userInfo = gitHubClient.getUserInfo(gitHubToken);
         WorkspacePreferences preferences = getPreferences(userInfo);
-        setCommitterInfo(cheServerUrl, keycloakToken, preferences);
+        setCommitterInfo(keycloakToken, preferences);
     }
 
-    public void setCommitterInfo(final String cheServerUrl, final String keycloakToken, final WorkspacePreferences preferences) {
+    public void setCommitterInfo(final String keycloakToken, final WorkspacePreferences preferences) {
         RestTemplate template = new KeycloakRestTemplate(keycloakToken);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<WorkspacePreferences> entity = new HttpEntity<WorkspacePreferences>(preferences, headers);
-        template.exchange(CheRestEndpoints.UPDATE_PREFERENCES.generateUrl(cheServerUrl), HttpMethod.PUT, entity, String.class);
+        template.exchange(CheRestEndpoints.UPDATE_PREFERENCES.generateUrl(multiTenantCheServerURL), HttpMethod.PUT, entity, String.class);
     }
 
-    public WorkspacePreferences getCommitterInfo(final String cheServerUrl, final String keycloakToken) {
+    public WorkspacePreferences getCommitterInfo(final String keycloakToken) {
         RestTemplate template = new KeycloakRestTemplate(keycloakToken);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<String>(headers);
 
         ResponseEntity<WorkspacePreferences> response = template.exchange(
-                CheRestEndpoints.GET_PREFERENCES.generateUrl(cheServerUrl), HttpMethod.GET, entity,
+                CheRestEndpoints.GET_PREFERENCES.generateUrl(multiTenantCheServerURL), HttpMethod.GET, entity,
                 WorkspacePreferences.class);
         return response.getBody();
     }

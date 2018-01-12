@@ -20,7 +20,6 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 
 import io.fabric8.che.starter.TestConfig;
 import io.fabric8.che.starter.model.WorkspacePreferences;
@@ -34,9 +33,6 @@ public class WorkspacePreferencesClientTest extends TestConfig {
     private String committerName;
     private String committerEmail;
     private GitHubUserInfo gitHubUserInfo;
-
-    @Value("${che.server.url}")
-    String cheServerUrl;
 
     @Autowired
     WorkspacePreferencesClient client;
@@ -53,7 +49,7 @@ public class WorkspacePreferencesClientTest extends TestConfig {
 
     @Test
     public void setCommitterInfo() throws Exception {
-        client.setCommitterInfo(cheServerUrl, KEYCLOAK_TOKEN, getTestPreferences());
+        client.setCommitterInfo(KEYCLOAK_TOKEN, getTestPreferences());
         checkCommitterInfoSetCorrectly();
     }
 
@@ -70,7 +66,7 @@ public class WorkspacePreferencesClientTest extends TestConfig {
     }
 
     private void checkCommitterInfoSetCorrectly() {
-        WorkspacePreferences committerInfo = client.getCommitterInfo(cheServerUrl, KEYCLOAK_TOKEN);
+        WorkspacePreferences committerInfo = client.getCommitterInfo(KEYCLOAK_TOKEN);
 
         assertNotNull(committerInfo);
         assertEquals(committerInfo.getCommiterName(), committerName);

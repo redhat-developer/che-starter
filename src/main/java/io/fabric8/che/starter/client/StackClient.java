@@ -15,6 +15,7 @@ package io.fabric8.che.starter.client;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -29,8 +30,11 @@ import io.fabric8.che.starter.model.stack.StackProjectMapping;
 @Component
 public class StackClient {
 
-    public List<Stack> listStacks(String cheServerUrl, String keycloakToken) {
-        String url = CheRestEndpoints.LIST_STACKS.generateUrl(cheServerUrl);
+    @Value("${MULTI_TENANT_CHE_SERVER_URL:https://che.prod-preview.openshift.io}")
+    private String multiTenantCheServerURL;
+
+    public List<Stack> listStacks(String keycloakToken) {
+        String url = CheRestEndpoints.LIST_STACKS.generateUrl(multiTenantCheServerURL);
 
         RestTemplate template = new KeycloakRestTemplate(keycloakToken);
 
@@ -44,14 +48,13 @@ public class StackClient {
      * Gets image for specified stack ID. Throws StackNotFoundException if there is no such stack
      * on the Che server.
      * 
-     * @param cheServerUrl URL of Che server
      * @param stackId stack ID
      * @param keycloakToken Keycloak token
      * @return image name for stack
      * @throws StackNotFoundException if no image name exists for such stack ID or call to Che server was not successful
      */
-    public Stack getStack(String cheServerUrl, String stackId, String keycloakToken) throws StackNotFoundException {
-        List<Stack> stacks = listStacks(cheServerUrl, keycloakToken);
+    public Stack getStack(String stackId, String keycloakToken) throws StackNotFoundException {
+        List<Stack> stacks = listStacks(keycloakToken);
         if (stacks != null && !stacks.isEmpty()) {
             try {
                 Stack stack = stacks.stream().filter(s -> stackId.equals(s.getId())).findFirst().get();

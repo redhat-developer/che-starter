@@ -39,12 +39,6 @@ public class GlobalExceptionHandler {
         return e.getMessage();
     }
 
-    @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Route not found")
-    @ExceptionHandler(RouteNotFoundException.class)
-    public String handleRouteNotFoundException(RouteNotFoundException e) {
-        return e.getMessage();
-    }
-
     @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Stack not found")
     @ExceptionHandler(StackNotFoundException.class)
     public String handleStackNotFoundException(StackNotFoundException e) {
@@ -81,21 +75,10 @@ public class GlobalExceptionHandler {
         return e.getMessage();
     }
 
-    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR, reason = "Error occurred while creating project")
-    @ExceptionHandler(ProjectCreationException.class)
-    public String handleProjectCreationException(ProjectCreationException e) {
-        return e.getMessage();
-    }
-
     @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Workspace not found")
     @ExceptionHandler(WorkspaceNotFound.class)
     public String handleWorkspaceNotFoundException(WorkspaceNotFound e) {
         return e.getMessage();
     }
 
-    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR, reason = "Migration to multi-tenant Che server has failed")
-    @ExceptionHandler(MultiTenantMigrationException.class)
-    public String handleMultiTenantMigrationException(WorkspaceNotFound e) {
-        return e.getMessage();
-    }
 }

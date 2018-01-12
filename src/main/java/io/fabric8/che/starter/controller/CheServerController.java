@@ -15,7 +15,6 @@ package io.fabric8.che.starter.controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -23,14 +22,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.fabric8.che.starter.client.CheServerClient;
-import io.fabric8.che.starter.client.keycloak.KeycloakClient;
 import io.fabric8.che.starter.client.keycloak.KeycloakTokenValidator;
-import io.fabric8.che.starter.exception.MultiTenantMigrationException;
-import io.fabric8.che.starter.exception.RouteNotFoundException;
 import io.fabric8.che.starter.model.server.CheServerInfo;
-import io.fabric8.che.starter.openshift.OpenShiftClientWrapper;
-import io.fabric8.openshift.client.OpenShiftClient;
+import io.fabric8.che.starter.util.CheServerHelper;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
@@ -38,68 +32,31 @@ import io.swagger.annotations.ApiParam;
 @RestController
 public class CheServerController {
 
-    @Autowired
-    OpenShiftClientWrapper openShiftClientWrapper;
-
-    @Autowired
-    KeycloakClient keycloakClient;
-
-    @Autowired
-    CheServerClient cheServerClient;
-
     @ApiOperation(value = "Get Che server info")
     @GetMapping("/server")
     public CheServerInfo getCheServerInfo(@RequestParam String masterUrl, @RequestParam String namespace,
             @ApiParam(value = "Keycloak token", required = true) @RequestHeader("Authorization") String keycloakToken, HttpServletRequest request) throws Exception {
-
         KeycloakTokenValidator.validate(keycloakToken);
-        String openShiftToken = keycloakClient.getOpenShiftToken(keycloakToken);
-        OpenShiftClient openShiftClient = openShiftClientWrapper.get(masterUrl, openShiftToken);
-        String requestURL = request.getRequestURL().toString();
-        return cheServerClient.getCheServerInfo(openShiftClient, namespace, requestURL, keycloakToken);
+        return getCheServerInfo(request);
+      
     }
 
-    @ApiOperation(value = "Get Che server info")
-    @GetMapping("/server/oso")
-    public CheServerInfo getCheServerInfoOnOpenShift(@RequestParam String masterUrl, @RequestParam String namespace,
-            @ApiParam(value = "OpenShift token", required = true) @RequestHeader("Authorization") String openShiftToken, HttpServletRequest request) throws Exception {
-
-        OpenShiftClient openShiftClient = openShiftClientWrapper.get(masterUrl, openShiftToken);
-        String requestURL = request.getRequestURL().toString();
-        return cheServerClient.getCheServerInfo(openShiftClient, namespace, requestURL, null);
-    }
-
+    /*
+     * Deprecated since che-starter is not supposed to start multi-tenant che server which never idles
+     */
+    @Deprecated
     @ApiOperation(value = "Start Che Server")
     @PatchMapping("/server")
     public CheServerInfo startCheServer(@RequestParam String masterUrl, @RequestParam String namespace,
             @ApiParam(value = "Keycloak token", required = true) @RequestHeader("Authorization") String keycloakToken, HttpServletResponse response, HttpServletRequest request) throws Exception {
 
         KeycloakTokenValidator.validate(keycloakToken);
-        String openShiftToken = keycloakClient.getOpenShiftToken(keycloakToken);
-        CheServerInfo info = startServer(masterUrl, openShiftToken, keycloakToken, namespace, response, request);
-        return info;
+        return getCheServerInfo(request);
     }
 
-    @ApiOperation(value = "Start Che Server")
-    @PatchMapping("/server/oso")
-    public CheServerInfo startCheServerOnOpenShift(@RequestParam String masterUrl, @RequestParam String namespace,
-            @ApiParam(value = "OpenShift token", required = true) @RequestHeader("Authorization") String openShiftToken, HttpServletResponse response, HttpServletRequest request) throws Exception {
-
-        CheServerInfo info = startServer(masterUrl, openShiftToken, null, namespace, response, request);
-        return info;
-    }
-
-    private CheServerInfo startServer(String masterUrl, String openShiftToken, String keycloakToken, String namespace, HttpServletResponse response,
-            HttpServletRequest request) throws RouteNotFoundException, MultiTenantMigrationException {
-        OpenShiftClient openShiftClient = openShiftClientWrapper.get(masterUrl, openShiftToken);
+    private CheServerInfo getCheServerInfo(HttpServletRequest request) {
         String requestURL = request.getRequestURL().toString();
-
-        CheServerInfo cheServerInfo = cheServerClient.getCheServerInfo(openShiftClient, namespace, requestURL, keycloakToken);
-        if (!cheServerInfo.isRunning()) {
-            cheServerClient.startCheServer(openShiftClient, namespace, keycloakToken);
-            response.setStatus(HttpServletResponse.SC_ACCEPTED);
-        }
-        return cheServerInfo;
+        return CheServerHelper.generateCheServerInfo(true, requestURL, true);
     }
 
 }

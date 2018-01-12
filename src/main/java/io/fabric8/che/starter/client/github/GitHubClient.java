@@ -39,6 +39,9 @@ import io.fabric8.che.starter.model.github.GitHubUserInfo;
 public class GitHubClient {
     private static final Logger LOG = LoggerFactory.getLogger(GitHubClient.class);
 
+    @Value("${MULTI_TENANT_CHE_SERVER_URL:https://che.prod-preview.openshift.io}")
+    private String multiTenantCheServerURL;
+
     @Value("${GITHUB_USER_URL:https://api.github.com/user}")
     private String GITHUB_USER_URL;
 
@@ -52,9 +55,9 @@ public class GitHubClient {
      * @throws IOException
      * @throws GitHubOAthTokenException 
      */
-    public void setGitHubOAuthToken(final String cheServerURL, final String gitHubToken, final String keycloakToken)
+    public void setGitHubOAuthToken(final String gitHubToken, final String keycloakToken)
             throws IOException, GitHubOAthTokenException {
-        String url = cheServerURL + CheRestEndpoints.SET_OAUTH_TOKEN_V1.getEndpoint().replace("{provider}", "github");
+        String url = CheRestEndpoints.SET_OAUTH_TOKEN.generateUrl(multiTenantCheServerURL);
 
         Token token = new Token();
         token.setToken(gitHubToken);
@@ -66,13 +69,9 @@ public class GitHubClient {
 
         try {
             template.postForLocation(url, entity);
+            LOG.debug("GitHub OAuth token has been successfully set via '{}'", url);
         } catch (Exception e) {
-            LOG.info("Trying new version of API - Unable to set GitHub OAuth token via '{}'", url);
-            try {
-                setGitHubOAuthTokenVersion2(cheServerURL, template, entity);
-            } catch (Exception ex) {
-                throw new GitHubOAthTokenException("Error setting GitHub OAuth token", ex);
-            }
+            throw new GitHubOAthTokenException("Error setting GitHub OAuth token", e);
         }
     }
 
@@ -100,12 +99,6 @@ public class GitHubClient {
         List<GitHubEmail> emails = response.getBody();
         GitHubEmail primary = emails.stream().filter(e -> e.isPrimary()).findFirst().get();
         return primary;
-    }
-
-    private void setGitHubOAuthTokenVersion2(String cheServerURL, RestTemplate template, HttpEntity<Token> entity) {
-        String url = cheServerURL + CheRestEndpoints.SET_OAUTH_TOKEN_V2.getEndpoint();
-        template.postForLocation(url, entity);
-        LOG.info("GitHub OAuth token has been successfully set via '{}'", url);
     }
 
 }
