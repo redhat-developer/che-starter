@@ -95,10 +95,9 @@ public class WorkspaceController {
             @ApiParam(value = "Keycloak token", required = true) @RequestHeader("Authorization") String keycloakToken)
             throws IOException, URISyntaxException, StackNotFoundException,
             GitHubOAthTokenException, KeycloakException, WorkspaceNotFound {
-
         KeycloakTokenValidator.validate(keycloakToken);
-        String gitHubOAuthToken = keycloakClient.getGitHubToken(keycloakToken);
-        return createWorkspace(gitHubOAuthToken, keycloakToken, params);
+        String gitHubToken = keycloakClient.getGitHubToken(keycloakToken);
+        return createWorkspace(gitHubToken, keycloakToken, params);
     }
 
     @ApiOperation(value = "Start an existing workspace. Stop all other workspaces (only one workspace can be running at a time)")

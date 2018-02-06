@@ -17,6 +17,8 @@ import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.List;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,8 +41,10 @@ import io.fabric8.che.starter.model.workspace.Workspace;
 import io.fabric8.che.starter.model.workspace.WorkspaceConfig;
 import io.fabric8.che.starter.model.workspace.WorkspaceState;
 import io.fabric8.che.starter.model.workspace.WorkspaceStatus;
+import io.fabric8.che.starter.model.workspace.WorkspaceV6;
 import io.fabric8.che.starter.util.ProjectHelper;
 import io.fabric8.che.starter.util.WorkspaceHelper;
+import io.fabric8.che.starter.util.WorkspaceLegacyFormatAdapter;
 
 @Component
 public class WorkspaceClient {
@@ -125,7 +129,6 @@ public class WorkspaceClient {
      * Create workspace on the Che server with given URL.
      * 
      * @param keycloakToken
-     * @param name
      * @param stackId
      * @param repo
      * @param branch
@@ -155,12 +158,19 @@ public class WorkspaceClient {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<WorkspaceConfig> entity = new HttpEntity<WorkspaceConfig>(wsConfig, headers);
-
-        ResponseEntity<Workspace> workspaceResponse = template.exchange(url, HttpMethod.POST, entity, Workspace.class);
-        Workspace workspace = workspaceResponse.getBody();
-
-        LOG.info("Workspace has been created: {}", workspace);
+        Gson gson = new Gson();
+        HttpEntity<WorkspaceConfig> entity = new HttpEntity<>(wsConfig, headers);
+        String workspaceRequestRaw = gson.toJson(entity);
+        ResponseEntity<String> workspaceResponseRaw = template.exchange(url, HttpMethod.POST, entity, String.class);
+        Workspace workspace;
+        try {
+            workspace = gson.fromJson(workspaceResponseRaw.getBody(), Workspace.class);
+        } catch (JsonSyntaxException e) {
+            LOG.warn("Could not deserialize che server response, possibly v6");
+            WorkspaceV6 workspaceV6 = gson.fromJson(workspaceResponseRaw.getBody(), WorkspaceV6.class);
+            workspace = WorkspaceLegacyFormatAdapter.getWorkspaceLegacyFormat(workspaceV6);
+        }
+        LOG.info("Workspace has been created: {}", workspace.getId());
 
         return workspace;
     }
