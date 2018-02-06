@@ -1,0 +1,142 @@
+{
+  "attributes":{"created":"1515489473683"},
+  "namespace":"tdancs",
+  "temporary":false,
+  "id":"workspace3ca9wjqq5qm66skq",
+  "status":"STOPPED",
+  "config":{
+    "defaultEnv":"default",
+    "environments":{
+      "default":{
+        "machines":{
+          "dev-machine":{
+            "attributes":{"memoryLimitBytes":"2147483648"},
+            "servers":{},
+            "agents":[
+              "com.redhat.bayesian.lsp",
+              "org.eclipse.che.ws-agent",
+              "org.eclipse.che.terminal",
+              "org.eclipse.che.exec"
+            ]
+          }
+        },
+        "recipe":{
+          "location":"registry.devshift.net/che/vertx",
+          "type":"dockerimage"
+        }
+      }
+    },
+    "projects":[
+      {
+        "links":[],
+        "name":"vertx-http-booster",
+        "attributes":{},
+        "type":"maven",
+        "source":{
+          "location":"https://github.com/openshiftio-vertx-boosters/vertx-http-booster",
+          "type":"git",
+          "parameters":{"branch":"master","keepVcs":"true"}
+        },
+        "path":"/vertx-http-booster",
+        "description":"Created via che-starter API",
+        "problems":[],
+        "mixins":["git"]
+      }
+    ],
+    "name":"tfiaq",
+    "description":"mycustomdescription",
+    "commands":[
+      {
+        "commandLine":"scl enable rh-maven33 \u0027mvn compile vertx:debug -f ${current.project.path}\u0027",
+        "name":"debug",
+        "attributes":{"previewUrl":"http://${server.port.8080}","goal":"Debug"},
+        "type":"custom"
+      },
+      {
+        "commandLine":"scl enable rh-maven33 \u0027mvn compile vertx:run -f ${current.project.path}\u0027",
+        "name":"run",
+        "attributes":{"previewUrl":"http://${server.port.8080}","goal":"Run"},
+        "type":"custom"
+      },
+      {
+        "commandLine":"scl enable rh-maven33 \u0027mvn clean install -f ${current.project.path}\u0027",
+        "name":"build",
+        "attributes":{"goal":"Build"},
+        "type":"mvn"
+      }
+    ],
+    "links":[]
+  },
+  "links":[
+    {
+      "href":"https://che.openshift.io/wsmaster/api/workspace/workspace3ca9wjqq5qm66skq",
+      "parameters":[],
+      "rel":"self link",
+      "method":"GET"
+    },
+    {
+      "href":"https://che.openshift.io/wsmaster/api/workspace/workspace3ca9wjqq5qm66skq/runtime",
+      "parameters":[],
+      "rel":"start workspace",
+      "method":"POST",
+      "produces":"application/json"
+    },
+    {
+      "href":"https://che.openshift.io/wsmaster/api/workspace/workspace3ca9wjqq5qm66skq",
+      "parameters":[],
+      "rel":"remove workspace",
+      "method":"DELETE",
+      "produces":"application/json"
+    },
+    {
+      "href":"https://che.openshift.io/wsmaster/api/workspace",
+      "parameters":[],
+      "rel":"get all user workspaces",
+      "method":"GET",
+      "produces":"application/json"
+    },
+    {
+      "href":"https://che.openshift.io/wsmaster/api/workspace/workspace3ca9wjqq5qm66skq/snapshot",
+      "parameters":[],
+      "rel":"get workspace snapshot",
+      "method":"GET",
+      "produces":"application/json"
+    },
+    {
+      "href":"https://che.openshift.io/tdancs/tfiaq",
+      "parameters":[],
+      "rel":"ide url",
+      "method":"GET",
+      "produces":"text/html"
+    },
+    {
+      "href":"wss://che.openshift.io/wsmaster/api/ws",
+      "parameters":[
+        {"required":true,"name":"channel","valid":[],"defaultValue":"workspace:workspace3ca9wjqq5qm66skq"}
+      ],
+      "rel":"get workspace events channel",
+      "method":"GET"
+    },
+    {
+      "href":"wss://che.openshift.io/wsmaster/api/ws",
+      "parameters":[
+        {
+          "required":true,
+          "name":"channel",
+          "valid":[],
+          "defaultValue":"workspace:workspace3ca9wjqq5qm66skq:environment_output"
+        }
+      ],
+      "rel":"environment.output_channel",
+      "method":"GET"
+    },
+    {
+      "href":"wss://che.openshift.io/wsmaster/api/ws",
+      "parameters":[
+        {"required":true,"name":"channel","valid":[],"defaultValue":"workspace:workspace3ca9wjqq5qm66skq:machines_statuses"}
+      ],
+      "rel":"environment.status_channel",
+      "method":"GET"
+    }
+  ]
+}

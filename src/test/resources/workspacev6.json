@@ -1,0 +1,73 @@
+{
+  "links":{
+    "self":"https://che.openshift.io/wsmaster/api/workspace/workspace3ca9wjqq5qm66skq",
+    "ide":"https://che.openshift.io/tdancs/tfiaq",
+    "environment/outputChannel": "wss://che.openshift.io/wsmaster/api/ws",
+    "environment/statusChannel": "wss://che.openshift.io/wsmaster/api/ws"
+  },
+  "attributes":{"created":"1515489473683"},
+  "namespace":"tdancs",
+  "temporary":false,
+  "id":"workspace3ca9wjqq5qm66skq",
+  "status":"STOPPED",
+  "config":{
+    "defaultEnv":"default",
+    "environments":{
+      "default":{
+        "machines":{
+          "dev-machine":{
+            "attributes":{"memoryLimitBytes":"2147483648"},
+            "servers":{},
+            "volumes":{},
+            "installers":[],
+            "env":{}
+          }
+        },
+        "recipe":{
+          "location":"registry.devshift.net/che/vertx",
+          "type":"dockerimage"
+        }
+      }
+    },
+    "projects":[
+      {
+        "links":[],
+        "name":"vertx-http-booster",
+        "attributes":{},
+        "type":"maven",
+        "source":{
+          "location":"https://github.com/openshiftio-vertx-boosters/vertx-http-booster",
+          "type":"git",
+          "parameters":{"branch":"master","keepVcs":"true"}
+        },
+        "path":"/vertx-http-booster",
+        "description":"Created via che-starter API",
+        "problems":[],
+        "mixins":["git"]
+      }
+    ],
+    "name":"tfiaq",
+    "description":"mycustomdescription",
+    "commands":[
+      {
+        "commandLine":"scl enable rh-maven33 \u0027mvn clean install -f ${current.project.path}\u0027",
+        "name":"build",
+        "attributes":{"goal":"Build"},
+        "type":"mvn"
+      },
+      {
+        "commandLine":"scl enable rh-maven33 \u0027mvn compile vertx:run -f ${current.project.path}\u0027",
+        "name":"run",
+        "attributes":{"previewUrl":"http://${server.port.8080}","goal":"Run"},
+        "type":"custom"
+      },
+      {
+        "commandLine":"scl enable rh-maven33 \u0027mvn compile vertx:debug -f ${current.project.path}\u0027",
+        "name":"debug",
+        "attributes":{"previewUrl":"http://${server.port.8080}","goal":"Debug"},
+        "type":"custom"
+      }
+    ],
+    "links":[]
+  }
+}
