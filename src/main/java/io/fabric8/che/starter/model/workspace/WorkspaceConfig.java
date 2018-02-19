@@ -14,6 +14,7 @@ package io.fabric8.che.starter.model.workspace;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -26,7 +27,7 @@ public class WorkspaceConfig {
     // there could go list of projects
     private String defaultEnv;
     private String description;
-    private WorkspaceEnvironments environments;
+    private Map<String, WorkspaceEnvironment> environments;
     private String name;
     private List<WorkspaceLink> links;
     private List<Project> projects;
@@ -69,11 +70,11 @@ public class WorkspaceConfig {
         this.defaultEnv = defaultEnv;
     }
 
-    public WorkspaceEnvironments getEnvironments() {
+    public Map<String, WorkspaceEnvironment> getEnvironments() {
         return environments;
     }
 
-    public void setEnvironments(WorkspaceEnvironments environments) {
+    public void setEnvironments(Map<String, WorkspaceEnvironment> environments) {
         this.environments = environments;
     }
 
