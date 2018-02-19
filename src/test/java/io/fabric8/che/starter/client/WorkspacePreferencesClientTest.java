@@ -20,19 +20,22 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import io.fabric8.che.starter.TestConfig;
 import io.fabric8.che.starter.model.WorkspacePreferences;
 import io.fabric8.che.starter.model.github.GitHubUserInfo;
 
 public class WorkspacePreferencesClientTest extends TestConfig {
-    private static final String KEYCLOAK_TOKEN = null;
     private static final String GITHUB_LOGIN = "johndoe";
     private static final String GITHUB_EMAIL = "johndoe@gmail.com";
 
     private String committerName;
     private String committerEmail;
     private GitHubUserInfo gitHubUserInfo;
+
+    @Value("${OSIO_USER_TOKEN:#{null}}")
+    private String osioUserToken;
 
     @Autowired
     WorkspacePreferencesClient client;
@@ -49,7 +52,7 @@ public class WorkspacePreferencesClientTest extends TestConfig {
 
     @Test
     public void setCommitterInfo() throws Exception {
-        client.setCommitterInfo(KEYCLOAK_TOKEN, getTestPreferences());
+        client.setCommitterInfo(osioUserToken, getTestPreferences());
         checkCommitterInfoSetCorrectly();
     }
 
@@ -66,7 +69,7 @@ public class WorkspacePreferencesClientTest extends TestConfig {
     }
 
     private void checkCommitterInfoSetCorrectly() {
-        WorkspacePreferences committerInfo = client.getCommitterInfo(KEYCLOAK_TOKEN);
+        WorkspacePreferences committerInfo = client.getCommitterInfo(osioUserToken);
 
         assertNotNull(committerInfo);
         assertEquals(committerInfo.getCommiterName(), committerName);

@@ -25,6 +25,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import io.fabric8.che.starter.TestConfig;
 import io.fabric8.che.starter.exception.StackNotFoundException;
@@ -37,21 +38,23 @@ public class WorkspaceClientTest extends TestConfig {
     private static final String BRANCH = "master";
     private static final String STACK_ID = "java-centos";
     private static final String DESCRIPTION = GITHUB_REPO + "#" + BRANCH + "#" + "WI1345";
-    private static final String KEYCLOAK_TOKEN = null;
 
     @Autowired
     private WorkspaceClient client;
 
+    @Value("${OSIO_USER_TOKEN:#{null}}")
+    private String osioUserToken;
+
     @Test
     public void listWorkspaces() {
-        List<Workspace> workspaces = this.client.listWorkspaces(KEYCLOAK_TOKEN);
+        List<Workspace> workspaces = this.client.listWorkspaces(osioUserToken);
         LOG.info("Number of workspaces: {}", workspaces.size());
         workspaces.forEach(w -> LOG.info("workspace ID: {}", w.getId()));
     }
 
     @Test
     public void createAndDeleteWorkspace() throws IOException, StackNotFoundException, WorkspaceNotFound, URISyntaxException {
-        Workspace workspace = client.createWorkspace(KEYCLOAK_TOKEN, STACK_ID, GITHUB_REPO, BRANCH, DESCRIPTION);
+        Workspace workspace = client.createWorkspace(osioUserToken, STACK_ID, GITHUB_REPO, BRANCH, DESCRIPTION);
         String name = workspace.getConfig().getName();
         String id = workspace.getId();
 
@@ -60,20 +63,20 @@ public class WorkspaceClientTest extends TestConfig {
         LOG.info("Workspace '{}' with id '{}' has been created", name, id);
 
         // Check that workspace has been really created
-        Workspace createdWorkspace = client.listWorkspaces(KEYCLOAK_TOKEN).stream().filter(w -> w.getId().equals(id)).findFirst().get();
+        Workspace createdWorkspace = client.listWorkspaces(osioUserToken).stream().filter(w -> w.getId().equals(id)).findFirst().get();
         assertNotNull(createdWorkspace);
         assertEquals(name, createdWorkspace.getConfig().getName());
 
         // Deleting workspace
-        client.deleteWorkspace(id, KEYCLOAK_TOKEN);
+        client.deleteWorkspace(id, osioUserToken);
         // Checking that workspaces has was really deleted
-        Workspace workspaceThatShouldNotExist = client.listWorkspaces(KEYCLOAK_TOKEN).stream().filter(w -> w.getId().equals(id)).findFirst().orElse(null);
+        Workspace workspaceThatShouldNotExist = client.listWorkspaces(osioUserToken).stream().filter(w -> w.getId().equals(id)).findFirst().orElse(null);
         assertNull(workspaceThatShouldNotExist);
     }
 
     @Test
     public void stopWorskpace() {
-        List<Workspace> workspaces = client.listWorkspaces(KEYCLOAK_TOKEN);
+        List<Workspace> workspaces = client.listWorkspaces(osioUserToken);
 
         if (!workspaces.isEmpty()) {
             LOG.info("Number of workspaces: {}", workspaces.size());
@@ -81,8 +84,8 @@ public class WorkspaceClientTest extends TestConfig {
                     .collect(Collectors.toList());
             if (!runningWorkspaces.isEmpty()) {
                 LOG.info("Number of running workspaces: {}", runningWorkspaces.size());
-                client.stopWorkspace(runningWorkspaces.get(0), KEYCLOAK_TOKEN);
-                client.waitUntilWorkspaceIsStopped(runningWorkspaces.get(0), KEYCLOAK_TOKEN);
+                client.stopWorkspace(runningWorkspaces.get(0), osioUserToken);
+                client.waitUntilWorkspaceIsStopped(runningWorkspaces.get(0), osioUserToken);
             }
         }
     }
