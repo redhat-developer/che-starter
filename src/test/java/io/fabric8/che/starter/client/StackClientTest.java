@@ -22,6 +22,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import io.fabric8.che.starter.TestConfig;
 import io.fabric8.che.starter.exception.StackNotFoundException;
@@ -36,21 +37,23 @@ public class StackClientTest extends TestConfig {
     private static final String WILDFLY_SWARM_STACK_ID = "wildfly-swarm";
     private static final String NODE_JS_STACK_ID = "nodejs-centos";
     private static final String NON_EXISTING_STACK_ID = "non-existing-stack-id";
-    private static final String KEYCLOAK_TOKEN = null;
 
     @Autowired
     private StackClient client;
 
+    @Value("${OSIO_USER_TOKEN:#{null}}")
+    private String osioUserToken;
+
     @Test
     public void listStacks() {
-        List<Stack> stacks = client.listStacks(KEYCLOAK_TOKEN);
+        List<Stack> stacks = client.listStacks(osioUserToken);
         LOG.info("Number of stacks: {}", stacks.size());
         assertTrue(!stacks.isEmpty());
     }
 
     @Test
     public void vertxStackExists() {
-        List<Stack> stacks = client.listStacks(KEYCLOAK_TOKEN);
+        List<Stack> stacks = client.listStacks(osioUserToken);
         Stack stack = stacks.stream().filter(s -> VERTX_STACK_ID.equals(s.getId())).findFirst().get();
         assertNotNull(VERTX_STACK_ID + " not Found", stack);
         LOG.info("vertx stack is found: {}", stack.getId());
@@ -59,31 +62,31 @@ public class StackClientTest extends TestConfig {
 
     @Test
     public void getVertxStack() throws StackNotFoundException {
-        Stack vertx = client.getStack(VERTX_STACK_ID, KEYCLOAK_TOKEN);
+        Stack vertx = client.getStack(VERTX_STACK_ID, osioUserToken);
         LOG.info("'vert.x' stack is found: {}", vertx);
     }
 
     @Test
     public void getJavaCentosStack() throws StackNotFoundException {
-        Stack javaCentos = client.getStack(JAVA_CENTOS_STACK_ID, KEYCLOAK_TOKEN);
+        Stack javaCentos = client.getStack(JAVA_CENTOS_STACK_ID, osioUserToken);
         LOG.info("'java-centos' stack is found: {}", javaCentos);
     }
 
     @Test
     public void getSpringBootStack() throws StackNotFoundException {
-        Stack springBoot = client.getStack(SPRING_BOOT_STACK_ID, KEYCLOAK_TOKEN);
+        Stack springBoot = client.getStack(SPRING_BOOT_STACK_ID, osioUserToken);
         LOG.info("'spring-boot' stack is found: {}", springBoot);
     }
 
     @Test
     public void getWildflySwarmStack() throws StackNotFoundException {
-        Stack wildflySwarm = client.getStack(WILDFLY_SWARM_STACK_ID, KEYCLOAK_TOKEN);
+        Stack wildflySwarm = client.getStack(WILDFLY_SWARM_STACK_ID, osioUserToken);
         LOG.info("'wildfly-swarm' stack is found: {}", wildflySwarm);
     }
 
     @Test
     public void getNodeJsStack() throws StackNotFoundException {
-        Stack nodeJs = client.getStack(NODE_JS_STACK_ID, KEYCLOAK_TOKEN);
+        Stack nodeJs = client.getStack(NODE_JS_STACK_ID, osioUserToken);
         LOG.info("'nodejs4' stack is found: {}", nodeJs);
     }
 
@@ -101,7 +104,7 @@ public class StackClientTest extends TestConfig {
 
     @Test(expected = StackNotFoundException.class)
     public void getNonExistingStackImage() throws StackNotFoundException {
-        client.getStack(NON_EXISTING_STACK_ID, KEYCLOAK_TOKEN);
+        client.getStack(NON_EXISTING_STACK_ID, osioUserToken);
     }
 
 }

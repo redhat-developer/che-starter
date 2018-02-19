@@ -19,6 +19,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import io.fabric8.che.starter.TestConfig;
 import io.fabric8.che.starter.exception.GitHubOAthTokenException;
@@ -28,14 +29,16 @@ import io.fabric8.che.starter.model.github.GitHubUserInfo;
 public class GitHubTokenClientTest extends TestConfig {
     private static final Logger LOG = LoggerFactory.getLogger(GitHubTokenClientTest.class);
     private static final String GIT_HUB_TOKEN = "dummy_token";
-    private static final String KEYCLOAK_TOKEN = null;
+
+    @Value("${OSIO_USER_TOKEN:#{null}}")
+    private String osioUserToken;
 
     @Autowired
     private GitHubClient client;
 
     @Test
     public void setGitHubToken() throws GitHubOAthTokenException, IOException {
-        client.setGitHubOAuthToken(GIT_HUB_TOKEN, KEYCLOAK_TOKEN);
+        client.setGitHubOAuthToken(GIT_HUB_TOKEN, osioUserToken);
     }
 
     @Ignore("Valid GitHub token must be provided")
