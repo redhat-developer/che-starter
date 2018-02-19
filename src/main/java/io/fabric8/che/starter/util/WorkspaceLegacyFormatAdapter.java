@@ -12,12 +12,11 @@
  */
 package io.fabric8.che.starter.util;
 
-import io.fabric8.che.starter.model.workspace.Workspace;
-import io.fabric8.che.starter.model.workspace.WorkspaceLink;
-import io.fabric8.che.starter.model.workspace.WorkspaceV6;
+import io.fabric8.che.starter.model.workspace.*;
 import org.springframework.http.HttpMethod;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +33,7 @@ public class WorkspaceLegacyFormatAdapter {
      */
     public static Workspace getWorkspaceLegacyFormat(final WorkspaceV6 workspaceV6) {
         Workspace response = new Workspace();
-        response.setConfig(workspaceV6.getConfig());
+        response.setConfig(convertConfigToLegacy(workspaceV6.getConfig()));
         response.setId(workspaceV6.getId());
         response.setRuntime(workspaceV6.getRuntime());
         response.setStatus(workspaceV6.getStatus());
@@ -120,6 +119,46 @@ public class WorkspaceLegacyFormatAdapter {
                 default: break;
             }
         });
+        return response;
+    }
+
+    /**
+     * Layout of config has changed in V6, this method takes new config and maps it to the legacy format
+     * @param configV6 New config from response
+     * @return legacy config format
+     */
+    private static WorkspaceConfig convertConfigToLegacy(WorkspaceConfigV6 configV6) {
+        WorkspaceConfig response = new WorkspaceConfig();
+        response.setName(configV6.getName());
+        response.setDescription(configV6.getDescription());
+        response.setDefaultEnv(configV6.getDefaultEnv());
+        response.setLinks(configV6.getLinks());
+        response.setCommands(configV6.getCommands());
+        response.setProjects(configV6.getProjects());
+
+        Map<String, WorkspaceEnvironmentV6> configV6Environments = configV6.getEnvironments();
+        if (configV6Environments != null) {
+            Map<String, WorkspaceEnvironment> environments = new HashMap<>();
+            WorkspaceEnvironmentV6 configV6DefaultEnvironment = configV6Environments.get(configV6.getDefaultEnv());
+            if (configV6DefaultEnvironment != null) {
+                WorkspaceEnvironment defaultEnv = new WorkspaceEnvironment();
+                Map<String, WorkspaceMachineV6> configV6Machines = configV6DefaultEnvironment.getMachines();
+                if (configV6Machines != null) {
+                    Map<String, WorkspaceMachine> machines = new HashMap<>();
+                    configV6Machines.forEach((name, machine) -> {
+                        WorkspaceMachine tmp = new WorkspaceMachine();
+                        tmp.setAttributes(machine.getAttributes());
+                        tmp.setAgents(machine.getInstallers());
+                        machines.put(name, tmp);
+                    });
+                    defaultEnv.setMachines(machines);
+                }
+                defaultEnv.setRecipe(configV6DefaultEnvironment.getRecipe());
+                environments.put(configV6.getDefaultEnv(),defaultEnv);
+            }
+            response.setEnvironments(environments);
+        }
+
         return response;
     }
 

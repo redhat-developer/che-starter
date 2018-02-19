@@ -14,10 +14,12 @@ package io.fabric8.che.starter.util;
 
 import io.fabric8.che.starter.model.DevMachine;
 import io.fabric8.che.starter.model.DevMachineRuntime;
+import io.fabric8.che.starter.model.project.Project;
 import io.fabric8.che.starter.model.project.Source;
 import io.fabric8.che.starter.model.workspace.*;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -45,13 +47,27 @@ public class WorkspaceComparator implements Comparator<Workspace> {
         }
 
         // Compare IDs
-        if (workspace1.getId().compareTo(workspace2.getId()) != 0) {
-            return workspace1.getId().compareTo(workspace2.getId());
+        String workspace1ID = workspace1.getId();
+        String workspace2ID = workspace2.getId();
+        if (workspace1ID != null && workspace2ID != null) {
+            int workspaceIDsEqual = workspace1ID.compareTo(workspace2ID);
+            if (workspaceIDsEqual != 0) return workspaceIDsEqual;
+        } else if (workspace1ID != null && workspace2ID == null) {
+            return 1;
+        } else if (workspace1ID == null && workspace2ID != null) {
+            return -1;
         }
 
         // Compare machine states
-        if (workspace1.getStatus().compareTo(workspace2.getStatus()) != 0) {
-            return workspace1.getStatus().compareTo(workspace2.getStatus());
+        String workspace1Status = workspace1.getStatus();
+        String workspace2Status = workspace2.getStatus();
+        if (workspace1Status != null && workspace2Status != null) {
+            int workspaceStatusesEqual = workspace1Status.compareTo(workspace2Status);
+            if (workspaceStatusesEqual != 0) return workspaceStatusesEqual;
+        } else if (workspace1Status != null && workspace2Status == null) {
+            return 1;
+        } else if (workspace1Status == null && workspace2Status!= null) {
+            return -1;
         }
 
         // Compare workspace links
@@ -168,11 +184,11 @@ public class WorkspaceComparator implements Comparator<Workspace> {
     }
 
     private boolean compareWorkspaceConfigEnvironments(WorkspaceConfig workspace1Config, WorkspaceConfig workspace2Config) {
-        WorkspaceEnvironments workspace1Environments = workspace1Config.getEnvironments();
-        WorkspaceEnvironments workspace2Environments = workspace2Config.getEnvironments();
+        Map<String, WorkspaceEnvironment> workspace1Environments = workspace1Config.getEnvironments();
+        Map<String, WorkspaceEnvironment> workspace2Environments = workspace2Config.getEnvironments();
         if (workspace1Environments != null && workspace2Environments != null) {
-            WorkspaceEnvironment workspace1Environment = workspace1Environments.getDefaultEnv();
-            WorkspaceEnvironment workspace2Environment = workspace2Environments.getDefaultEnv();
+            WorkspaceEnvironment workspace1Environment = workspace1Environments.get(workspace1Config.getDefaultEnv());
+            WorkspaceEnvironment workspace2Environment = workspace2Environments.get(workspace2Config.getDefaultEnv());
             if (workspace1Environment != null && workspace2Environment != null) {
                 WorkspaceRecipe workspace1Recipe = workspace1Environment.getRecipe();
                 WorkspaceRecipe workspace2Recipe = workspace2Environment.getRecipe();
@@ -217,12 +233,10 @@ public class WorkspaceComparator implements Comparator<Workspace> {
                 });
             });
             return workspaceMachinesEqual.get();
-        } else if (workspace1Machines != null && workspace2Machines == null) {
-            return false;
-        } else if (workspace1Machines == null && workspace2Machines != null) {
-            return false;
+        } else if (workspace1Machines == null && workspace2Machines == null) {
+            return true;
         }
-        return true;
+        return false;
     }
 
     private boolean compareWorkspaceMachineAttributes(WorkspaceMachine workspace1Machine, WorkspaceMachine workspace2Machine) {
@@ -238,38 +252,44 @@ public class WorkspaceComparator implements Comparator<Workspace> {
 
     private boolean compareWorkspaceRecipes(WorkspaceRecipe workspace1Recipe, WorkspaceRecipe workspace2Recipe) {
         if (workspace1Recipe != null && workspace2Recipe != null) {
-            if (!compareStrings(workspace1Recipe.getContent(), workspace2Recipe.getContent()) ||
-                !compareStrings(workspace1Recipe.getContentType(), workspace2Recipe.getContentType()) ||
-                !compareStrings(workspace1Recipe.getLocation(), workspace2Recipe.getLocation()) ||
-                !compareStrings(workspace1Recipe.getType(), workspace2Recipe.getType())
+            if (compareStrings(workspace1Recipe.getContent(), workspace2Recipe.getContent()) &&
+                compareStrings(workspace1Recipe.getContentType(), workspace2Recipe.getContentType()) &&
+                compareStrings(workspace1Recipe.getLocation(), workspace2Recipe.getLocation()) &&
+                compareStrings(workspace1Recipe.getType(), workspace2Recipe.getType())
             ) {
-                return false;
+                return true;
             }
-        } else if (workspace1Recipe != null && workspace2Recipe == null) {
-            return false;
-        } else if (workspace1Recipe == null && workspace2Recipe != null) {
-            return false;
+        } else if (workspace1Recipe == null && workspace2Recipe == null) {
+            return true;
         }
-        return true;
+        return false;
     }
 
     private boolean compareWorkspaceConfigCommands(WorkspaceConfig workspace1Config, WorkspaceConfig workspace2Config) {
-        AtomicBoolean workspaceConfigCommandsEqual = new AtomicBoolean(true);
-        workspace1Config.getCommands().forEach(workspace1ConfigCommand -> {
-            AtomicBoolean found = new AtomicBoolean(false);
-            workspace2Config.getCommands().forEach(workspace2ConfigCommand -> {
-                if (compareStrings(workspace1ConfigCommand.getCommandLine(),workspace2ConfigCommand.getCommandLine()) &&
-                    compareStrings(workspace1ConfigCommand.getName(),workspace2ConfigCommand.getName()) &&
-                    compareStrings(workspace1ConfigCommand.getType(),workspace2ConfigCommand.getType()) &&
-                    compareWorkspaceConfigCommandsAttributes(workspace1ConfigCommand.getAttributes(), workspace2ConfigCommand.getAttributes())) {
-                    found.set(true);
+        List<WorkspaceCommand> workspace1Commands = workspace1Config.getCommands();
+        List<WorkspaceCommand> workspace2Commands = workspace2Config.getCommands();
+        if (workspace1Commands != null && workspace2Commands != null) {
+            AtomicBoolean workspaceConfigCommandsEqual = new AtomicBoolean(true);
+            workspace1Commands.forEach(workspace1ConfigCommand -> {
+                AtomicBoolean found = new AtomicBoolean(false);
+                workspace2Commands.forEach(workspace2ConfigCommand -> {
+                    if (compareStrings(workspace1ConfigCommand.getCommandLine(), workspace2ConfigCommand.getCommandLine()) &&
+                        compareStrings(workspace1ConfigCommand.getName(), workspace2ConfigCommand.getName()) &&
+                        compareStrings(workspace1ConfigCommand.getType(), workspace2ConfigCommand.getType()) &&
+                        compareWorkspaceConfigCommandsAttributes(workspace1ConfigCommand.getAttributes(), workspace2ConfigCommand.getAttributes())
+                    ) {
+                        found.set(true);
+                    }
+                });
+                if (!found.get()) {
+                    workspaceConfigCommandsEqual.set(false);
                 }
             });
-            if (!found.get()) {
-                workspaceConfigCommandsEqual.set(false);
-            }
-        });
-        return workspaceConfigCommandsEqual.get();
+            return workspaceConfigCommandsEqual.get();
+        } else if (workspace1Commands == null && workspace2Commands == null) {
+            return true;
+        }
+        return false;
     }
 
     private boolean compareWorkspaceConfigCommandsAttributes(
@@ -281,25 +301,33 @@ public class WorkspaceComparator implements Comparator<Workspace> {
     }
 
     private boolean compareWorkspaceConfigProjects(WorkspaceConfig workspace1Config, WorkspaceConfig workspace2Config) {
-        AtomicBoolean workspaceConfigProjectsEqual = new AtomicBoolean(true);
-        workspace1Config.getProjects().forEach(workspace1ConfigProject -> {
-            AtomicBoolean found = new AtomicBoolean(false);
-            workspace2Config.getProjects().forEach(workspace2ConfigProject -> {
-                if (compareStrings(workspace1ConfigProject.getDescription(),workspace2ConfigProject.getDescription()) &&
-                    compareStrings(workspace1ConfigProject.getName(),workspace2ConfigProject.getName()) &&
-                    compareStrings(workspace1ConfigProject.getPath(),workspace2ConfigProject.getPath()) &&
-                    compareStrings(workspace1ConfigProject.getType(),workspace2ConfigProject.getType()) &&
-                    workspace1ConfigProject.getMixins().containsAll(workspace2ConfigProject.getMixins()) &&
-                    compareWorkspaceConfigProjectsSource(workspace1ConfigProject.getSource(), workspace2ConfigProject.getSource())
-                ) {
-                    found.set(true);
+        List<Project> workspace1Projects = workspace1Config.getProjects();
+        List<Project> workspace2Projects = workspace2Config.getProjects();
+        if (workspace1Projects != null && workspace2Projects != null) {
+            AtomicBoolean workspaceConfigProjectsEqual = new AtomicBoolean(true);
+            workspace1Projects.forEach(workspace1ConfigProject -> {
+                AtomicBoolean found = new AtomicBoolean(false);
+                workspace2Projects.forEach(workspace2ConfigProject -> {
+                    if (compareStrings(workspace1ConfigProject.getDescription(), workspace2ConfigProject.getDescription()) &&
+                        compareStrings(workspace1ConfigProject.getName(), workspace2ConfigProject.getName()) &&
+                        compareStrings(workspace1ConfigProject.getPath(), workspace2ConfigProject.getPath()) &&
+                        compareStrings(workspace1ConfigProject.getType(), workspace2ConfigProject.getType()) &&
+                        workspace1ConfigProject.getMixins().containsAll(workspace2ConfigProject.getMixins()) &&
+                        workspace1ConfigProject.getMixins().size() == workspace2ConfigProject.getMixins().size() &&
+                        compareWorkspaceConfigProjectsSource(workspace1ConfigProject.getSource(), workspace2ConfigProject.getSource())
+                    ) {
+                        found.set(true);
+                    }
+                });
+                if (!found.get()) {
+                    workspaceConfigProjectsEqual.set(false);
                 }
             });
-            if (!found.get()) {
-                workspaceConfigProjectsEqual.set(false);
-            }
-        });
-        return workspaceConfigProjectsEqual.get();
+            return workspaceConfigProjectsEqual.get();
+        } else if (workspace1Projects == null && workspace2Projects == null) {
+            return true;
+        }
+        return false;
     }
 
     private boolean compareWorkspaceConfigProjectsSource(Source workspace1ConfigProjectSource, Source workspace2ConfigProjectSource) {
@@ -309,30 +337,39 @@ public class WorkspaceComparator implements Comparator<Workspace> {
     }
 
     private boolean compareWorkspaceConfigLinks(WorkspaceConfig workspace1Config, WorkspaceConfig workspace2Config) {
-        AtomicBoolean workspaceConfigLinksEqual = new AtomicBoolean(true);
-        workspace1Config.getLinks().forEach(workspace1ConfigLink -> {
-            AtomicBoolean found = new AtomicBoolean(false);
-            workspace2Config.getLinks().forEach(workspace2ConfigLink -> {
-                if (compareStrings(workspace1ConfigLink.getMethod(),workspace2ConfigLink.getMethod()) &&
-                    compareStrings(workspace1ConfigLink.getHref(),workspace2ConfigLink.getHref()) &&
-                    compareStrings(workspace1ConfigLink.getRel(),workspace2ConfigLink.getRel())
-                ) {
-                    found.set(true);
+        List<WorkspaceLink> workspace1Links = workspace1Config.getLinks();
+        List<WorkspaceLink> workspace2Links = workspace2Config.getLinks();
+        if (workspace1Links != null && workspace2Links != null) {
+            AtomicBoolean workspaceConfigLinksEqual = new AtomicBoolean(true);
+            workspace1Links.forEach(workspace1ConfigLink -> {
+                AtomicBoolean found = new AtomicBoolean(false);
+                workspace2Links.forEach(workspace2ConfigLink -> {
+                    if (compareStrings(workspace1ConfigLink.getMethod(), workspace2ConfigLink.getMethod()) &&
+                        compareStrings(workspace1ConfigLink.getHref(), workspace2ConfigLink.getHref()) &&
+                        compareStrings(workspace1ConfigLink.getRel(), workspace2ConfigLink.getRel())
+                    ) {
+                        found.set(true);
+                    }
+                });
+                if (!found.get()) {
+                    workspaceConfigLinksEqual.set(false);
                 }
             });
-            if (!found.get()) {
-                workspaceConfigLinksEqual.set(false);
-            }
-        });
-        return workspaceConfigLinksEqual.get();
+            return workspaceConfigLinksEqual.get();
+        } else if (workspace1Links == null && workspace2Links == null) {
+            return true;
+        }
+        return false;
     }
 
     private boolean compareWorkspaceLinks(Workspace workspace1, Workspace workspace2) {
-        if (workspace1.getLinks() != null && workspace2.getLinks() != null) {
+        List<WorkspaceLink> workspace1Links = workspace1.getLinks();
+        List<WorkspaceLink> workspace2Links = workspace2.getLinks();
+        if (workspace1Links != null && workspace2Links != null) {
             AtomicBoolean workspaceLinksEqual = new AtomicBoolean(true);
-            workspace1.getLinks().forEach(workspace1Link -> {
+            workspace1Links.forEach(workspace1Link -> {
                 AtomicBoolean found = new AtomicBoolean(false);
-                workspace2.getLinks().forEach(workspace2Link -> {
+                workspace2Links.forEach(workspace2Link -> {
                     if (compareStrings(workspace1Link.getRel(),workspace2Link.getRel()) &&
                         compareStrings(workspace1Link.getHref(),workspace2Link.getHref()) &&
                         compareStrings(workspace1Link.getMethod(),workspace2Link.getMethod())
@@ -345,13 +382,10 @@ public class WorkspaceComparator implements Comparator<Workspace> {
                 }
             });
             return workspaceLinksEqual.get();
-        } else if (workspace1.getLinks() != null && workspace2.getLinks() == null) {
-            return false;
-        } else if (workspace1.getLinks() == null && workspace2.getLinks() != null) {
-            return false;
-        } else {
+        } else if (workspace1Links == null && workspace2Links == null) {
             return true;
         }
+        return false;
     }
 
     //TODO: Find something better, default behavior missing

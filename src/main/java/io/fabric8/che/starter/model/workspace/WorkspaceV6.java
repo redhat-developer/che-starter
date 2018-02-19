@@ -23,8 +23,7 @@ public class WorkspaceV6 {
     private String status;
     // Runtime is returned only on get workspace by composite key, in collection call, it is not
     private WorkspaceRuntime runtime;
-    private WorkspaceConfig config;
-    //TODO: config -> agents is now called installers
+    private WorkspaceConfigV6 config;
     private Map<String, String> links;
 
     public String getId() {
@@ -43,11 +42,11 @@ public class WorkspaceV6 {
         this.status = status;
     }
 
-    public WorkspaceConfig getConfig() {
+    public WorkspaceConfigV6 getConfig() {
         return config;
     }
 
-    public void setConfig(WorkspaceConfig config) {
+    public void setConfig(WorkspaceConfigV6 config) {
         this.config = config;
     }
 

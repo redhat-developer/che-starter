@@ -12,20 +12,15 @@
  */
 package io.fabric8.che.starter.model.workspace;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WorkspaceEnvironment {
 
     private WorkspaceRecipe recipe;
     private Map<String, WorkspaceMachine> machines;
-
-    public WorkspaceEnvironment() {
-        setMachines(new HashMap<String, WorkspaceMachine>());
-    }
 
     public WorkspaceRecipe getRecipe() {
         return recipe;
