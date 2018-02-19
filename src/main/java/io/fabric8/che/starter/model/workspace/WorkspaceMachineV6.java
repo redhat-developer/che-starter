@@ -17,17 +17,17 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class WorkspaceMachine {
+public class WorkspaceMachineV6 {
 
-    private List<String> agents;
+    private List<String> installers;
     private WorkspaceMachineAttribute attributes;
 
-    public List<String> getAgents() {
-        return agents;
+    public List<String> getInstallers() {
+        return installers;
     }
 
-    public void setAgents(List<String> agents) {
-        this.agents = agents;
+    public void setInstallers(List<String> installers) {
+        this.installers = installers;
     }
 
     public WorkspaceMachineAttribute getAttributes() {

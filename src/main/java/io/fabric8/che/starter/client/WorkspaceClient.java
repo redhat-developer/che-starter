@@ -12,27 +12,9 @@
  */
 package io.fabric8.che.starter.client;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.Collections;
-import java.util.List;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
-
+import com.google.gson.reflect.TypeToken;
 import io.fabric8.che.starter.client.keycloak.KeycloakRestTemplate;
 import io.fabric8.che.starter.exception.StackNotFoundException;
 import io.fabric8.che.starter.exception.WorkspaceNotFound;
@@ -45,6 +27,24 @@ import io.fabric8.che.starter.model.workspace.WorkspaceV6;
 import io.fabric8.che.starter.util.ProjectHelper;
 import io.fabric8.che.starter.util.WorkspaceHelper;
 import io.fabric8.che.starter.util.WorkspaceLegacyFormatAdapter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 @Component
 public class WorkspaceClient {
@@ -113,11 +113,21 @@ public class WorkspaceClient {
     public List<Workspace> listWorkspaces(String keycloakToken) {
         String url = CheRestEndpoints.LIST_WORKSPACES.generateUrl(multiTenantCheServerURL);
         RestTemplate template = new KeycloakRestTemplate(keycloakToken);
-        ResponseEntity<List<Workspace>> response = template.exchange(url, HttpMethod.GET, null,
-                new ParameterizedTypeReference<List<Workspace>>() {
-                });
-
-        return response.getBody();
+        Gson gson = new Gson();
+        ResponseEntity<String> responseRaw = template.exchange(url, HttpMethod.GET, null, String.class);
+        List<Workspace> response = new ArrayList<>();
+        try {
+            List<Workspace> workspaces = gson.fromJson(responseRaw.getBody(), new TypeToken<ArrayList<Workspace>>(){}.getType());
+            response.addAll(workspaces);
+        } catch (Exception e) {
+            LOG.info("Unable to deserialize workspace list, probably V6 format.");
+            List<WorkspaceV6> workspaces = gson.fromJson(responseRaw.getBody(), new TypeToken<ArrayList<WorkspaceV6>>(){}.getType());
+            workspaces.forEach(workspaceV6 -> {
+                Workspace workspace = WorkspaceLegacyFormatAdapter.getWorkspaceLegacyFormat(workspaceV6);
+                response.add(workspace);
+            });
+        }
+        return response;
     }
 
     public List<Workspace> listWorkspacesPerRepository(String repository, String keycloakToken) {
@@ -177,13 +187,24 @@ public class WorkspaceClient {
 
     public Workspace getWorkspaceById(String workspaceId, String keycloakToken) {
         String url = CheRestEndpoints.GET_WORKSPACE_BY_ID.generateUrl(multiTenantCheServerURL, workspaceId);
+        Gson gson = new Gson();
 
         RestTemplate template = new KeycloakRestTemplate(keycloakToken);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> entity = new HttpEntity<String>(headers);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
 
-        return template.exchange(url, HttpMethod.GET, entity, Workspace.class).getBody();
+        ResponseEntity<String> getWorkspaceByIdRaw = template.exchange(url, HttpMethod.GET, entity, String.class);
+        String getWorkspaceByIdRawString = getWorkspaceByIdRaw.getBody();
+        Workspace response;
+        try {
+            response = gson.fromJson(getWorkspaceByIdRawString, Workspace.class);
+        } catch (JsonSyntaxException e) {
+            LOG.warn("Could not deserialize che server response, possibly V6");
+            WorkspaceV6 workspaceV6 = gson.fromJson(getWorkspaceByIdRawString,WorkspaceV6.class);
+            response = WorkspaceLegacyFormatAdapter.getWorkspaceLegacyFormat(workspaceV6);
+        }
+        return response;
     }
 
     public Workspace getWorkspaceByName(String workspaceName, String keycloakToken) throws WorkspaceNotFound {

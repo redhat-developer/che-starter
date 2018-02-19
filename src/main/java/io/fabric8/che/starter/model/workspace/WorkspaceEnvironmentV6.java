@@ -14,28 +14,28 @@ package io.fabric8.che.starter.model.workspace;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import java.util.List;
+import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class WorkspaceMachine {
+public class WorkspaceEnvironmentV6 {
 
-    private List<String> agents;
-    private WorkspaceMachineAttribute attributes;
+    private WorkspaceRecipe recipe;
+    private Map<String, WorkspaceMachineV6> machines;
 
-    public List<String> getAgents() {
-        return agents;
+    public WorkspaceRecipe getRecipe() {
+        return recipe;
     }
 
-    public void setAgents(List<String> agents) {
-        this.agents = agents;
+    public void setRecipe(WorkspaceRecipe recipe) {
+        this.recipe = recipe;
     }
 
-    public WorkspaceMachineAttribute getAttributes() {
-        return attributes;
+    public Map<String, WorkspaceMachineV6> getMachines() {
+        return machines;
     }
 
-    public void setAttributes(WorkspaceMachineAttribute attributes) {
-        this.attributes = attributes;
+    public void setMachines(Map<String, WorkspaceMachineV6> machines) {
+        this.machines = machines;
     }
 
 }

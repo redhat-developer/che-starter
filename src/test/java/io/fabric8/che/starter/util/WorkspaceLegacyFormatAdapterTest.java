@@ -16,7 +16,16 @@ import com.google.gson.Gson;
 import io.fabric8.che.starter.model.project.Attribute;
 import io.fabric8.che.starter.model.project.Project;
 import io.fabric8.che.starter.model.project.Source;
-import io.fabric8.che.starter.model.workspace.*;
+import io.fabric8.che.starter.model.workspace.Workspace;
+import io.fabric8.che.starter.model.workspace.WorkspaceCommand;
+import io.fabric8.che.starter.model.workspace.WorkspaceCommandAttributes;
+import io.fabric8.che.starter.model.workspace.WorkspaceConfig;
+import io.fabric8.che.starter.model.workspace.WorkspaceEnvironment;
+import io.fabric8.che.starter.model.workspace.WorkspaceLink;
+import io.fabric8.che.starter.model.workspace.WorkspaceMachine;
+import io.fabric8.che.starter.model.workspace.WorkspaceMachineAttribute;
+import io.fabric8.che.starter.model.workspace.WorkspaceRecipe;
+import io.fabric8.che.starter.model.workspace.WorkspaceV6;
 import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
@@ -24,6 +33,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.test.annotation.Repeat;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -70,8 +80,8 @@ public class WorkspaceLegacyFormatAdapterTest {
         v5CorrectFullConfigEnvironmentDefault.setMachines(v5CorrectFullEnvironmentDefaultMachines);
         v5CorrectFullConfigEnvironmentDefault.setRecipe(v5CorrectFullEnvironmentDefaultRecipe);
 
-        WorkspaceEnvironments v5CorrectFullConfigEnvironments = new WorkspaceEnvironments();
-        v5CorrectFullConfigEnvironments.setDefaultEnv(v5CorrectFullConfigEnvironmentDefault);
+        Map<String, WorkspaceEnvironment> v5CorrectFullConfigEnvironments = new HashMap<>();
+        v5CorrectFullConfigEnvironments.put("default", v5CorrectFullConfigEnvironmentDefault);
 
         /*====================*
          * WORKSPACE PROJECTS *
@@ -197,29 +207,31 @@ public class WorkspaceLegacyFormatAdapterTest {
         v5CorrectFull.setConfig(v5CorrectFullConfig);
         v5CorrectFull.setLinks(v5CorrectFullLinks);
     }
-
+    
     @Test
-    public void getWorkspaceLegacyFormat() {
-        String workspaceV5Json = null;
-        String workspaceV6Json = null;
-        try {
-            InputStream workspaceV5JsonStream = getClass().getClassLoader().getResourceAsStream("workspacev5.json");
-            InputStream workspaceV6JsonStream = getClass().getClassLoader().getResourceAsStream("workspacev6.json");
-            workspaceV5Json = IOUtils.toString(workspaceV5JsonStream, StandardCharsets.UTF_8);
-            workspaceV6Json = IOUtils.toString(workspaceV6JsonStream, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            LOG.error("Could not read test input JSON files.");
-            System.exit(-1);
-        } catch (NullPointerException e) {
-            LOG.error("Resources failed to load correctly.");
-            System.exit(-1);
-        }
+    public void getWorkspaceLegacyFormat() throws IOException {
         Gson gson = new Gson();
-        Workspace workspaceV5JsonDeserialized = gson.fromJson(workspaceV5Json, Workspace.class);
-        WorkspaceV6 workspaceV6JsonDeserialized = gson.fromJson(workspaceV6Json, WorkspaceV6.class);
-        Workspace workspaceV6JsonConverted = WorkspaceLegacyFormatAdapter.getWorkspaceLegacyFormat(workspaceV6JsonDeserialized);
         WorkspaceComparator comparator = new WorkspaceComparator();
-        Assert.assertTrue(comparator.compare(workspaceV5JsonDeserialized,workspaceV6JsonConverted) == 0);
+        String workspaceV5Json, workspaceV6Json;
+
+        InputStream workspaceV5JsonStream = getClass().getClassLoader().getResourceAsStream("workspacev5.json");
+        Assert.assertNotNull("ClassLoader failed to load test resource: workspacev5.json", workspaceV5JsonStream);
+        InputStream workspaceV6JsonStream = getClass().getClassLoader().getResourceAsStream("workspacev6.json");
+        Assert.assertNotNull("ClassLoader failed to load test resource: workspacev6.json", workspaceV6JsonStream);
+        workspaceV5Json = IOUtils.toString(workspaceV5JsonStream, StandardCharsets.UTF_8);
+        Assert.assertNotNull("IOUtils failed to load resource, WorkspaceV5 JSON String not present", workspaceV5Json);
+        workspaceV6Json = IOUtils.toString(workspaceV6JsonStream, StandardCharsets.UTF_8);
+        Assert.assertNotNull("IOUtils failed to load resource, WorkspaceV6 JSON String not present", workspaceV6Json);
+
+        Workspace workspaceV5JsonDeserialized = gson.fromJson(workspaceV5Json, Workspace.class);
+        Assert.assertNotNull("Gson failed to deserialize workspaceV5, object is null",workspaceV5JsonDeserialized);
+        WorkspaceV6 workspaceV6JsonDeserialized = gson.fromJson(workspaceV6Json, WorkspaceV6.class);
+        Assert.assertNotNull("Gson failed to deserialize workspaceV6, object is null",workspaceV6JsonDeserialized);
+        Workspace workspaceV6JsonConverted = WorkspaceLegacyFormatAdapter.getWorkspaceLegacyFormat(workspaceV6JsonDeserialized);
+        Assert.assertNotNull("WorkspaceV6 failed to convert to legacy", workspaceV6JsonConverted);
+
+        int workspacesEqual = comparator.compare(workspaceV5JsonDeserialized,workspaceV6JsonConverted);
+        Assert.assertTrue(workspacesEqual == 0);
     }
 
 }

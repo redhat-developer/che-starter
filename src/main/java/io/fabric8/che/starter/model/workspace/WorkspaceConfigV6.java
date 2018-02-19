@@ -19,13 +19,13 @@ import java.util.List;
 import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class WorkspaceConfig {
+public class WorkspaceConfigV6 {
 
     private List<WorkspaceCommand> commands;
     // there could go list of projects
     private String defaultEnv;
     private String description;
-    private Map<String, WorkspaceEnvironment> environments;
+    private Map<String, WorkspaceEnvironmentV6> environments;
     private String name;
     private List<WorkspaceLink> links;
     private List<Project> projects;
@@ -62,11 +62,11 @@ public class WorkspaceConfig {
         this.defaultEnv = defaultEnv;
     }
 
-    public Map<String, WorkspaceEnvironment> getEnvironments() {
+    public Map<String, WorkspaceEnvironmentV6> getEnvironments() {
         return environments;
     }
 
-    public void setEnvironments(Map<String, WorkspaceEnvironment> environments) {
+    public void setEnvironments(Map<String, WorkspaceEnvironmentV6> environments) {
         this.environments = environments;
     }
 
