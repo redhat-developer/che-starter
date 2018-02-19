@@ -12,12 +12,15 @@
  */
 package io.fabric8.che.starter.client;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,15 +50,25 @@ public class WorkspaceClientTest extends TestConfig {
     }
 
     @Test
-    @Ignore("Ignored due to issue with running a workspace on remote OS test instance")
     public void createAndDeleteWorkspace() throws IOException, StackNotFoundException, WorkspaceNotFound, URISyntaxException {
         Workspace workspace = client.createWorkspace(KEYCLOAK_TOKEN, STACK_ID, GITHUB_REPO, BRANCH, DESCRIPTION);
-        client.waitUntilWorkspaceIsRunning(workspace, KEYCLOAK_TOKEN);
-        
-        client.stopWorkspace(workspace, KEYCLOAK_TOKEN);
-        client.waitUntilWorkspaceIsStopped(workspace, KEYCLOAK_TOKEN);
-        
-        client.deleteWorkspace(workspace.getId(), KEYCLOAK_TOKEN);
+        String name = workspace.getConfig().getName();
+        String id = workspace.getId();
+
+        assertNotNull("Workspace name can not be null", name);
+        assertNotNull("Workspace id can not be null", id);
+        LOG.info("Workspace '{}' with id '{}' has been created", name, id);
+
+        // Check that workspace has been really created
+        Workspace createdWorkspace = client.listWorkspaces(KEYCLOAK_TOKEN).stream().filter(w -> w.getId().equals(id)).findFirst().get();
+        assertNotNull(createdWorkspace);
+        assertEquals(name, createdWorkspace.getConfig().getName());
+
+        // Deleting workspace
+        client.deleteWorkspace(id, KEYCLOAK_TOKEN);
+        // Checking that workspaces has was really deleted
+        Workspace workspaceThatShouldNotExist = client.listWorkspaces(KEYCLOAK_TOKEN).stream().filter(w -> w.getId().equals(id)).findFirst().orElse(null);
+        assertNull(workspaceThatShouldNotExist);
     }
 
     @Test
@@ -63,9 +76,11 @@ public class WorkspaceClientTest extends TestConfig {
         List<Workspace> workspaces = client.listWorkspaces(KEYCLOAK_TOKEN);
 
         if (!workspaces.isEmpty()) {
+            LOG.info("Number of workspaces: {}", workspaces.size());
             List<Workspace> runningWorkspaces = workspaces.stream().filter(w -> w.getStatus().equals("RUNNING"))
                     .collect(Collectors.toList());
             if (!runningWorkspaces.isEmpty()) {
+                LOG.info("Number of running workspaces: {}", runningWorkspaces.size());
                 client.stopWorkspace(runningWorkspaces.get(0), KEYCLOAK_TOKEN);
                 client.waitUntilWorkspaceIsStopped(runningWorkspaces.get(0), KEYCLOAK_TOKEN);
             }
