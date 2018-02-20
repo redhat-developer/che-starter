@@ -176,7 +176,7 @@ public class WorkspaceClient {
         return template.exchange(url, HttpMethod.GET, entity, Workspace.class).getBody();
     }
 
-    public Workspace getWorkspaceByName(String cheServerURL, String workspaceName, String keycloakToken) throws WorkspaceNotFound {
+    public Workspace getWorkspaceByName(String workspaceName, String keycloakToken) throws WorkspaceNotFound {
         List<Workspace> workspaces = listWorkspaces( keycloakToken);
         for (Workspace workspace : workspaces) {
             if (workspace.getConfig().getName().equals(workspaceName)) {

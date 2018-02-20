@@ -36,8 +36,10 @@ public class WorkspaceClientTest extends TestConfig {
     private static final Logger LOG = LoggerFactory.getLogger(WorkspaceClientTest.class);
     private static final String GITHUB_REPO = "https://github.com/che-samples/console-java-simple";
     private static final String BRANCH = "master";
-    private static final String STACK_ID = "java-centos";
     private static final String DESCRIPTION = GITHUB_REPO + "#" + BRANCH + "#" + "WI1345";
+    private static final String JAVA_CENTOS_STACK_ID = "java-centos";
+    private static final String VERTX_STACK_ID = "vert.x";
+    private static final String WILDFLY_SWARM_STACK_ID = "wildfly-swarm";
 
     @Autowired
     private WorkspaceClient client;
@@ -54,7 +56,7 @@ public class WorkspaceClientTest extends TestConfig {
 
     @Test
     public void createAndDeleteWorkspace() throws IOException, StackNotFoundException, WorkspaceNotFound, URISyntaxException {
-        Workspace workspace = client.createWorkspace(osioUserToken, STACK_ID, GITHUB_REPO, BRANCH, DESCRIPTION);
+        Workspace workspace = client.createWorkspace(osioUserToken, JAVA_CENTOS_STACK_ID, GITHUB_REPO, BRANCH, DESCRIPTION);
         String name = workspace.getConfig().getName();
         String id = workspace.getId();
 
@@ -67,17 +69,46 @@ public class WorkspaceClientTest extends TestConfig {
         assertNotNull(createdWorkspace);
         assertEquals(name, createdWorkspace.getConfig().getName());
 
-        // Deleting workspace
-        client.deleteWorkspace(id, osioUserToken);
-        // Checking that workspaces has was really deleted
-        Workspace workspaceThatShouldNotExist = client.listWorkspaces(osioUserToken).stream().filter(w -> w.getId().equals(id)).findFirst().orElse(null);
-        assertNull(workspaceThatShouldNotExist);
+        deleteWorkspaceById(createdWorkspace.getId());
+    }
+
+    @Test
+    public void getWorkspaceByIdAndDelete() throws StackNotFoundException, IOException, URISyntaxException, WorkspaceNotFound {
+        Workspace workspace = client.createWorkspace(osioUserToken, VERTX_STACK_ID, GITHUB_REPO, BRANCH, DESCRIPTION);
+        String name = workspace.getConfig().getName();
+        String id = workspace.getId();
+
+        assertNotNull("Workspace name can not be null", name);
+        assertNotNull("Workspace id can not be null", id);
+        LOG.info("Workspace '{}' with id '{}' has been created", name, id);
+
+        Workspace workspaceById = client.getWorkspaceById(id, osioUserToken);
+        assertNotNull(workspaceById);
+        assertEquals(name, workspaceById.getConfig().getName());
+
+        deleteWorkspaceById(workspaceById.getId());
+    }
+
+    @Test
+    public void getWorkspaceByNameAndDelete() throws StackNotFoundException, IOException, URISyntaxException, WorkspaceNotFound {
+        Workspace workspace = client.createWorkspace(osioUserToken, WILDFLY_SWARM_STACK_ID, GITHUB_REPO, BRANCH, DESCRIPTION);
+        String name = workspace.getConfig().getName();
+        String id = workspace.getId();
+
+        assertNotNull("Workspace name can not be null", name);
+        assertNotNull("Workspace id can not be null", id);
+        LOG.info("Workspace '{}' with id '{}' has been created", name, id);
+
+        Workspace workspaceByName = client.getWorkspaceByName(name, osioUserToken);
+        assertNotNull(workspaceByName);
+        assertEquals(name, workspaceByName.getConfig().getName());
+
+        deleteWorkspaceById(workspaceByName.getId());
     }
 
     @Test
     public void stopWorskpace() {
         List<Workspace> workspaces = client.listWorkspaces(osioUserToken);
-
         if (!workspaces.isEmpty()) {
             LOG.info("Number of workspaces: {}", workspaces.size());
             List<Workspace> runningWorkspaces = workspaces.stream().filter(w -> w.getStatus().equals("RUNNING"))
@@ -88,6 +119,13 @@ public class WorkspaceClientTest extends TestConfig {
                 client.waitUntilWorkspaceIsStopped(runningWorkspaces.get(0), osioUserToken);
             }
         }
+    }
+
+    private void deleteWorkspaceById(final String id) throws WorkspaceNotFound {
+        client.deleteWorkspace(id, osioUserToken);
+        Workspace workspaceThatShouldNotExist = client.listWorkspaces(osioUserToken).stream().filter(w -> w.getId().equals(id)).findFirst().orElse(null);
+        assertNull(workspaceThatShouldNotExist);
+        LOG.info("Workspace with id '{}' has been deleted", id);
     }
 
 }
