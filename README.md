@@ -68,9 +68,20 @@ There are several ways for debugging the project:
     $ java -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=8000,suspend=n -Dspring.profiles.active=local -jar target/che-starter-1.0-SNAPSHOT.jar 
 ````
 
+Integration test
+----------------
+Integration tests are running as part of the build against multi-tenant Che server deployed on prod-preview dedicated.
+In order to successfully run those tests locally `OSIO_USER_TOKEN` env var must be set before building the project:
+
+```bash
+    $ export OSIO_USER_TOKEN=<OSIO_PROD_PREVIEW_USER_TOKEN>
+````
+
+Test can be skipped via `-DskipTests` mvn command line argument.
+
 CI Jobs
 -------
-1. https://ci.centos.org/job/devtools-che-starter/
+1. https://ci.centos.org/job/devtools-che-starter-prcheck/
 
 2. https://ci.centos.org/job/devtools-che-starter-build-che-credentials-master/
 
@@ -83,29 +94,7 @@ Live preview
 
 Testing with Minishift
 ----------------------
-che-starter can be tested locally against Minishift. The instructions for running Minishift can be found in the [How to run Che on OpenShift](https://github.com/redhat-developer/rh-che#how-to-run-che-on-openshift) document.
-
-Executing Requests
-------------------
-Many of the services available via the Swagger interface require setting `masterUrl`, `namespace` and `Authorization` token.
-
-- The `masterUrl` value is the Openshift REST API endpoint. If running against Minishift, execute the following to open the minishift console:
-
-```bash
-    minishift console
-````
-- Copy the URL excluding the path component, this will be used as the `masterUrl`. For example, a console address of https://192.168.42.64:8443/console/ would mean the masterUrl value is https://192.168.42.64:8443/.
-
-- The namespace is the project name in Openshift in which the Che server is deployed (e.g. `username-che`). Logging in as the developer user (described next) will list the user's projects.
-
-- In order to obtain the Authorization token use the following command:
-
-```bash
-    oc login -u developer -p developer
-    oc whoami -t
-````
-
-The output of this command (which looks like a random alphanumeric string) is the authorization token.
+che-starter can be tested locally against Minishift. The instructions for running Minishift can be found in the [How to deploy che-starter on Minishift ?](https://github.com/redhat-developer/che-starter/tree/master/openshift-template) document.
 
 Code Conventions
 ----------------
@@ -123,5 +112,4 @@ EPL 1.0, See [LICENSE](LICENSE.txt) file.
 ```bash
     $ mvn license:update-file-header
 ````
-
 
