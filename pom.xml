@@ -41,7 +41,7 @@
         <org.apache.commons.lang.version>3.5</org.apache.commons.lang.version>
         <swagger.version>2.6.1</swagger.version>
         <licenseMavenPluginVersion>1.11</licenseMavenPluginVersion>
-        <vertx.server.version>v1.7</vertx.server.version>
+        <vertx.server.version>v1.8</vertx.server.version>
         <logstash.logback.encoder.version>4.9</logstash.logback.encoder.version>
         <jjwt.version>0.7.0</jjwt.version>
         <unleash.client.java.version>2.1.4</unleash.client.java.version>

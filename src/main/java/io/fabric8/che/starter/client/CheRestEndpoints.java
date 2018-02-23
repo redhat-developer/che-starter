@@ -21,10 +21,10 @@ public enum CheRestEndpoints {
     LIST_WORKSPACES     ("/api/workspace"),
     STOP_WORKSPACE      ("/api/workspace/{id}/runtime"),
     LIST_STACKS         ("/api/stack?maxItems=1000"),
-    DELETE_PROJECT      ("/project/{id}"),
-    SET_OAUTH_TOKEN     ("/wsmaster/api/token/github"),
-    GET_PREFERENCES     ("/wsmaster/api/preferences"),
-    UPDATE_PREFERENCES  ("/wsmaster/api/preferences");
+    SET_OAUTH_TOKEN     ("/api/token/github"),
+    GET_PREFERENCES     ("/api/preferences"),
+    UPDATE_PREFERENCES  ("/api/preferences"),
+    DELETE_PROJECT      ("/project/{id}");
 
     private final String endpoint;
 
