@@ -12,21 +12,12 @@
  */
 package io.fabric8.che.starter.client;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
-import com.google.gson.reflect.TypeToken;
-import io.fabric8.che.starter.client.keycloak.KeycloakRestTemplate;
-import io.fabric8.che.starter.exception.StackNotFoundException;
-import io.fabric8.che.starter.exception.WorkspaceNotFound;
-import io.fabric8.che.starter.model.project.Project;
-import io.fabric8.che.starter.model.workspace.Workspace;
-import io.fabric8.che.starter.model.workspace.WorkspaceConfig;
-import io.fabric8.che.starter.model.workspace.WorkspaceState;
-import io.fabric8.che.starter.model.workspace.WorkspaceStatus;
-import io.fabric8.che.starter.model.workspace.WorkspaceV6;
-import io.fabric8.che.starter.util.ProjectHelper;
-import io.fabric8.che.starter.util.WorkspaceHelper;
-import io.fabric8.che.starter.util.WorkspaceLegacyFormatAdapter;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,11 +31,21 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
+
+import io.fabric8.che.starter.client.keycloak.KeycloakRestTemplate;
+import io.fabric8.che.starter.exception.StackNotFoundException;
+import io.fabric8.che.starter.exception.WorkspaceNotFound;
+import io.fabric8.che.starter.model.project.Project;
+import io.fabric8.che.starter.model.workspace.Workspace;
+import io.fabric8.che.starter.model.workspace.WorkspaceConfig;
+import io.fabric8.che.starter.model.workspace.WorkspaceStatus;
+import io.fabric8.che.starter.model.workspace.WorkspaceV6;
+import io.fabric8.che.starter.util.ProjectHelper;
+import io.fabric8.che.starter.util.WorkspaceHelper;
+import io.fabric8.che.starter.util.WorkspaceLegacyFormatAdapter;
 
 @Component
 public class WorkspaceClient {
@@ -69,9 +70,9 @@ public class WorkspaceClient {
     private ProjectHelper projectHelper;
 
     public void waitUntilWorkspaceIsRunning(Workspace workspace, String keycloakToken) {
-        WorkspaceStatus status = getWorkspaceStatus(workspace.getId(), keycloakToken);
+        String status = getWorkspaceStatus(workspace.getId(), keycloakToken);
         long currentTime = System.currentTimeMillis();
-        while (!WorkspaceState.RUNNING.toString().equals(status.getWorkspaceStatus())
+        while (!WorkspaceStatus.RUNNING.toString().equals(status)
                 && System.currentTimeMillis() < (currentTime + workspaceStartTimeout)) {
             try {
                 Thread.sleep(1000);
@@ -93,11 +94,11 @@ public class WorkspaceClient {
      * @param keycloakToken The KeyCloak token
      */
     public void waitUntilWorkspaceIsStopped(Workspace workspace, String keycloakToken) {
-        WorkspaceStatus status = getWorkspaceStatus(workspace.getId(), keycloakToken);
+        String status = getWorkspaceStatus(workspace.getId(), keycloakToken);
         long currentTime = System.currentTimeMillis();
 
         // Poll the Che server until it returns a status of 'STOPPED' for the workspace
-        while (!WorkspaceState.STOPPED.toString().equals(status.getWorkspaceStatus())
+        while (!WorkspaceStatus.STOPPED.toString().equals(status)
                 && System.currentTimeMillis() < (currentTime + workspaceStopTimeout)) {
             try {
                 Thread.sleep(1000);
@@ -237,11 +238,11 @@ public class WorkspaceClient {
         for (Workspace workspace : workspaces) {
             if (workspace.getConfig().getName().equals(workspaceName)) {
                 workspaceToStart = workspace;
-                if (WorkspaceState.RUNNING.toString().equals(workspace.getStatus())
-                        || WorkspaceState.STARTING.toString().equals(workspace.getStatus())) {
+                if (WorkspaceStatus.RUNNING.toString().equals(workspace.getStatus())
+                        || WorkspaceStatus.STARTING.toString().equals(workspace.getStatus())) {
                     alreadyStarted = true;
                 }
-            } else if (!WorkspaceState.STOPPED.toString().equals(workspace.getStatus())) {
+            } else if (!WorkspaceStatus.STOPPED.toString().equals(workspace.getStatus())) {
                 stopWorkspace(workspace, keycloakToken);
                 waitUntilWorkspaceIsStopped(workspace, keycloakToken);
             }
@@ -268,24 +269,17 @@ public class WorkspaceClient {
         List<Workspace> workspaces = listWorkspaces(keycloakToken);
 
         for (Workspace workspace : workspaces) {
-            if (WorkspaceState.RUNNING.toString().equals(workspace.getStatus())
-                    || WorkspaceState.STARTING.toString().equals(workspace.getStatus())) {
+            if (WorkspaceStatus.RUNNING.toString().equals(workspace.getStatus())
+                    || WorkspaceStatus.STARTING.toString().equals(workspace.getStatus())) {
                 return workspace;
             }
         }
         return null;
     }
 
-    public WorkspaceStatus getWorkspaceStatus(String workspaceId, String keycloakToken) {
-        String url = CheRestEndpoints.CHECK_WORKSPACE.generateUrl(multiTenantCheServerURL, workspaceId);
-
-        RestTemplate template = new KeycloakRestTemplate(keycloakToken);
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> entity = new HttpEntity<String>(headers);
-
-        ResponseEntity<WorkspaceStatus> status = template.exchange(url, HttpMethod.GET, entity, WorkspaceStatus.class);
-        return status.getBody();
+    public String getWorkspaceStatus(String workspaceId, String keycloakToken) {
+        Workspace workspace = getWorkspaceById(workspaceId, keycloakToken);
+        return workspace.getStatus();
     }
 
     public void stopWorkspace(Workspace workspace, String keycloakToken) {

@@ -90,13 +90,13 @@ public class WorkspaceClientTest extends TestConfig {
 
         client.startWorkspace(name, osioUserToken);
         client.waitUntilWorkspaceIsRunning(createdWorkspace, osioUserToken);
-        WorkspaceStatus statusRunning = client.getWorkspaceStatus(id, osioUserToken);
-        assertEquals(statusRunning.getWorkspaceStatus(), "RUNNING");
+        String statusRunning = client.getWorkspaceStatus(id, osioUserToken);
+        assertEquals(statusRunning, WorkspaceStatus.RUNNING.toString());
 
         client.stopWorkspace(workspace, osioUserToken);
         client.waitUntilWorkspaceIsStopped(workspace, osioUserToken);
-        WorkspaceStatus statusStopped = client.getWorkspaceStatus(id, osioUserToken);
-        assertEquals(statusStopped.getWorkspaceStatus(), "STOPPED");
+        String statusStopped = client.getWorkspaceStatus(id, osioUserToken);
+        assertEquals(statusStopped, WorkspaceStatus.STOPPED.toString());
 
         deleteWorkspaceById(createdWorkspace.getId());
     }
@@ -120,8 +120,8 @@ public class WorkspaceClientTest extends TestConfig {
         // Waiting till the first workspace is running
         client.startWorkspace(firstWorkspaceName, osioUserToken);
         client.waitUntilWorkspaceIsRunning(createdFirstWorkspace, osioUserToken);
-        WorkspaceStatus firstStatusRunning = client.getWorkspaceStatus(firstWorkspaceId, osioUserToken);
-        assertEquals(firstStatusRunning.getWorkspaceStatus(), "RUNNING");
+        String firstStatusRunning = client.getWorkspaceStatus(firstWorkspaceId, osioUserToken);
+        assertEquals(firstStatusRunning, WorkspaceStatus.RUNNING.toString());
 
         // Creating and starting second workspace
         Workspace secondWorkspace = client.createWorkspace(osioUserToken, WILDFLY_SWARM_STACK_ID, GITHUB_REPO, BRANCH, DESCRIPTION);
@@ -137,16 +137,16 @@ public class WorkspaceClientTest extends TestConfig {
         client.waitUntilWorkspaceIsRunning(secondWorkspace, osioUserToken);
 
         // Checking workspace statuses - first should be stopped / second is running
-        WorkspaceStatus firstStatusStopped = client.getWorkspaceStatus(firstWorkspaceId, osioUserToken);
-        WorkspaceStatus secondStatusRunning = client.getWorkspaceStatus(secondWorkspaceId, osioUserToken);
-        assertEquals(firstStatusStopped.getWorkspaceStatus(), "STOPPED");
-        assertEquals(secondStatusRunning.getWorkspaceStatus(), "RUNNING");
+        String firstStatusStopped = client.getWorkspaceStatus(firstWorkspaceId, osioUserToken);
+        String secondStatusRunning = client.getWorkspaceStatus(secondWorkspaceId, osioUserToken);
+        assertEquals(firstStatusStopped, WorkspaceStatus.STOPPED.toString());
+        assertEquals(secondStatusRunning, WorkspaceStatus.RUNNING.toString());
 
         // Stopping second workspace
         client.stopWorkspace(secondWorkspace, osioUserToken);
         client.waitUntilWorkspaceIsStopped(secondWorkspace, osioUserToken);
-        WorkspaceStatus secondStatusStopped = client.getWorkspaceStatus(firstWorkspaceId, osioUserToken);
-        assertEquals(secondStatusStopped.getWorkspaceStatus(), "STOPPED");
+        String secondStatusStopped = client.getWorkspaceStatus(firstWorkspaceId, osioUserToken);
+        assertEquals(secondStatusStopped, WorkspaceStatus.STOPPED.toString());
 
         // Deleting two workspaces
         deleteWorkspaceById(firstWorkspaceId);
