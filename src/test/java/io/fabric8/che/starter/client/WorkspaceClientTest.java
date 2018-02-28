@@ -102,6 +102,59 @@ public class WorkspaceClientTest extends TestConfig {
     }
 
     @Test
+    public void createAndStartWorkspaceWhenThereIsAlreadyOneRunning() throws IOException, StackNotFoundException, WorkspaceNotFound, URISyntaxException {
+        // Creating and starting first workspace
+        Workspace firstWorkspace = client.createWorkspace(osioUserToken, JAVA_CENTOS_STACK_ID, GITHUB_REPO, BRANCH, DESCRIPTION);
+        String firstWorkspaceName = firstWorkspace.getConfig().getName();
+        String firstWorkspaceId = firstWorkspace.getId();
+
+        assertNotNull("First Workspace name can not be null", firstWorkspaceName);
+        assertNotNull("First Workspace id can not be null", firstWorkspaceId);
+        LOG.info("First Workspace '{}' with id '{}' has been created", firstWorkspaceName, firstWorkspaceId);
+
+        // Check that workspace has been really created
+        Workspace createdFirstWorkspace = client.listWorkspaces(osioUserToken).stream().filter(w -> w.getId().equals(firstWorkspaceId)).findFirst().get();
+        assertNotNull(createdFirstWorkspace);
+        assertEquals(firstWorkspaceName, createdFirstWorkspace.getConfig().getName());
+
+        // Waiting till the first workspace is running
+        client.startWorkspace(firstWorkspaceName, osioUserToken);
+        client.waitUntilWorkspaceIsRunning(createdFirstWorkspace, osioUserToken);
+        WorkspaceStatus firstStatusRunning = client.getWorkspaceStatus(firstWorkspaceId, osioUserToken);
+        assertEquals(firstStatusRunning.getWorkspaceStatus(), "RUNNING");
+
+        // Creating and starting second workspace
+        Workspace secondWorkspace = client.createWorkspace(osioUserToken, WILDFLY_SWARM_STACK_ID, GITHUB_REPO, BRANCH, DESCRIPTION);
+        String secondWorkspaceName = secondWorkspace.getConfig().getName();
+        String secondWorkspaceId = secondWorkspace.getId();
+
+        assertNotNull("Second Workspace name can not be null", secondWorkspaceName);
+        assertNotNull("Second Workspace id can not be null", secondWorkspaceId);
+        LOG.info("Second Workspace '{}' with id '{}' has been created", secondWorkspaceName, secondWorkspaceId);
+
+        // Waiting till the second workspace is running
+        client.startWorkspace(secondWorkspaceName, osioUserToken);
+        client.waitUntilWorkspaceIsRunning(secondWorkspace, osioUserToken);
+
+        // Checking workspace statuses - first should be stopped / second is running
+        WorkspaceStatus firstStatusStopped = client.getWorkspaceStatus(firstWorkspaceId, osioUserToken);
+        WorkspaceStatus secondStatusRunning = client.getWorkspaceStatus(secondWorkspaceId, osioUserToken);
+        assertEquals(firstStatusStopped.getWorkspaceStatus(), "STOPPED");
+        assertEquals(secondStatusRunning.getWorkspaceStatus(), "RUNNING");
+
+        // Stopping second workspace
+        client.stopWorkspace(secondWorkspace, osioUserToken);
+        client.waitUntilWorkspaceIsStopped(secondWorkspace, osioUserToken);
+        WorkspaceStatus secondStatusStopped = client.getWorkspaceStatus(firstWorkspaceId, osioUserToken);
+        assertEquals(secondStatusStopped.getWorkspaceStatus(), "STOPPED");
+
+        // Deleting two workspaces
+        deleteWorkspaceById(firstWorkspaceId);
+        deleteWorkspaceById(secondWorkspaceId);
+
+    }
+
+    @Test
     public void getWorkspaceByIdAndDelete() throws StackNotFoundException, IOException, URISyntaxException, WorkspaceNotFound {
         Workspace workspace = client.createWorkspace(osioUserToken, VERTX_STACK_ID, GITHUB_REPO, BRANCH, DESCRIPTION);
         String name = workspace.getConfig().getName();
