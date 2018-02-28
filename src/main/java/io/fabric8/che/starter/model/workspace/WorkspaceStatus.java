@@ -12,27 +12,19 @@
  */
 package io.fabric8.che.starter.model.workspace;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+public enum WorkspaceStatus {
+    RUNNING("RUNNING"),
+    STARTING("STARTING"),
+    STOPPED("STOPPED");
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class WorkspaceStatus {
-    private String code;
-    private String workspaceStatus;
+    private final String state;
 
-    public String getCode() {
-        return code;
+    private WorkspaceStatus(final String state) {
+        this.state = state;
     }
 
-    public void setCode(String code) {
-        this.code = code;
+    @Override
+    public String toString() {
+        return state;
     }
-
-    public String getWorkspaceStatus() {
-        return workspaceStatus;
-    }
-
-    public void setWorkspaceStatus(String workspaceStatus) {
-        this.workspaceStatus = workspaceStatus;
-    }
-
 }

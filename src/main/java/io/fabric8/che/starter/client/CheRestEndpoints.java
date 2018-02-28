@@ -15,7 +15,6 @@ package io.fabric8.che.starter.client;
 public enum CheRestEndpoints {
     CREATE_WORKSPACE    ("/api/workspace"),
     START_WORKSPACE     ("/api/workspace/{id}/runtime"),
-    CHECK_WORKSPACE     ("/api/workspace/{id}/check"),
     DELETE_WORKSPACE    ("/api/workspace/{id}"),
     GET_WORKSPACE_BY_ID ("/api/workspace/{id}"),
     LIST_WORKSPACES     ("/api/workspace"),
