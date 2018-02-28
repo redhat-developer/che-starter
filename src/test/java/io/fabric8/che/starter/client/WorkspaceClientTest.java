@@ -31,6 +31,7 @@ import io.fabric8.che.starter.TestConfig;
 import io.fabric8.che.starter.exception.StackNotFoundException;
 import io.fabric8.che.starter.exception.WorkspaceNotFound;
 import io.fabric8.che.starter.model.workspace.Workspace;
+import io.fabric8.che.starter.model.workspace.WorkspaceStatus;
 
 public class WorkspaceClientTest extends TestConfig {
     private static final Logger LOG = LoggerFactory.getLogger(WorkspaceClientTest.class);
@@ -68,6 +69,34 @@ public class WorkspaceClientTest extends TestConfig {
         Workspace createdWorkspace = client.listWorkspaces(osioUserToken).stream().filter(w -> w.getId().equals(id)).findFirst().get();
         assertNotNull(createdWorkspace);
         assertEquals(name, createdWorkspace.getConfig().getName());
+
+        deleteWorkspaceById(createdWorkspace.getId());
+    }
+
+    @Test
+    public void createAndStartWorkspace() throws IOException, StackNotFoundException, WorkspaceNotFound, URISyntaxException {
+        Workspace workspace = client.createWorkspace(osioUserToken, JAVA_CENTOS_STACK_ID, GITHUB_REPO, BRANCH, DESCRIPTION);
+        String name = workspace.getConfig().getName();
+        String id = workspace.getId();
+
+        assertNotNull("Workspace name can not be null", name);
+        assertNotNull("Workspace id can not be null", id);
+        LOG.info("Workspace '{}' with id '{}' has been created", name, id);
+
+        // Check that workspace has been really created
+        Workspace createdWorkspace = client.listWorkspaces(osioUserToken).stream().filter(w -> w.getId().equals(id)).findFirst().get();
+        assertNotNull(createdWorkspace);
+        assertEquals(name, createdWorkspace.getConfig().getName());
+
+        client.startWorkspace(name, osioUserToken);
+        client.waitUntilWorkspaceIsRunning(createdWorkspace, osioUserToken);
+        WorkspaceStatus statusRunning = client.getWorkspaceStatus(id, osioUserToken);
+        assertEquals(statusRunning.getWorkspaceStatus(), "RUNNING");
+
+        client.stopWorkspace(workspace, osioUserToken);
+        client.waitUntilWorkspaceIsStopped(workspace, osioUserToken);
+        WorkspaceStatus statusStopped = client.getWorkspaceStatus(id, osioUserToken);
+        assertEquals(statusStopped.getWorkspaceStatus(), "STOPPED");
 
         deleteWorkspaceById(createdWorkspace.getId());
     }

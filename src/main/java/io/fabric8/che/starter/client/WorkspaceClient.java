@@ -170,7 +170,6 @@ public class WorkspaceClient {
 
         Gson gson = new Gson();
         HttpEntity<WorkspaceConfig> entity = new HttpEntity<>(wsConfig, headers);
-        String workspaceRequestRaw = gson.toJson(entity);
         ResponseEntity<String> workspaceResponseRaw = template.exchange(url, HttpMethod.POST, entity, String.class);
         Workspace workspace;
         try {
