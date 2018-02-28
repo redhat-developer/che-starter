@@ -16,7 +16,18 @@ import io.fabric8.che.starter.model.DevMachine;
 import io.fabric8.che.starter.model.DevMachineRuntime;
 import io.fabric8.che.starter.model.project.Project;
 import io.fabric8.che.starter.model.project.Source;
-import io.fabric8.che.starter.model.workspace.*;
+import io.fabric8.che.starter.model.workspace.Workspace;
+import io.fabric8.che.starter.model.workspace.WorkspaceCommand;
+import io.fabric8.che.starter.model.workspace.WorkspaceCommandAttributes;
+import io.fabric8.che.starter.model.workspace.WorkspaceConfig;
+import io.fabric8.che.starter.model.workspace.WorkspaceEnvironment;
+import io.fabric8.che.starter.model.workspace.WorkspaceLink;
+import io.fabric8.che.starter.model.workspace.WorkspaceMachine;
+import io.fabric8.che.starter.model.workspace.WorkspaceMachineAttribute;
+import io.fabric8.che.starter.model.workspace.WorkspaceRecipe;
+import io.fabric8.che.starter.model.workspace.WorkspaceRuntime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Comparator;
 import java.util.List;
@@ -24,6 +35,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class WorkspaceComparator implements Comparator<Workspace> {
+    private static final Logger LOG = LoggerFactory.getLogger(WorkspaceComparator.class);
 
     /**
      * Workspaces are equal if this method returns 0
@@ -84,24 +96,31 @@ public class WorkspaceComparator implements Comparator<Workspace> {
         WorkspaceConfig workspace2Config = workspace2.getConfig();
         if (workspace1Config != null && workspace2Config != null) {
             if (!compareStrings(workspace1Config.getName(),workspace2Config.getName())) {
+                LOG.info("Workspace config names not equal.");
                 return Integer.MAX_VALUE;
             }
             if (!compareStrings(workspace1Config.getDefaultEnv(),workspace2Config.getDefaultEnv())) {
+                LOG.info("Workspace config default envs not equal.");
                 return Integer.MAX_VALUE;
             }
             if (!compareStrings(workspace1Config.getDescription(),workspace2Config.getDescription())) {
+                LOG.info("Workspace config descriptions not equal.");
                 return Integer.MAX_VALUE;
             }
             if (!compareWorkspaceConfigLinks(workspace1Config, workspace2Config)) {
+                LOG.info("Workspace config links not equal.");
                 return Integer.MAX_VALUE;
             }
             if (!compareWorkspaceConfigProjects(workspace1Config, workspace2Config)) {
+                LOG.info("Workspace config projects not equal.");
                 return Integer.MAX_VALUE;
             }
             if (!compareWorkspaceConfigCommands(workspace1Config, workspace2Config)) {
+                LOG.info("Workspace config commands not equal.");
                 return Integer.MAX_VALUE;
             }
             if (!compareWorkspaceConfigEnvironments(workspace1Config, workspace2Config)) {
+                LOG.info("Workspace config environments not equal.");
                 return Integer.MAX_VALUE;
             }
         } else if (workspace1Config != null && workspace2Config == null) {

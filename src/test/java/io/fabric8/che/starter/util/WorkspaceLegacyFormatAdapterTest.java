@@ -117,11 +117,11 @@ public class WorkspaceLegacyFormatAdapterTest {
         WorkspaceCommandAttributes runAttributes = new WorkspaceCommandAttributes();
         WorkspaceCommandAttributes buildAttributes = new WorkspaceCommandAttributes();
 
-        debugAttributes.setGoal("Build");
+        debugAttributes.setPreviewUrl("http://${server.port.8080}");
+        debugAttributes.setGoal("Debug");
         runAttributes.setPreviewUrl("http://${server.port.8080}");
         runAttributes.setGoal("Run");
-        buildAttributes.setPreviewUrl("http://${server.port.8080}");
-        buildAttributes.setGoal("Debug");
+        buildAttributes.setGoal("Build");
 
         debug.setCommandLine("scl enable rh-maven33 \u0027mvn compile vertx:debug -f ${current.project.path}\u0027");
         debug.setName("debug");
@@ -228,8 +228,10 @@ public class WorkspaceLegacyFormatAdapterTest {
         Workspace workspaceV6JsonConverted = WorkspaceLegacyFormatAdapter.getWorkspaceLegacyFormat(workspaceV6JsonDeserialized);
         Assert.assertNotNull("WorkspaceV6 failed to convert to legacy", workspaceV6JsonConverted);
 
-        int workspacesEqual = comparator.compare(workspaceV5JsonDeserialized,workspaceV6JsonConverted);
-        Assert.assertTrue(workspacesEqual == 0);
+        int jsonEqualToManual = comparator.compare(v5CorrectFull, workspaceV5JsonDeserialized);
+        Assert.assertEquals("Json deserialized does not equal manually created",0,jsonEqualToManual);
+        int v6EqualToV5 = comparator.compare(workspaceV5JsonDeserialized,workspaceV6JsonConverted);
+        Assert.assertEquals("Json V6 converted does not equal V5 deserialized", 0, v6EqualToV5);
     }
 
 }
