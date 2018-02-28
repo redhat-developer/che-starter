@@ -12,7 +12,21 @@
  */
 package io.fabric8.che.starter.util;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.io.IOUtils;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
 import com.google.gson.Gson;
+
 import io.fabric8.che.starter.model.project.Attribute;
 import io.fabric8.che.starter.model.project.Project;
 import io.fabric8.che.starter.model.project.Source;
@@ -27,24 +41,8 @@ import io.fabric8.che.starter.model.workspace.WorkspaceMachineAttribute;
 import io.fabric8.che.starter.model.workspace.WorkspaceRecipe;
 import io.fabric8.che.starter.model.workspace.WorkspaceV6;
 import io.jsonwebtoken.lang.Collections;
-import org.apache.commons.io.IOUtils;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.test.annotation.Repeat;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class WorkspaceLegacyFormatAdapterTest {
-    private static final Logger LOG = LoggerFactory.getLogger(WorkspaceLegacyFormatAdapterTest.class);
     private static Workspace v5CorrectFull;
 
     @Before
