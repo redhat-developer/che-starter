@@ -52,8 +52,8 @@ public class WorkspaceLegacyFormatAdapter {
     private static List<WorkspaceLink> convertLinksToLegacy(WorkspaceV6 workspaceV6) {
         Map<String, String> links = workspaceV6.getLinks();
         List<WorkspaceLink> response = new ArrayList<>();
-        links.entrySet().parallelStream().forEach(entry -> {
-            switch (entry.getKey()) {
+        links.forEach((key, value) -> {
+            switch (key) {
                 case "self":
                     WorkspaceLink self = new WorkspaceLink();
                     WorkspaceLink start = new WorkspaceLink();
@@ -61,23 +61,23 @@ public class WorkspaceLegacyFormatAdapter {
                     WorkspaceLink getAllWorkspaces = new WorkspaceLink();
                     WorkspaceLink getSnapshot = new WorkspaceLink();
 
-                    self.setHref(entry.getValue());
+                    self.setHref(value);
                     self.setRel("self link");
                     self.setMethod(HttpMethod.GET.name().toUpperCase());
 
-                    start.setHref(entry.getValue() + RUNTIME);
+                    start.setHref(value + RUNTIME);
                     start.setRel("start workspace");
                     start.setMethod(HttpMethod.POST.name().toUpperCase());
 
-                    remove.setHref(entry.getValue());
+                    remove.setHref(value);
                     remove.setRel("remove workspace");
                     remove.setMethod(HttpMethod.DELETE.name().toUpperCase());
 
-                    getAllWorkspaces.setHref(entry.getValue().substring(0, entry.getValue().length() - (workspaceV6.getId().length() + 1)));
+                    getAllWorkspaces.setHref(value.substring(0, value.length() - (workspaceV6.getId().length() + 1)));
                     getAllWorkspaces.setRel("get all user workspaces");
                     getAllWorkspaces.setMethod(HttpMethod.GET.name().toUpperCase());
 
-                    getSnapshot.setHref(entry.getValue() + SNAPSHOT);
+                    getSnapshot.setHref(value + SNAPSHOT);
                     getSnapshot.setRel("get workspace snapshot");
                     getSnapshot.setMethod(HttpMethod.GET.name().toUpperCase());
 
@@ -89,7 +89,7 @@ public class WorkspaceLegacyFormatAdapter {
                     break;
                 case "ide":
                     WorkspaceLink ide = new WorkspaceLink();
-                    ide.setHref(entry.getValue());
+                    ide.setHref(value);
                     ide.setRel("ide url");
                     ide.setMethod(HttpMethod.GET.name().toUpperCase());
                     response.add(ide);
@@ -98,11 +98,11 @@ public class WorkspaceLegacyFormatAdapter {
                     WorkspaceLink outputChannel = new WorkspaceLink();
                     WorkspaceLink getWorkspaceEvents = new WorkspaceLink();
 
-                    outputChannel.setHref(entry.getValue());
+                    outputChannel.setHref(value);
                     outputChannel.setRel("environment.output_channel");
                     outputChannel.setMethod(HttpMethod.GET.name().toUpperCase());
 
-                    getWorkspaceEvents.setHref(entry.getValue());
+                    getWorkspaceEvents.setHref(value);
                     getWorkspaceEvents.setRel("get workspace events channel");
                     getWorkspaceEvents.setMethod(HttpMethod.GET.name().toUpperCase());
 
@@ -111,12 +111,13 @@ public class WorkspaceLegacyFormatAdapter {
                     break;
                 case "environment/statusChannel":
                     WorkspaceLink statusChannel = new WorkspaceLink();
-                    statusChannel.setHref(entry.getValue());
+                    statusChannel.setHref(value);
                     statusChannel.setRel("environment.status_channel");
                     statusChannel.setMethod(HttpMethod.GET.name().toUpperCase());
                     response.add(statusChannel);
                     break;
-                default: break;
+                default:
+                    break;
             }
         });
         return response;
