@@ -17,7 +17,7 @@ public enum CheRestEndpoints {
     START_WORKSPACE     ("/api/workspace/{id}/runtime"),
     DELETE_WORKSPACE    ("/api/workspace/{id}"),
     GET_WORKSPACE_BY_ID ("/api/workspace/{id}"),
-    LIST_WORKSPACES     ("/api/workspace"),
+    LIST_WORKSPACES     ("/api/workspace?maxItems=1000"),
     STOP_WORKSPACE      ("/api/workspace/{id}/runtime"),
     LIST_STACKS         ("/api/stack?maxItems=1000"),
     SET_OAUTH_TOKEN     ("/api/token/github"),
