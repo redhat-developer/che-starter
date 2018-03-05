@@ -70,7 +70,7 @@ There are several ways for debugging the project:
 
 Integration test
 ----------------
-Integration tests are running as part of the build against multi-tenant Che server deployed on prod-preview dedicated.
+Integration tests are running as part of the build against multi-tenant Che server deployed on prod-preview osd.
 In order to successfully run those tests locally `OSIO_USER_TOKEN` env var must be set before building the project:
 
 ```bash
