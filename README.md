@@ -1,7 +1,6 @@
 
 [![Build Status](https://ci.centos.org/buildStatus/icon?job=devtools-che-starter-build-che-credentials-master)](https://ci.centos.org/job/devtools-che-starter-build-che-credentials-master)
 
-
 che-starter
 ===========
 
@@ -112,4 +111,3 @@ EPL 1.0, See [LICENSE](LICENSE.txt) file.
 ```bash
     $ mvn license:update-file-header
 ````
-
