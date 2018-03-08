@@ -17,7 +17,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -30,9 +29,6 @@ import io.fabric8.che.starter.model.workspace.Workspace;
 @Component
 public class ProjectClient {
     private static final Logger LOG = LoggerFactory.getLogger(ProjectClient.class);
-
-    @Value("${MULTI_TENANT_CHE_SERVER_URL:https://che.prod-preview.openshift.io}")
-    private String multiTenantCheServerURL;
 
     @Autowired
     private WorkspaceClient workspaceClient;

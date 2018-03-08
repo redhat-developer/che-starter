@@ -18,6 +18,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -34,19 +35,20 @@ import io.fabric8.che.starter.exception.GitHubOAthTokenException;
 import io.fabric8.che.starter.model.Token;
 import io.fabric8.che.starter.model.github.GitHubEmail;
 import io.fabric8.che.starter.model.github.GitHubUserInfo;
+import io.fabric8.che.starter.util.CheServerUrlProvider;
 
 @Component
 public class GitHubClient {
     private static final Logger LOG = LoggerFactory.getLogger(GitHubClient.class);
-
-    @Value("${MULTI_TENANT_CHE_SERVER_URL:https://che.prod-preview.openshift.io}")
-    private String multiTenantCheServerURL;
 
     @Value("${GITHUB_USER_URL:https://api.github.com/user}")
     private String GITHUB_USER_URL;
 
     @Value("${GITHUB_EMAIL_URL:https://api.github.com/user/emails}")
     private String GITHUB_EMAIL_URL;
+
+    @Autowired
+    CheServerUrlProvider cheServerUrlProvider;
     /**
      * Uploads the Github oAuth token to the workspace so that the developer can send push requests
      *  
@@ -57,7 +59,7 @@ public class GitHubClient {
      */
     public void setGitHubOAuthToken(final String gitHubToken, final String keycloakToken)
             throws IOException, GitHubOAthTokenException {
-        String url = CheRestEndpoints.SET_OAUTH_TOKEN.generateUrl(multiTenantCheServerURL);
+        String url = CheRestEndpoints.SET_OAUTH_TOKEN.generateUrl(cheServerUrlProvider.getUrl(keycloakToken));
 
         Token token = new Token();
         token.setToken(gitHubToken);

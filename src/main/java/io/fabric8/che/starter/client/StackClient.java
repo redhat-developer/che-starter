@@ -15,7 +15,7 @@ package io.fabric8.che.starter.client;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -26,15 +26,16 @@ import io.fabric8.che.starter.client.keycloak.KeycloakRestTemplate;
 import io.fabric8.che.starter.exception.StackNotFoundException;
 import io.fabric8.che.starter.model.stack.Stack;
 import io.fabric8.che.starter.model.stack.StackProjectMapping;
+import io.fabric8.che.starter.util.CheServerUrlProvider;
 
 @Component
 public class StackClient {
 
-    @Value("${MULTI_TENANT_CHE_SERVER_URL:https://che.prod-preview.openshift.io}")
-    private String multiTenantCheServerURL;
+    @Autowired
+    CheServerUrlProvider cheServerUrlProvider;
 
     public List<Stack> listStacks(String keycloakToken) {
-        String url = CheRestEndpoints.LIST_STACKS.generateUrl(multiTenantCheServerURL);
+        String url = CheRestEndpoints.LIST_STACKS.generateUrl(cheServerUrlProvider.getUrl(keycloakToken));
 
         RestTemplate template = new KeycloakRestTemplate(keycloakToken);
 
