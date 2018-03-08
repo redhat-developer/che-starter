@@ -43,6 +43,7 @@ import io.fabric8.che.starter.model.workspace.Workspace;
 import io.fabric8.che.starter.model.workspace.WorkspaceConfig;
 import io.fabric8.che.starter.model.workspace.WorkspaceStatus;
 import io.fabric8.che.starter.model.workspace.WorkspaceV6;
+import io.fabric8.che.starter.util.CheServerUrlProvider;
 import io.fabric8.che.starter.util.ProjectHelper;
 import io.fabric8.che.starter.util.WorkspaceHelper;
 import io.fabric8.che.starter.util.WorkspaceLegacyFormatAdapter;
@@ -50,9 +51,6 @@ import io.fabric8.che.starter.util.WorkspaceLegacyFormatAdapter;
 @Component
 public class WorkspaceClient {
     private static final Logger LOG = LoggerFactory.getLogger(WorkspaceClient.class);
-
-    @Value("${MULTI_TENANT_CHE_SERVER_URL:https://che.prod-preview.openshift.io}")
-    private String multiTenantCheServerURL;
 
     @Value("${che.workspace.start.timeout}")
     private long workspaceStartTimeout;
@@ -68,6 +66,9 @@ public class WorkspaceClient {
 
     @Autowired
     private ProjectHelper projectHelper;
+
+    @Autowired
+    CheServerUrlProvider cheServerUrlProvider;
 
     public void waitUntilWorkspaceIsRunning(Workspace workspace, String keycloakToken) {
         String status = getWorkspaceStatus(workspace.getId(), keycloakToken);
@@ -112,7 +113,7 @@ public class WorkspaceClient {
     }
 
     public List<Workspace> listWorkspaces(String keycloakToken) {
-        String url = CheRestEndpoints.LIST_WORKSPACES.generateUrl(multiTenantCheServerURL);
+        String url = CheRestEndpoints.LIST_WORKSPACES.generateUrl(cheServerUrlProvider.getUrl(keycloakToken));
         RestTemplate template = new KeycloakRestTemplate(keycloakToken);
         Gson gson = new Gson();
         ResponseEntity<String> responseRaw = template.exchange(url, HttpMethod.GET, null, String.class);
@@ -150,7 +151,7 @@ public class WorkspaceClient {
      */
     public Workspace createWorkspace(String keycloakToken, String stackId, String repo,
             String branch, String description) throws StackNotFoundException, IOException, URISyntaxException {
-        String url = CheRestEndpoints.CREATE_WORKSPACE.generateUrl(multiTenantCheServerURL);
+        String url = CheRestEndpoints.CREATE_WORKSPACE.generateUrl(cheServerUrlProvider.getUrl(keycloakToken));
         WorkspaceConfig wsConfig = stackClient.getStack(stackId, keycloakToken).getWorkspaceConfig();
 
         String projectName = projectHelper.getProjectNameFromGitRepository(repo);
@@ -186,7 +187,7 @@ public class WorkspaceClient {
     }
 
     public Workspace getWorkspaceById(String workspaceId, String keycloakToken) {
-        String url = CheRestEndpoints.GET_WORKSPACE_BY_ID.generateUrl(multiTenantCheServerURL, workspaceId);
+        String url = CheRestEndpoints.GET_WORKSPACE_BY_ID.generateUrl(cheServerUrlProvider.getUrl(keycloakToken), workspaceId);
         Gson gson = new Gson();
 
         RestTemplate template = new KeycloakRestTemplate(keycloakToken);
@@ -224,7 +225,7 @@ public class WorkspaceClient {
      * @throws WorkspaceNotFound if workspace does not exists
      */
     public void deleteWorkspace(String workspaceId, String keycloakToken) throws WorkspaceNotFound {
-        String url = CheRestEndpoints.DELETE_WORKSPACE.generateUrl(multiTenantCheServerURL, workspaceId);
+        String url = CheRestEndpoints.DELETE_WORKSPACE.generateUrl(cheServerUrlProvider.getUrl(keycloakToken), workspaceId);
         RestTemplate template = new KeycloakRestTemplate(keycloakToken);
         template.delete(url);
     }
@@ -253,7 +254,7 @@ public class WorkspaceClient {
         }
 
         if (!alreadyStarted) {
-            String url = CheRestEndpoints.START_WORKSPACE.generateUrl(multiTenantCheServerURL, workspaceToStart.getId());
+            String url = CheRestEndpoints.START_WORKSPACE.generateUrl(cheServerUrlProvider.getUrl(keycloakToken), workspaceToStart.getId());
             RestTemplate template = new KeycloakRestTemplate(keycloakToken);
             template.postForLocation(url, null);
         }
@@ -284,7 +285,7 @@ public class WorkspaceClient {
 
     public void stopWorkspace(Workspace workspace, String keycloakToken) {
             LOG.info("Stopping workspace {}", workspace.getId());
-            String url = CheRestEndpoints.STOP_WORKSPACE.generateUrl(multiTenantCheServerURL, workspace.getId());
+            String url = CheRestEndpoints.STOP_WORKSPACE.generateUrl(cheServerUrlProvider.getUrl(keycloakToken), workspace.getId());
             RestTemplate template = new KeycloakRestTemplate(keycloakToken);
             template.delete(url);
     }

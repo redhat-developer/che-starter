@@ -16,6 +16,7 @@ import java.io.IOException;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,10 +61,13 @@ public class Che6Toggle {
     }
 
     public boolean isChe6(final String keycloakToken) {
+        if (StringUtils.isBlank(keycloakToken)) {
+            return false;
+        }
         try {
             UnleashContext context = getContext(keycloakToken);
             return unleash.isEnabled(FEATURE_NAME, context);
-        } catch (IOException e) {
+        } catch (Throwable e) {
             LOG.error("Unable to get UnleashContext from the Keycloak token", e);
             return false;
         }
