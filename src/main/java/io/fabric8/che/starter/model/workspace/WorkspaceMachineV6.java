@@ -15,12 +15,14 @@ package io.fabric8.che.starter.model.workspace;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.List;
+import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WorkspaceMachineV6 {
 
     private List<String> installers;
     private WorkspaceMachineAttribute attributes;
+    private Map<String, WorkspaceMachineServers> servers;
 
     public List<String> getInstallers() {
         return installers;
@@ -36,6 +38,14 @@ public class WorkspaceMachineV6 {
 
     public void setAttributes(WorkspaceMachineAttribute attributes) {
         this.attributes = attributes;
+    }
+
+    public Map<String, WorkspaceMachineServers> getServers() {
+        return servers;
+    }
+
+    public void setServers(Map<String, WorkspaceMachineServers> servers) {
+        this.servers = servers;
     }
 
 }
