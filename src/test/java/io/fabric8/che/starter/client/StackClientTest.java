@@ -28,6 +28,7 @@ import io.fabric8.che.starter.TestConfig;
 import io.fabric8.che.starter.exception.StackNotFoundException;
 import io.fabric8.che.starter.model.stack.Stack;
 import io.fabric8.che.starter.model.stack.StackProjectMapping;
+import io.fabric8.che.starter.model.workspace.WorkspaceEnvironment;
 
 public class StackClientTest extends TestConfig {
     private static final Logger LOG = LoggerFactory.getLogger(StackClientTest.class);
@@ -107,4 +108,12 @@ public class StackClientTest extends TestConfig {
         client.getStack(NON_EXISTING_STACK_ID, osioUserToken);
     }
 
+    @Test
+    public void defaultEnvironmentHasAgentsOrInstallers() throws StackNotFoundException {
+        Stack vertxStack = client.getStack(VERTX_STACK_ID, osioUserToken);
+        WorkspaceEnvironment env = vertxStack.getWorkspaceConfig().getEnvironments().get("default");
+        env.getMachines().forEach((key, value) -> {
+            assertTrue(value.getAgents() != null || value.getInstallers() != null);
+        });
+    }
 }
