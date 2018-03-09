@@ -28,7 +28,6 @@ public class KeycloakTokenParser {
     private static final String TOKEN_PREFIX = "Bearer ";
     private static final String SESSION_STATE = "session_state";
 
-
     @SuppressWarnings("rawtypes")
     public String getIdentityId(final String keycloakToken) throws JsonProcessingException, IOException {
         Jwt<Header, Claims> jwt = getJwt(keycloakToken);
