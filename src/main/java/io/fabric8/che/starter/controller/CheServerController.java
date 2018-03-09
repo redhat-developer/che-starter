@@ -25,10 +25,12 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.fabric8.che.starter.che6.migration.Che6MigrationStatus;
+import io.fabric8.che.starter.che6.migration.Che6Migrator;
+import io.fabric8.che.starter.che6.toggle.Che6Toggle;
 import io.fabric8.che.starter.client.keycloak.KeycloakTokenParser;
 import io.fabric8.che.starter.client.keycloak.KeycloakTokenValidator;
 import io.fabric8.che.starter.model.server.CheServerInfo;
-import io.fabric8.che.starter.toggle.Che6Toggle;
 import io.fabric8.che.starter.util.CheServerHelper;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -42,6 +44,9 @@ public class CheServerController {
     Che6Toggle che6toggle;
 
     @Autowired
+    Che6Migrator che6Migrator;
+
+    @Autowired
     KeycloakTokenParser keycloakTokenParser;
 
     @ApiOperation(value = "Get Che server info")
@@ -53,6 +58,10 @@ public class CheServerController {
         if (che6toggle.isChe6(keycloakToken)) {
             String identityId = keycloakTokenParser.getIdentityId(keycloakToken);
             LOG.info("User '{}' should be migrated to che 6", identityId);
+            Che6MigrationStatus status = che6Migrator.migrateWorkspaces(keycloakToken, namespace);
+            LOG.info("Status code: {}", status.getCode());
+            LOG.info("Status message: {}", status.getMessage());
+            LOG.info("Status detals: {}", status.getDetails());
         }
 
         return getCheServerInfo(request);

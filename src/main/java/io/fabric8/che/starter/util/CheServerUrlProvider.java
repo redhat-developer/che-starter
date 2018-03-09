@@ -18,7 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import io.fabric8.che.starter.toggle.Che6Toggle;
+import io.fabric8.che.starter.che6.toggle.Che6Toggle;
 
 @Component
 public class CheServerUrlProvider {
@@ -32,7 +32,7 @@ public class CheServerUrlProvider {
 
     @Autowired
     Che6Toggle che6toggle;
-    
+
     public String getUrl(final String keycloakToken) {
         LOG.info("Che 6 url: {}", che6Url);
         LOG.info("Che 5 url: {}", che5Url);

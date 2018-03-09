@@ -10,7 +10,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package io.fabric8.che.starter.toggle;
+package io.fabric8.che.starter.che6.toggle;
 
 import java.io.IOException;
 
