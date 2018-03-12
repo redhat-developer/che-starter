@@ -21,6 +21,7 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,6 +74,7 @@ public class WorkspaceClientTest extends TestConfig {
         deleteWorkspaceById(createdWorkspace.getId());
     }
 
+    @Ignore("Not possible to start workspaces on free-stg https://github.com/openshiftio/openshift.io/issues/2273")
     @Test
     public void createAndStartWorkspace() throws IOException, StackNotFoundException, WorkspaceNotFound, URISyntaxException {
         Workspace workspace = client.createWorkspace(osioUserToken, JAVA_CENTOS_STACK_ID, GITHUB_REPO, BRANCH, DESCRIPTION);
@@ -101,6 +103,7 @@ public class WorkspaceClientTest extends TestConfig {
         deleteWorkspaceById(createdWorkspace.getId());
     }
 
+    @Ignore("Not possible to start workspaces on free-stg https://github.com/openshiftio/openshift.io/issues/2273")
     @Test
     public void createAndStartWorkspaceWhenThereIsAlreadyOneRunning() throws IOException, StackNotFoundException, WorkspaceNotFound, URISyntaxException {
         // Creating and starting first workspace
