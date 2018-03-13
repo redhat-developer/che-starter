@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.fabric8.che.starter.che6.migration.Che6MigrationStatus;
+import io.fabric8.che.starter.che6.migration.Che6MigrationMap;
 import io.fabric8.che.starter.che6.migration.Che6Migrator;
 import io.fabric8.che.starter.che6.toggle.Che6Toggle;
 import io.fabric8.che.starter.client.keycloak.KeycloakTokenParser;
@@ -47,7 +47,11 @@ public class CheServerController {
     Che6Migrator che6Migrator;
 
     @Autowired
-    KeycloakTokenParser keycloakTokenParser;
+    Che6MigrationMap che6MigrationMap;
+
+    @Autowired
+    KeycloakTokenParser keycoakTokenParser;
+
 
     @ApiOperation(value = "Get Che server info")
     @GetMapping("/server")
@@ -56,15 +60,19 @@ public class CheServerController {
         KeycloakTokenValidator.validate(keycloakToken);
 
         if (che6toggle.isChe6(keycloakToken)) {
-            String identityId = keycloakTokenParser.getIdentityId(keycloakToken);
-            LOG.info("User '{}' should be migrated to che 6", identityId);
-            Che6MigrationStatus status = che6Migrator.migrateWorkspaces(keycloakToken, namespace);
-            LOG.info("Status code: {}", status.getCode());
-            LOG.info("Status message: {}", status.getMessage());
-            LOG.info("Status detals: {}", status.getDetails());
+            String identityId = keycoakTokenParser.getIdentityId(keycloakToken);
+            boolean isAlreadyMigrated = che6MigrationMap.get().getOrDefault(identityId, false);
+            if (isAlreadyMigrated) {
+                LOG.info("User '{}' have been already migrated to che 6", identityId);
+                return getCheServerInfo(request, true);
+            } else {
+                LOG.info("User '{}' is not yet migrated to che 6. Need to migrate now", identityId);
+                che6Migrator.migrateWorkspaces(keycloakToken, namespace);
+                return getCheServerInfo(request, false);
+            }
         }
 
-        return getCheServerInfo(request);
+        return getCheServerInfo(request, true);
       
     }
 
@@ -78,12 +86,20 @@ public class CheServerController {
             @ApiParam(value = "Keycloak token", required = true) @RequestHeader("Authorization") String keycloakToken, HttpServletResponse response, HttpServletRequest request) throws Exception {
 
         KeycloakTokenValidator.validate(keycloakToken);
-        return getCheServerInfo(request);
+
+        if (che6toggle.isChe6(keycloakToken)) {
+            String identityId = keycoakTokenParser.getIdentityId(keycloakToken);
+            Boolean isReady = che6MigrationMap.get().getOrDefault(identityId, false);
+            LOG.info("User '{}' already migrated: {}", identityId, isReady);
+            return getCheServerInfo(request, isReady);
+        }
+
+        return getCheServerInfo(request, true);
     }
 
-    private CheServerInfo getCheServerInfo(HttpServletRequest request) {
+    private CheServerInfo getCheServerInfo(HttpServletRequest request, boolean isReady) {
         String requestURL = request.getRequestURL().toString();
-        return CheServerHelper.generateCheServerInfo(true, requestURL, true);
+        return CheServerHelper.generateCheServerInfo(isReady, requestURL, true);
     }
 
 }
