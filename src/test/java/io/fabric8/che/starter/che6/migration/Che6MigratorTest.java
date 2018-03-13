@@ -16,8 +16,6 @@ import java.io.IOException;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -27,8 +25,6 @@ import io.fabric8.che.starter.TestConfig;
 
 @Ignore
 public class Che6MigratorTest extends TestConfig {
-    private static final Logger LOG = LoggerFactory.getLogger(Che6MigratorTest.class);
-
     @Value("${OSIO_USER_TOKEN:#{null}}")
     private String osioUserToken;
 
@@ -40,10 +36,7 @@ public class Che6MigratorTest extends TestConfig {
 
     @Test
     public void migrateWorkspacesFromChe5toChe6() throws JsonProcessingException, IOException {
-        Che6MigrationStatus status = che6Mirgator.migrateWorkspaces(osioUserToken, namespace);
-        LOG.info("Status code: {}", status.getCode());
-        LOG.info("Status message: {}", status.getMessage());
-        LOG.info("Status detals: {}", status.getDetails());
+        che6Mirgator.migrateWorkspaces(osioUserToken, namespace);
     }
 
 }
