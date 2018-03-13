@@ -15,7 +15,8 @@ package io.fabric8.che.starter.model.workspace;
 public enum WorkspaceStatus {
     RUNNING("RUNNING"),
     STARTING("STARTING"),
-    STOPPED("STOPPED");
+    STOPPED("STOPPED"),
+    STOPPING("STOPPING");
 
     private final String state;
 

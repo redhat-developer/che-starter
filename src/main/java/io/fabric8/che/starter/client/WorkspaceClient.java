@@ -17,6 +17,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -288,6 +289,20 @@ public class WorkspaceClient {
             String url = CheRestEndpoints.STOP_WORKSPACE.generateUrl(cheServerUrlProvider.getUrl(keycloakToken), workspace.getId());
             RestTemplate template = new KeycloakRestTemplate(keycloakToken);
             template.delete(url);
+    }
+
+    public void stopWorkspaces(String keycloakToken) {
+        List<Workspace> runningWorkspaces = listWorkspacesForStopping(keycloakToken);
+        for (Workspace workspace : runningWorkspaces) {
+            stopWorkspace(workspace, keycloakToken);
+            waitUntilWorkspaceIsStopped(workspace, keycloakToken);
+        }
+    }
+
+    private List<Workspace> listWorkspacesForStopping(String keycloakToken) {
+        List<Workspace> workspaces = listWorkspaces(keycloakToken);
+        return workspaces.stream().filter(w -> w.getStatus().equals(WorkspaceStatus.RUNNING.toString())
+                || w.getStatus().equals(WorkspaceStatus.STARTING.toString())).collect(Collectors.toList());
     }
 
 }

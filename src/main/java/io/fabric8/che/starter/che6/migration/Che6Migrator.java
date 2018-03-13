@@ -26,6 +26,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import io.fabric8.che.starter.client.WorkspaceClient;
 import io.fabric8.che.starter.client.keycloak.KeycloakTokenParser;
 
 @Component
@@ -40,17 +41,25 @@ public class Che6Migrator {
 
     @Autowired
     Che6MigrationMap che6MigrationMap;
+    
+    @Autowired
+    WorkspaceClient workspaceClient;
 
     @Async
     public void migrateWorkspaces(final String keycloakToken, final String namespace) throws JsonProcessingException, IOException {
         String identityId = keycoakTokenParser.getIdentityId(keycloakToken);
         LOG.info("User '{}' should be migrated to che 6", identityId);
+        LOG.info("Stopping all workspaces before migration");
+        workspaceClient.stopWorkspaces(keycloakToken);
+
         RestTemplate template = new Che6MigratorRestTemplate(keycloakToken, namespace);
         ResponseEntity<Che6MigrationStatus> response = template.exchange(cheTenantMaintainerUrl, HttpMethod.GET, null, Che6MigrationStatus.class);
+
         Che6MigrationStatus status = response.getBody();
         LOG.info("Status code: {}", status.getCode());
         LOG.info("Status message: {}", status.getMessage());
         LOG.info("Status detals: {}", status.getDetails());
+
         che6MigrationMap.get().put(identityId, isSuccessful(status));
     }
     

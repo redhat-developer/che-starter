@@ -206,6 +206,11 @@ public class WorkspaceClientTest extends TestConfig {
         }
     }
 
+    @Test
+    public void stopAllWorkspaces() {
+        client.stopWorkspaces(osioUserToken);
+    }
+
     private void deleteWorkspaceById(final String id) throws WorkspaceNotFound {
         client.deleteWorkspace(id, osioUserToken);
         Workspace workspaceThatShouldNotExist = client.listWorkspaces(osioUserToken).stream().filter(w -> w.getId().equals(id)).findFirst().orElse(null);
