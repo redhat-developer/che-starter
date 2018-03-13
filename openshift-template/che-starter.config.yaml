@@ -11,3 +11,4 @@ data:
   github.tokenurl: https://auth.prod-preview.openshift.io/api/token?for=https://github.com
   multi.tenant.che.server.url: https://che.prod-preview.openshift.io
   update.tenant.endpoint: https://api.prod-preview.openshift.io/api/user/services
+  che.server.url: https://che.prod-preview.openshift.io
