@@ -293,6 +293,7 @@ public class WorkspaceClient {
 
     public void stopWorkspaces(String keycloakToken) {
         List<Workspace> runningWorkspaces = listWorkspacesForStopping(keycloakToken);
+        LOG.info("Number of workspaces to stop: {}", runningWorkspaces.size());
         for (Workspace workspace : runningWorkspaces) {
             stopWorkspace(workspace, keycloakToken);
             waitUntilWorkspaceIsStopped(workspace, keycloakToken);
