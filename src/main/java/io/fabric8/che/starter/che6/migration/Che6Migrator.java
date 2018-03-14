@@ -62,7 +62,7 @@ public class Che6Migrator {
 
         che6MigrationMap.get().put(identityId, isSuccessful(status));
     }
-    
+
     private boolean isSuccessful(final Che6MigrationStatus status) {
         return status.getCode() == 0 ? true : false;
     }
