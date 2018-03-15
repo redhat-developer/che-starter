@@ -207,8 +207,8 @@ public class WorkspaceClientTest extends TestConfig {
     }
 
     @Test
-    public void stopAllWorkspaces() {
-        client.stopWorkspaces(osioUserToken);
+    public void stopAllChe5Workspaces() {
+        client.stopChe5Workspaces(osioUserToken);
     }
 
     private void deleteWorkspaceById(final String id) throws WorkspaceNotFound {

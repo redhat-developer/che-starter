@@ -49,8 +49,8 @@ public class Che6Migrator {
     public void migrateWorkspaces(final String keycloakToken, final String namespace) throws JsonProcessingException, IOException {
         String identityId = keycoakTokenParser.getIdentityId(keycloakToken);
         LOG.info("User '{}' should be migrated to che 6", identityId);
-        LOG.info("Stopping all workspaces before migration");
-        workspaceClient.stopWorkspaces(keycloakToken);
+        LOG.info("Stopping all Che 5 workspaces before migration");
+        workspaceClient.stopChe5Workspaces(keycloakToken);
 
         RestTemplate template = new Che6MigratorRestTemplate(keycloakToken, namespace);
         ResponseEntity<Che6MigrationStatus> response = template.exchange(cheTenantMaintainerUrl, HttpMethod.GET, null, Che6MigrationStatus.class);

@@ -12,6 +12,8 @@
  */
 package io.fabric8.che.starter.controller;
 
+import java.util.concurrent.TimeUnit;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -68,12 +70,11 @@ public class CheServerController {
             } else {
                 LOG.info("User '{}' is not yet migrated to che 6. Need to migrate now", identityId);
                 che6Migrator.migrateWorkspaces(keycloakToken, namespace);
+                delayResponse();
                 return getCheServerInfo(request, false);
             }
         }
-
         return getCheServerInfo(request, true);
-      
     }
 
     /*
@@ -90,7 +91,7 @@ public class CheServerController {
         if (che6toggle.isChe6(keycloakToken)) {
             String identityId = keycoakTokenParser.getIdentityId(keycloakToken);
             Boolean isReady = che6MigrationMap.get().getOrDefault(identityId, false);
-            LOG.info("User '{}' already migrated: {}", identityId, isReady);
+            LOG.info("User '{}' workspaces have been migrated: {}", identityId, isReady);
             return getCheServerInfo(request, isReady);
         }
 
@@ -100,6 +101,13 @@ public class CheServerController {
     private CheServerInfo getCheServerInfo(HttpServletRequest request, boolean isReady) {
         String requestURL = request.getRequestURL().toString();
         return CheServerHelper.generateCheServerInfo(isReady, requestURL, true);
+    }
+
+    private void delayResponse() {
+        try {
+            TimeUnit.SECONDS.sleep(5);
+        } catch (InterruptedException e) {
+        }
     }
 
 }

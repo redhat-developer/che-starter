@@ -41,4 +41,12 @@ public class CheServerUrlProvider {
         return url;
     }
 
+    public String getChe5Url() {
+        return che5Url;
+    }
+
+    public String getChe6Url() {
+        return che6Url;
+    }
+
 }
