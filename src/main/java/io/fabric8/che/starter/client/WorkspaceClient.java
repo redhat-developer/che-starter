@@ -291,7 +291,7 @@ public class WorkspaceClient {
             template.delete(url);
     }
 
-    public void stopWorkspaces(String keycloakToken) {
+    public void stopChe5Workspaces(String keycloakToken) {
         List<Workspace> runningWorkspaces = listWorkspacesForStopping(keycloakToken);
         LOG.info("Number of workspaces to stop: {}", runningWorkspaces.size());
         for (Workspace workspace : runningWorkspaces) {
@@ -301,9 +301,29 @@ public class WorkspaceClient {
     }
 
     private List<Workspace> listWorkspacesForStopping(String keycloakToken) {
-        List<Workspace> workspaces = listWorkspaces(keycloakToken);
+        List<Workspace> workspaces = listChe5Workspaces(keycloakToken);
         return workspaces.stream().filter(w -> w.getStatus().equals(WorkspaceStatus.RUNNING.toString())
                 || w.getStatus().equals(WorkspaceStatus.STARTING.toString())).collect(Collectors.toList());
+    }
+
+    private List<Workspace> listChe5Workspaces(String keycloakToken) {
+        String url = CheRestEndpoints.LIST_WORKSPACES.generateUrl(cheServerUrlProvider.getChe5Url());
+        RestTemplate template = new KeycloakRestTemplate(keycloakToken);
+        Gson gson = new Gson();
+        ResponseEntity<String> responseRaw = template.exchange(url, HttpMethod.GET, null, String.class);
+        List<Workspace> response = new ArrayList<>();
+        try {
+            List<Workspace> workspaces = gson.fromJson(responseRaw.getBody(), new TypeToken<ArrayList<Workspace>>(){}.getType());
+            response.addAll(workspaces);
+        } catch (Exception e) {
+            LOG.info("Unable to deserialize workspace list, probably V6 format.");
+            List<WorkspaceV6> workspaces = gson.fromJson(responseRaw.getBody(), new TypeToken<ArrayList<WorkspaceV6>>(){}.getType());
+            workspaces.forEach(workspaceV6 -> {
+                Workspace workspace = WorkspaceLegacyFormatAdapter.getWorkspaceLegacyFormat(workspaceV6);
+                response.add(workspace);
+            });
+        }
+        return response;
     }
 
 }
