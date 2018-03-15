@@ -17,6 +17,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -295,10 +296,17 @@ public class WorkspaceClient {
         List<Workspace> runningWorkspaces = listWorkspacesForStopping(keycloakToken);
         LOG.info("Number of workspaces to stop: {}", runningWorkspaces.size());
         for (Workspace workspace : runningWorkspaces) {
-            stopWorkspace(workspace, keycloakToken);
-            waitUntilWorkspaceIsStopped(workspace, keycloakToken);
+            stopChe5Workspace(workspace, keycloakToken);
+            delayResponse();
         }
     }
+
+    private void stopChe5Workspace(Workspace workspace, String keycloakToken) {
+        LOG.info("Stopping workspace {}", workspace.getId());
+        String url = CheRestEndpoints.STOP_WORKSPACE.generateUrl(cheServerUrlProvider.getChe5Url(), workspace.getId());
+        RestTemplate template = new KeycloakRestTemplate(keycloakToken);
+        template.delete(url);
+     }
 
     private List<Workspace> listWorkspacesForStopping(String keycloakToken) {
         List<Workspace> workspaces = listChe5Workspaces(keycloakToken);
@@ -324,6 +332,13 @@ public class WorkspaceClient {
             });
         }
         return response;
+    }
+
+    private void delayResponse() {
+        try {
+            TimeUnit.SECONDS.sleep(5);
+        } catch (InterruptedException e) {
+        }
     }
 
 }
