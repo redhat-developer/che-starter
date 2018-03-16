@@ -58,7 +58,7 @@ public class Che6Migrator {
         Che6MigrationStatus status = response.getBody();
         LOG.info("Status code: {}", status.getCode());
         LOG.info("Status message: {}", status.getMessage());
-        LOG.info("Status detals: {}", status.getDetails());
+        LOG.info("Status details: {}", status.getDetails());
 
         che6MigrationMap.get().put(identityId, isSuccessful(status));
     }
