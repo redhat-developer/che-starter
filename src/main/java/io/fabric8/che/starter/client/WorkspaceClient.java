@@ -265,7 +265,14 @@ public class WorkspaceClient {
 
     @Async
     public Workspace startWorkspaceAsync(String workspaceName, String keycloakToken) throws WorkspaceNotFound {
-        return startWorkspace(workspaceName, keycloakToken);
+        long startTime = System.nanoTime();
+        Workspace workspace = startWorkspace(workspaceName, keycloakToken);
+        long endTime = System.nanoTime();
+        long durationNano = (endTime - startTime);
+        long durationSeconds = TimeUnit.SECONDS.convert(durationNano, TimeUnit.NANOSECONDS);
+        LOG.info("Async startup took (nano seconds): {}", Long.toString(durationNano));
+        LOG.info("Async startup took (seconds): {}", durationSeconds);
+        return workspace;
     }
 
     public Workspace getStartedWorkspace(String keycloakToken) {
