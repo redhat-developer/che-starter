@@ -24,6 +24,10 @@ curl -LO https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
 mv jq-linux64 /usr/bin/jq
 chmod +x /usr/bin/jq
 
+# TARGET variable gives ability to switch context for building rhel based images, default is "centos"
+# If CI slave is configured with TARGET="rhel" RHEL based images should be generated then.
+TARGET=${TARGET:-"centos"}
+
 # Keycloak token provided by `che_functional_tests_credentials_wrapper` from `openshiftio-cico-jobs` is a refresh token. 
 # Obtaining osio user token
 AUTH_RESPONSE=$(curl -H "Content-Type: application/json" -X POST -d '{"refresh_token":"'$KEYCLOAK_TOKEN'"}' https://auth.prod-preview.openshift.io/api/token/refresh)
@@ -39,7 +43,22 @@ if [ $? -eq 0 ]; then
 
   export PROJECT_VERSION=`mvn -o help:evaluate -Dexpression=project.version | grep -e '^[[:digit:]]'`
 
-  docker build -t rhche/che-starter:latest .
+  if [ $TARGET == "rhel" ]; then
+    DOCKERFILE="Dockerfile.rhel"
+    REGISTRY=${DOCKER_REGISTRY:-"push.registry.devshift.net/osio-prod"}
+  else
+    DOCKERFILE="Dockerfile"
+    REGISTRY="push.registry.devshift.net"
+  fi
+
+  if [ -n "${DEVSHIFT_USERNAME}" -a -n "${DEVSHIFT_PASSWORD}" ]; then
+    docker login -u ${DEVSHIFT_USERNAME} -p ${DEVSHIFT_PASSWORD} ${REGISTRY}
+  else
+      echo "Could not login, missing credentials for the registry"
+  fi
+  docker login -u rhchebot -p $RHCHEBOT_DOCKER_HUB_PASSWORD -e noreply@redhat.com
+
+  docker build -t rhche/che-starter:latest -f ${DOCKERFILE} .
 
   if [ $? -ne 0 ]; then
     echo 'Docker Build Failed!'
@@ -48,18 +67,11 @@ if [ $? -eq 0 ]; then
 
   TAG=$(echo $GIT_COMMIT | cut -c1-${DEVSHIFT_TAG_LEN})
 
-  docker login -u rhchebot -p $RHCHEBOT_DOCKER_HUB_PASSWORD -e noreply@redhat.com
-
-  docker tag rhche/che-starter:latest rhche/che-starter:$TAG
-  docker push rhche/che-starter:latest
-  docker push rhche/che-starter:$TAG
-
-  REGISTRY="push.registry.devshift.net"
-
-  if [ -n "${DEVSHIFT_USERNAME}" -a -n "${DEVSHIFT_PASSWORD}" ]; then
-    docker login -u ${DEVSHIFT_USERNAME} -p ${DEVSHIFT_PASSWORD} ${REGISTRY}
-  else
-      echo "Could not login, missing credentials for the registry"
+  #push to docker.io ONLY if not RHEL
+  if [ $TARGET != "rhel" ]; then
+    docker tag rhche/che-starter:latest rhche/che-starter:$TAG
+    docker push rhche/che-starter:latest
+    docker push rhche/che-starter:$TAG
   fi
 
   docker tag rhche/che-starter:latest ${REGISTRY}/almighty/che-starter:$TAG
