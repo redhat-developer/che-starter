@@ -38,7 +38,7 @@ import io.fabric8.che.starter.model.request.WorkspaceCreateParams;
 @SpringBootTest(properties = { "OPENSHIFT_TOKEN_URL=http://localhost:33333/keycloak/token/openshift",
         "GITHUB_TOKEN_URL=http://localhost:33333/keycloak/token/github",
         "GITHUB_USER_URL=http://localhost:33333/github/user",
-        "MULTI_TENANT_CHE_SERVER_URL=http://localhost:33333"})
+        "CHE_SERVER_URL=http://localhost:33333"})
 public class WorkspaceControllerTest extends TestBase {
 
     private static final String WORKSPACE_ENDPOINT = "/workspace";
