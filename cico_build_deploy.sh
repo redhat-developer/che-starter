@@ -28,6 +28,9 @@ chmod +x /usr/bin/jq
 # If CI slave is configured with TARGET="rhel" RHEL based images should be generated then.
 TARGET=${TARGET:-"centos"}
 
+# debug cico target 
+echo ">>$TARGET<<"
+
 # Keycloak token provided by `che_functional_tests_credentials_wrapper` from `openshiftio-cico-jobs` is a refresh token. 
 # Obtaining osio user token
 AUTH_RESPONSE=$(curl -H "Content-Type: application/json" -X POST -d '{"refresh_token":"'$KEYCLOAK_TOKEN'"}' https://auth.prod-preview.openshift.io/api/token/refresh)
