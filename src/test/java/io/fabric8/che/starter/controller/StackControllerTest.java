@@ -35,7 +35,7 @@ import io.fabric8.che.starter.TestBase;
 @AutoConfigureMockMvc
 @SpringBootTest(properties = { "OPENSHIFT_TOKEN_URL=http://localhost:33333/keycloak/token/openshift",
         "GITHUB_TOKEN_URL=http://localhost:33333/keycloak/token/github",
-        "MULTI_TENANT_CHE_SERVER_URL=http://localhost:33333"})
+        "CHE_SERVER_URL=http://localhost:33333"})
 public class StackControllerTest extends TestBase {
 
     private static final String STACK_ENDPOINT = "/stack";

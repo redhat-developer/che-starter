@@ -21,15 +21,15 @@ import static org.junit.Assert.assertEquals;
 public class CheRestEndpointTest extends TestConfig {
     private static final String WORKSPACE_ID = "test_workspace_id";
 
-    @Value("${MULTI_TENANT_CHE_SERVER_URL}")
-    private String multiTenantCheServerURL;
+    @Value("${CHE_SERVER_URL}")
+    private String cheServerURL;
 
     @Test
     public void generateUrlsFromEndpoints() {
-        String createWorkspceUrl = CheRestEndpoints.CREATE_WORKSPACE.generateUrl(multiTenantCheServerURL);
-        assertEquals(createWorkspceUrl, multiTenantCheServerURL + "/api/workspace");
-        String deleteWorkspaceUrl = CheRestEndpoints.DELETE_WORKSPACE.generateUrl(multiTenantCheServerURL, WORKSPACE_ID);
-        assertEquals(deleteWorkspaceUrl, multiTenantCheServerURL + "/api/workspace/" + WORKSPACE_ID);
+        String createWorkspceUrl = CheRestEndpoints.CREATE_WORKSPACE.generateUrl(cheServerURL);
+        assertEquals(createWorkspceUrl, cheServerURL + "/api/workspace");
+        String deleteWorkspaceUrl = CheRestEndpoints.DELETE_WORKSPACE.generateUrl(cheServerURL, WORKSPACE_ID);
+        assertEquals(deleteWorkspaceUrl, cheServerURL + "/api/workspace/" + WORKSPACE_ID);
     }
 
 }
