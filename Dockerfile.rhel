@@ -2,7 +2,6 @@ FROM prod.registry.devshift.net/osio-prod/base/jboss-jdk-8:latest
 
 ARG VERSION=1.0-SNAPSHOT
 
-ENV JAVA_HOME /etc/alternatives/jre
 ENV CHE_STARTER_HOME /opt/che-starter
 
 ## Default ENV variable values
