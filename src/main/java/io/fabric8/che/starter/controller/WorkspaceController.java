@@ -115,7 +115,7 @@ public class WorkspaceController {
         return workspace;
     }
 
-    @ApiOperation(value = "Delete an existing workspace")
+    @ApiOperation(value = "Delete an existing workspace by name")
     @DeleteMapping("/workspace/{name}")
     public void deleteExistingWorkspace(@PathVariable String name, @RequestParam String masterUrl,
             @RequestParam String namespace,
@@ -123,7 +123,13 @@ public class WorkspaceController {
             throws JsonProcessingException, IOException, KeycloakException, WorkspaceNotFound {
 
         KeycloakTokenValidator.validate(keycloakToken);
-        deleteWorkspace(name, keycloakToken);
+        Workspace workspace = workspaceClient.getWorkspaceByName(name, keycloakToken);
+        String id = workspace.getId();
+        LOG.info("Deleting workspace name: {}, id: {}", name, id);
+        workspaceClient.stopWorkspace(workspace, keycloakToken);
+        workspaceClient.waitUntilWorkspaceIsStopped(workspace, keycloakToken);
+        workspaceClient.deleteWorkspace(id, keycloakToken);
+        LOG.info("workspace '{}' has been succesfully deleted", name);
     }
 
     /**

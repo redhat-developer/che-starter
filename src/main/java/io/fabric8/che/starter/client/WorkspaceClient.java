@@ -211,7 +211,7 @@ public class WorkspaceClient {
     }
 
     public Workspace getWorkspaceByName(String workspaceName, String keycloakToken) throws WorkspaceNotFound {
-        List<Workspace> workspaces = listWorkspaces( keycloakToken);
+        List<Workspace> workspaces = listWorkspaces(keycloakToken);
         for (Workspace workspace : workspaces) {
             if (workspace.getConfig().getName().equals(workspaceName)) {
                 return getWorkspaceById(workspace.getId(), keycloakToken);
