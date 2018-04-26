@@ -48,6 +48,7 @@ import io.fabric8.che.starter.exception.StackNotFoundException;
 import io.fabric8.che.starter.exception.WorkspaceNotFound;
 import io.fabric8.che.starter.model.request.WorkspaceCreateParams;
 import io.fabric8.che.starter.model.workspace.Workspace;
+import io.fabric8.che.starter.model.workspace.WorkspaceStatus;
 import io.fabric8.che.starter.util.WorkspaceHelper;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -126,8 +127,13 @@ public class WorkspaceController {
         Workspace workspace = workspaceClient.getWorkspaceByName(name, keycloakToken);
         String id = workspace.getId();
         LOG.info("Deleting workspace name: {}, id: {}", name, id);
-        workspaceClient.stopWorkspace(workspace, keycloakToken);
-        workspaceClient.waitUntilWorkspaceIsStopped(workspace, keycloakToken);
+
+        String status = workspaceClient.getWorkspaceStatus(id, keycloakToken);
+        if (WorkspaceStatus.RUNNING.toString().equals(status)
+                || WorkspaceStatus.STARTING.toString().equals(status)) {
+            workspaceClient.stopWorkspace(workspace, keycloakToken);
+            workspaceClient.waitUntilWorkspaceIsStopped(workspace, keycloakToken);
+        }
         workspaceClient.deleteWorkspace(id, keycloakToken);
         LOG.info("workspace '{}' has been succesfully deleted", name);
     }
