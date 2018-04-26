@@ -18,14 +18,14 @@ public enum WorkspaceStatus {
     STOPPED("STOPPED"),
     STOPPING("STOPPING");
 
-    private final String state;
+    private final String status;
 
-    private WorkspaceStatus(final String state) {
-        this.state = state;
+    private WorkspaceStatus(final String status) {
+        this.status = status;
     }
 
     @Override
     public String toString() {
-        return state;
+        return status;
     }
 }
