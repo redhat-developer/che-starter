@@ -76,7 +76,7 @@ In order to successfully run those tests locally `OSIO_USER_TOKEN` env var must 
     $ export OSIO_USER_TOKEN=<OSIO_PROD_PREVIEW_USER_TOKEN>
 ````
 
-Test can be skipped via `-DskipTests` mvn command line argument.
+Tests can be skipped via `-DskipTests` mvn command line argument.
 
 CI Jobs
 -------
