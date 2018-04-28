@@ -36,7 +36,6 @@ public class CheServerController {
     @Autowired
     KeycloakTokenParser keycoakTokenParser;
 
-
     @ApiOperation(value = "Get Che server info")
     @GetMapping("/server")
     public CheServerInfo getCheServerInfo(@RequestParam String masterUrl, @RequestParam String namespace,

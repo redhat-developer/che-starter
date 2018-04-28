@@ -22,8 +22,7 @@ public enum CheRestEndpoints {
     LIST_STACKS         ("/api/stack?maxItems=1000"),
     SET_OAUTH_TOKEN     ("/api/token/github"),
     GET_PREFERENCES     ("/api/preferences"),
-    UPDATE_PREFERENCES  ("/api/preferences"),
-    DELETE_PROJECT      ("/project/{id}");
+    UPDATE_PREFERENCES  ("/api/preferences");
 
     private final String endpoint;
 

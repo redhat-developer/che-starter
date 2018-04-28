@@ -46,7 +46,7 @@ public class StackClient {
     }
 
     /**
-     * Gets image for specified stack ID. Throws StackNotFoundException if there is no such stack
+     * Gets stack for specified stack ID. Throws StackNotFoundException if there is no such stack
      * on the Che server.
      * 
      * @param stackId stack ID
