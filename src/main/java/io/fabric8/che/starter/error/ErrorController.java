@@ -35,6 +35,7 @@ public class ErrorController implements org.springframework.boot.autoconfigure.w
     @Autowired
     private ErrorAttributes errorAttributes;
 
+    @Override
     public String getErrorPath() {
         return PATH;
     }

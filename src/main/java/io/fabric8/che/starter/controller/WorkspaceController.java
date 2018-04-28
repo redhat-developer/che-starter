@@ -36,7 +36,6 @@ import org.springframework.web.client.RestClientException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import io.fabric8.che.starter.client.ProjectClient;
 import io.fabric8.che.starter.client.WorkspaceClient;
 import io.fabric8.che.starter.client.WorkspacePreferencesClient;
 import io.fabric8.che.starter.client.github.GitHubClient;
@@ -60,9 +59,6 @@ public class WorkspaceController {
 
     @Autowired
     WorkspaceClient workspaceClient;
-
-    @Autowired
-    ProjectClient projectClient;
 
     @Autowired
     GitHubTokenProvider keycloakClient;
@@ -89,7 +85,7 @@ public class WorkspaceController {
         return listWorkspaces(repository, requestURL, keycloakToken);
     }
 
-    @ApiOperation(value = "Create and start a new workspace. Stop all other workspaces (only one workspace can be running at a time)")
+    @ApiOperation(value = "Create a new workspace. Stop all other workspaces (only one workspace can be running at a time)")
     @PostMapping("/workspace")
     public Workspace create(@RequestParam String masterUrl, @RequestParam String namespace,
             @RequestBody WorkspaceCreateParams params,
@@ -101,7 +97,7 @@ public class WorkspaceController {
         return createWorkspace(gitHubToken, keycloakToken, params);
     }
 
-    @ApiOperation(value = "Start an existing workspace. Stop all other workspaces (only one workspace can be running at a time)")
+    @ApiOperation(value = "Prepare existing workspace for starting. Stop all other workspaces (only one workspace can be running at a time)")
     @PatchMapping("/workspace/{name}")
     public Workspace startExisting(@PathVariable String name, @RequestParam String masterUrl,
             @RequestParam String namespace,
@@ -111,7 +107,8 @@ public class WorkspaceController {
 
         KeycloakTokenValidator.validate(keycloakToken);
         String gitHubToken = keycloakClient.getGitHubToken(keycloakToken);
-        Workspace workspace = workspaceClient.startWorkspace(name, keycloakToken);
+        Workspace workspace = workspaceClient.getWorkspaceByName(name, keycloakToken);
+        stopOtherWorkspaces(workspace, keycloakToken);
         setGitHubOAthTokenAndCommitterInfo(gitHubToken, keycloakToken);
         return workspace;
     }
@@ -139,37 +136,32 @@ public class WorkspaceController {
     }
 
     /**
-     * Deletes a workspace by its name. If there are projects on a workspace,
-     * remove those at first, then delete a workspace. If different workspace is
-     * running, during this process it is stopped and after successful deletion
-     * it gets started again.
-     * 
-     * @param workspaceName
-     * @param keycloakToken
-     * @throws WorkspaceNotFound
-     */
-
-    public void deleteWorkspace(String workspaceName, String keycloakToken) throws WorkspaceNotFound {
-        projectClient.deleteAllProjectsAndWorkspace(workspaceName, keycloakToken);
-    }
-
-    /**
-     * Create workspace from specified params.
+     * Create workspace from specified parameters and stop all other workspaces
+     * which are RUNNING / STARTING
      * 
      * @param gitHubOAuthToken
      * @param keycloakToken
      * @param params
-     * @return create Workspace
+     * @return Workspace
      * @throws WorkspaceNotFound
      */
     public Workspace createWorkspace(String gitHubOAuthToken, String keycloakToken, WorkspaceCreateParams params)
             throws URISyntaxException, IOException, StackNotFoundException,
             GitHubOAthTokenException, WorkspaceNotFound {
-
         Workspace workspace = createWorkspaceFromParams(gitHubOAuthToken, keycloakToken, params);
-        String workspaceName = workspace.getConfig().getName();
-        workspaceClient.startWorkspaceAsync(workspaceName, keycloakToken);
+        stopOtherWorkspaces(workspace, keycloakToken);
         return workspace;
+    }
+
+    private void stopOtherWorkspaces(Workspace workspace, String keycloakToken) {
+        String workspaceName = workspace.getConfig().getName();
+        List<Workspace> workspacesToStop = workspaceClient.listWorkspacesForStopping(keycloakToken);
+        for (Workspace w : workspacesToStop) {
+            if (!workspaceName.equals(w.getConfig().getName())) {
+                workspaceClient.stopWorkspace(w, keycloakToken);
+                workspaceClient.waitUntilWorkspaceIsStopped(w, keycloakToken);
+            }
+        }
     }
 
     /**

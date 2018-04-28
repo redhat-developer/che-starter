@@ -104,7 +104,7 @@ public class WorkspaceClient {
         while (!WorkspaceStatus.STOPPED.toString().equals(status)
                 && System.currentTimeMillis() < (currentTime + workspaceStopTimeout)) {
             try {
-                Thread.sleep(1000);
+                Thread.sleep(500);
                 LOG.info("Polling Che server for workspace '{}' status...", workspace.getConfig().getName());
             } catch (InterruptedException e) {
                 LOG.error("Error while polling for workspace status", e);
@@ -273,18 +273,6 @@ public class WorkspaceClient {
         LOG.info("Async startup took (nano seconds): {}", Long.toString(durationNano));
         LOG.info("Async startup took (seconds): {}", durationSeconds);
         return workspace;
-    }
-
-    public Workspace getStartedWorkspace(String keycloakToken) {
-        List<Workspace> workspaces = listWorkspaces(keycloakToken);
-
-        for (Workspace workspace : workspaces) {
-            if (WorkspaceStatus.RUNNING.toString().equals(workspace.getStatus())
-                    || WorkspaceStatus.STARTING.toString().equals(workspace.getStatus())) {
-                return workspace;
-            }
-        }
-        return null;
     }
 
     public String getWorkspaceStatus(String workspaceId, String keycloakToken) {
