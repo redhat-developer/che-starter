@@ -21,6 +21,7 @@ public class CheServerInfo {
     private boolean isRunning;
     private List<CheServerLink> links;
     private boolean isMultiTenant;
+    private boolean isClusterFull;
 
     public boolean isRunning() {
         return isRunning;
@@ -44,6 +45,14 @@ public class CheServerInfo {
 
     public void setMultiTenant(boolean isMultiTenant) {
         this.isMultiTenant = isMultiTenant;
+    }
+
+    public boolean isClusterFull() {
+        return isClusterFull;
+    }
+
+    public void setClusterFull(boolean isClusterFull) {
+        this.isClusterFull = isClusterFull;
     }
 
 }

@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import io.fabric8.che.starter.client.keycloak.KeycloakTokenParser;
 import io.fabric8.che.starter.client.keycloak.KeycloakTokenValidator;
 import io.fabric8.che.starter.model.server.CheServerInfo;
+import io.fabric8.che.starter.oso.ClusterCapacityTracker;
 import io.fabric8.che.starter.util.CheServerHelper;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -36,12 +37,16 @@ public class CheServerController {
     @Autowired
     KeycloakTokenParser keycoakTokenParser;
 
+    @Autowired
+    ClusterCapacityTracker clusterCapacityTracker;
+
     @ApiOperation(value = "Get Che server info")
     @GetMapping("/server")
     public CheServerInfo getCheServerInfo(@RequestParam String masterUrl, @RequestParam String namespace,
             @ApiParam(value = "Keycloak token", required = true) @RequestHeader("Authorization") String keycloakToken, HttpServletRequest request) throws Exception {
         KeycloakTokenValidator.validate(keycloakToken);
-        return getCheServerInfo(request, true);
+        boolean isClusterFull = clusterCapacityTracker.isClusterFull(keycloakToken);
+        return getCheServerInfo(request, true, isClusterFull);
     }
 
     /*
@@ -54,12 +59,13 @@ public class CheServerController {
             @ApiParam(value = "Keycloak token", required = true) @RequestHeader("Authorization") String keycloakToken, HttpServletResponse response, HttpServletRequest request) throws Exception {
 
         KeycloakTokenValidator.validate(keycloakToken);
-        return getCheServerInfo(request, true);
+        boolean isClusterFull = clusterCapacityTracker.isClusterFull(keycloakToken);
+        return getCheServerInfo(request, true, isClusterFull);
     }
 
-    private CheServerInfo getCheServerInfo(HttpServletRequest request, boolean isReady) {
+    private CheServerInfo getCheServerInfo(HttpServletRequest request, boolean isReady, boolean isClusterFull) {
         String requestURL = request.getRequestURL().toString();
-        return CheServerHelper.generateCheServerInfo(isReady, requestURL, true);
+        return CheServerHelper.generateCheServerInfo(isReady, requestURL, true, isClusterFull);
     }
 
 }
