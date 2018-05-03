@@ -12,3 +12,4 @@ data:
   multi.tenant.che.server.url: https://che.prod-preview.openshift.io
   update.tenant.endpoint: https://api.prod-preview.openshift.io/api/user/services
   che.server.url: https://che.prod-preview.openshift.io
+  osio.api.base.url: https://api.prod-preview.openshift.io/api
