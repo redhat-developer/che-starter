@@ -33,13 +33,13 @@ import io.fabric8.che.starter.oso.user.services.model.UserServices;
 public class ClusterCapacityTracker {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterCapacityTracker.class);
 
-    @Value("${OSIO_API_BASE_URL:https://api.prod-preview.openshift.io/api/}")
+    @Value("${OSIO_API_BASE_URL:https://api.prod-preview.openshift.io/api}")
     private String apiBaseUrl;
     private String userServicesEndpoint;
 
     @PostConstruct
     public void init() {
-        this.userServicesEndpoint = apiBaseUrl + "user/services";
+        this.userServicesEndpoint = apiBaseUrl + "/user/services";
     }
 
     public boolean isClusterFull(final String osioUserToken) throws NamespaceNotFoundException {
@@ -60,7 +60,7 @@ public class ClusterCapacityTracker {
         boolean clusterCapacityExhausted = cheNamespace.isClusterCapacityExhausted();
 
         LOG.info("'{}' namespace info: domain - {}, isClusterFull - {}", name, clusterAppDomain, clusterCapacityExhausted);
-        return !clusterCapacityExhausted;
+        return clusterCapacityExhausted;
     }
 
 }
