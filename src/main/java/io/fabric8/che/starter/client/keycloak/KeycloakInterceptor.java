@@ -29,10 +29,11 @@ class KeycloakInterceptor implements ClientHttpRequestInterceptor {
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String REQUEST_ID_HEADER = "X-Request-Id";
     private static final String REQUEST_ID_MDC_KEY = "req_id";
+    private static final String BEARER_PREFIX = "Bearer ";
     private String keycloakToken;
 
     public KeycloakInterceptor(String keycloakToken) {
-        this.keycloakToken = keycloakToken;
+        this.keycloakToken = keycloakToken.startsWith(BEARER_PREFIX) ? keycloakToken : BEARER_PREFIX + keycloakToken;
     }
 
     @Override
