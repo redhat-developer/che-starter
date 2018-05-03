@@ -85,6 +85,11 @@ objects:
                 configMapKeyRef:
                   name: che-starter
                   key: update.tenant.endpoint
+            - name: OSIO_API_BASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: che-starter
+                  key: osio.api.base.url
             name: che-starter
             image: ${IMAGE}:${IMAGE_TAG}
             livenessProbe:
