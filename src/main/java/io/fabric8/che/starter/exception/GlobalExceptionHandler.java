@@ -44,6 +44,12 @@ public class GlobalExceptionHandler {
     public String handleStackNotFoundException(StackNotFoundException e) {
         return e.getMessage();
     }
+ 
+    @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Namespace not found")
+    @ExceptionHandler(NamespaceNotFoundException.class)
+    public String handleNamespaceNotFoundException(NamespaceNotFoundException e) {
+        return e.getMessage();
+    }
 
     @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Bad Request (most likely the token is invalid)")
     @ExceptionHandler(HttpClientErrorException.class)
