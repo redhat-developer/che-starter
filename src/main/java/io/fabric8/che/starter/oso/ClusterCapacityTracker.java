@@ -60,7 +60,7 @@ public class ClusterCapacityTracker {
         boolean clusterCapacityExhausted = cheNamespace.isClusterCapacityExhausted();
 
         LOG.info("'{}' namespace info: domain - {}, isClusterFull - {}", name, clusterAppDomain, clusterCapacityExhausted);
-        return clusterCapacityExhausted;
+        return !clusterCapacityExhausted;
     }
 
 }

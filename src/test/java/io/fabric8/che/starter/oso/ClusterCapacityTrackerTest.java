@@ -37,6 +37,6 @@ public class ClusterCapacityTrackerTest extends TestConfig {
     public void getClusterCapacity() throws NamespaceNotFoundException {
         boolean clusterFull = clusterCapacityTracker.isClusterFull(osioUserToken);
         LOG.info("Is cluster full: {}", clusterFull);
-        assertFalse(clusterFull);
+        assertFalse(!clusterFull);
     }
 }
