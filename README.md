@@ -4,7 +4,7 @@
 che-starter
 ===========
 
-REST endpoints for managing [Eclipse Che](http://www.eclipse.org/che/) servers and workspaces.
+REST endpoints for managing [Eclipse Che](http://www.eclipse.org/che/) workspaces.
 
 Building from command line
 --------------------------
