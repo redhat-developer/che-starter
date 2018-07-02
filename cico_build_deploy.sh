@@ -12,23 +12,25 @@
 # http://www.eclipse.org/legal/epl-v10.html
 # #L%
 ###
-cat jenkins-env | grep -e RHCHEBOT_DOCKER_HUB_PASSWORD -e GIT -e DEVSHIFT -e KEYCLOAK_TOKEN > inherit-env
-. inherit-env
+
+eval "$(./env-toolkit load -f jenkins-env.json \
+          DEVSHIFT_TAG_LEN \
+          RHCHEBOT_DOCKER_HUB_PASSWORD  \
+          GIT_COMMIT \
+          KEYCLOAK_TOKEN  \
+          QUAY_USERNAME  \
+          QUAY_PASSWORD)"
 
 yum -y update
-yum -y install centos-release-scl java-1.8.0-openjdk-devel docker curl
+yum -y install epel-release
+yum -y install centos-release-scl java-1.8.0-openjdk-devel docker curl jq
 yum -y install rh-maven33
-
-# installing jq via curl since 'No package jq available' for yum
-curl -LO https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
-mv jq-linux64 /usr/bin/jq
-chmod +x /usr/bin/jq
 
 # TARGET variable gives ability to switch context for building rhel based images, default is "centos"
 # If CI slave is configured with TARGET="rhel" RHEL based images should be generated then.
 TARGET=${TARGET:-"centos"}
 
-# Keycloak token provided by `che_functional_tests_credentials_wrapper` from `openshiftio-cico-jobs` is a refresh token. 
+# Keycloak token provided by `che_functional_tests_credentials_wrapper` from `openshiftio-cico-jobs` is a refresh token.
 # Obtaining osio user token
 AUTH_RESPONSE=$(curl -H "Content-Type: application/json" -X POST -d '{"refresh_token":"'$KEYCLOAK_TOKEN'"}' https://auth.prod-preview.openshift.io/api/token/refresh)
 
@@ -45,18 +47,17 @@ if [ $? -eq 0 ]; then
 
   if [ $TARGET == "rhel" ]; then
     DOCKERFILE="Dockerfile.rhel"
-    REGISTRY=${DOCKER_REGISTRY:-"push.registry.devshift.net/osio-prod"}
+    IMAGE_URL="quay.io/openshiftio/rhel-almighty-che-starter"
   else
     DOCKERFILE="Dockerfile"
-    REGISTRY="push.registry.devshift.net"
+    IMAGE_URL="quay.io/openshiftio/almighty-che-starter"
   fi
 
-  if [ -n "${DEVSHIFT_USERNAME}" -a -n "${DEVSHIFT_PASSWORD}" ]; then
-    docker login -u ${DEVSHIFT_USERNAME} -p ${DEVSHIFT_PASSWORD} ${REGISTRY}
+  if [ -n "${QUAY_USERNAME}" -a -n "${QUAY_PASSWORD}" ]; then
+    docker login -u ${QUAY_USERNAME} -p ${QUAY_PASSWORD} quay.io
   else
-      echo "Could not login, missing credentials for the registry"
+    echo "Could not login, missing credentials for the registry"
   fi
-  docker login -u rhchebot -p $RHCHEBOT_DOCKER_HUB_PASSWORD -e noreply@redhat.com
 
   docker build -t rhche/che-starter:latest -f ${DOCKERFILE} .
 
@@ -69,16 +70,17 @@ if [ $? -eq 0 ]; then
 
   #push to docker.io ONLY if not RHEL
   if [ $TARGET != "rhel" ]; then
+    docker login -u rhchebot -p $RHCHEBOT_DOCKER_HUB_PASSWORD -e noreply@redhat.com
     docker tag rhche/che-starter:latest rhche/che-starter:$TAG
     docker push rhche/che-starter:latest
     docker push rhche/che-starter:$TAG
   fi
 
-  docker tag rhche/che-starter:latest ${REGISTRY}/almighty/che-starter:$TAG
-  docker push ${REGISTRY}/almighty/che-starter:$TAG
+  docker tag rhche/che-starter:latest ${IMAGE_URL}:$TAG
+  docker push ${IMAGE_URL}:$TAG
 
-  docker tag rhche/che-starter:latest ${REGISTRY}/almighty/che-starter:latest
-  docker push ${REGISTRY}/almighty/che-starter:latest
+  docker tag rhche/che-starter:latest ${IMAGE_URL}:latest
+  docker push ${IMAGE_URL}:latest
 
 else
   echo 'Build Failed!'
