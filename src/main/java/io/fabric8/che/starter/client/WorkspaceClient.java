@@ -174,7 +174,7 @@ public class WorkspaceClient {
 
         Gson gson = new Gson();
         HttpEntity<WorkspaceConfig> entity = new HttpEntity<>(wsConfig, headers);
-        ResponseEntity<String> workspaceResponseRaw = template.exchange(url, HttpMethod.POST, entity, String.class);
+        ResponseEntity<String> workspaceResponseRaw = template.exchange(url + "?attribute=osio_spaceId:unknown", HttpMethod.POST, entity, String.class);
         Workspace workspace;
         try {
             workspace = gson.fromJson(workspaceResponseRaw.getBody(), Workspace.class);

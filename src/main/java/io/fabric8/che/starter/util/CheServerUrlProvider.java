@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CheServerUrlProvider {
-    @Value("${CHE_SERVER_URL:https://rhche.prod-preview.openshift.io}")
+    @Value("${CHE_SERVER_URL:https://che.prod-preview.openshift.io}")
     private String url;
 
     public String getUrl(final String keycloakToken) {
