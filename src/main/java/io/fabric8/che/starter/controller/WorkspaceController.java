@@ -85,7 +85,7 @@ public class WorkspaceController {
         return listWorkspaces(repository, requestURL, keycloakToken);
     }
 
-    @ApiOperation(value = "Create a new workspace. Stop all other workspaces (only one workspace can be running at a time)")
+    @ApiOperation(value = "Create a new workspace")
     @PostMapping("/workspace")
     public Workspace create(@RequestParam String masterUrl, @RequestParam String namespace,
             @RequestBody WorkspaceCreateParams params,
@@ -149,7 +149,6 @@ public class WorkspaceController {
             throws URISyntaxException, IOException, StackNotFoundException,
             GitHubOAthTokenException, WorkspaceNotFound {
         Workspace workspace = createWorkspaceFromParams(gitHubOAuthToken, keycloakToken, params);
-        stopOtherWorkspaces(workspace, keycloakToken);
         return workspace;
     }
 
