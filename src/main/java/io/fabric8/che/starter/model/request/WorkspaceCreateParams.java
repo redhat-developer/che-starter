@@ -25,6 +25,8 @@ public class WorkspaceCreateParams {
     private String repo;
     private String branch;
     private String description;
+    // openshift.io specific parameters
+    private String spaceId;
 
     public String getStackId() {
         return stackId;
@@ -56,6 +58,14 @@ public class WorkspaceCreateParams {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getSpaceId() {
+        return spaceId;
+    }
+
+    public void setSpaceId(String spaceId) {
+        this.spaceId = spaceId;
     }
 
 }

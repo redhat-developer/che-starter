@@ -42,6 +42,7 @@ public class WorkspaceClientTest extends TestConfig {
     private static final String JAVA_CENTOS_STACK_ID = "java-centos";
     private static final String VERTX_STACK_ID = "vert.x";
     private static final String WILDFLY_SWARM_STACK_ID = "wildfly-swarm";
+    private static final String SPACE_ID = "12db65ef-b5ed-4acb-bdab-yy4463171df3";
 
     @Autowired
     private WorkspaceClient client;
@@ -58,7 +59,7 @@ public class WorkspaceClientTest extends TestConfig {
 
     @Test
     public void createAndDeleteWorkspace() throws IOException, StackNotFoundException, WorkspaceNotFound, URISyntaxException {
-        Workspace workspace = client.createWorkspace(osioUserToken, JAVA_CENTOS_STACK_ID, GITHUB_REPO, BRANCH, DESCRIPTION);
+        Workspace workspace = client.createWorkspace(osioUserToken, JAVA_CENTOS_STACK_ID, GITHUB_REPO, BRANCH, DESCRIPTION, SPACE_ID);
         String name = workspace.getConfig().getName();
         String id = workspace.getId();
 
@@ -77,7 +78,7 @@ public class WorkspaceClientTest extends TestConfig {
     @Ignore("Not possible to start workspaces on free-stg https://github.com/openshiftio/openshift.io/issues/2273")
     @Test
     public void createAndStartWorkspace() throws IOException, StackNotFoundException, WorkspaceNotFound, URISyntaxException {
-        Workspace workspace = client.createWorkspace(osioUserToken, JAVA_CENTOS_STACK_ID, GITHUB_REPO, BRANCH, DESCRIPTION);
+        Workspace workspace = client.createWorkspace(osioUserToken, JAVA_CENTOS_STACK_ID, GITHUB_REPO, BRANCH, DESCRIPTION, SPACE_ID);
         String name = workspace.getConfig().getName();
         String id = workspace.getId();
 
@@ -107,7 +108,7 @@ public class WorkspaceClientTest extends TestConfig {
     @Test
     public void createAndStartWorkspaceWhenThereIsAlreadyOneRunning() throws IOException, StackNotFoundException, WorkspaceNotFound, URISyntaxException {
         // Creating and starting first workspace
-        Workspace firstWorkspace = client.createWorkspace(osioUserToken, JAVA_CENTOS_STACK_ID, GITHUB_REPO, BRANCH, DESCRIPTION);
+        Workspace firstWorkspace = client.createWorkspace(osioUserToken, JAVA_CENTOS_STACK_ID, GITHUB_REPO, BRANCH, DESCRIPTION, SPACE_ID);
         String firstWorkspaceName = firstWorkspace.getConfig().getName();
         String firstWorkspaceId = firstWorkspace.getId();
 
@@ -127,7 +128,7 @@ public class WorkspaceClientTest extends TestConfig {
         assertEquals(firstStatusRunning, WorkspaceStatus.RUNNING.toString());
 
         // Creating and starting second workspace
-        Workspace secondWorkspace = client.createWorkspace(osioUserToken, WILDFLY_SWARM_STACK_ID, GITHUB_REPO, BRANCH, DESCRIPTION);
+        Workspace secondWorkspace = client.createWorkspace(osioUserToken, WILDFLY_SWARM_STACK_ID, GITHUB_REPO, BRANCH, DESCRIPTION, SPACE_ID);
         String secondWorkspaceName = secondWorkspace.getConfig().getName();
         String secondWorkspaceId = secondWorkspace.getId();
 
@@ -159,7 +160,7 @@ public class WorkspaceClientTest extends TestConfig {
 
     @Test
     public void getWorkspaceByIdAndDelete() throws StackNotFoundException, IOException, URISyntaxException, WorkspaceNotFound {
-        Workspace workspace = client.createWorkspace(osioUserToken, VERTX_STACK_ID, GITHUB_REPO, BRANCH, DESCRIPTION);
+        Workspace workspace = client.createWorkspace(osioUserToken, VERTX_STACK_ID, GITHUB_REPO, BRANCH, DESCRIPTION, SPACE_ID);
         String name = workspace.getConfig().getName();
         String id = workspace.getId();
 
@@ -176,7 +177,7 @@ public class WorkspaceClientTest extends TestConfig {
 
     @Test
     public void getWorkspaceByNameAndDelete() throws StackNotFoundException, IOException, URISyntaxException, WorkspaceNotFound {
-        Workspace workspace = client.createWorkspace(osioUserToken, WILDFLY_SWARM_STACK_ID, GITHUB_REPO, BRANCH, DESCRIPTION);
+        Workspace workspace = client.createWorkspace(osioUserToken, WILDFLY_SWARM_STACK_ID, GITHUB_REPO, BRANCH, DESCRIPTION, SPACE_ID);
         String name = workspace.getConfig().getName();
         String id = workspace.getId();
 

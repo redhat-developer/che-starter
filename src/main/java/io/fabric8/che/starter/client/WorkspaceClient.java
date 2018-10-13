@@ -152,7 +152,7 @@ public class WorkspaceClient {
      * @throws URISyntaxException 
      */
     public Workspace createWorkspace(String keycloakToken, String stackId, String repo,
-            String branch, String description) throws StackNotFoundException, IOException, URISyntaxException {
+            String branch, String description, String spaceId) throws StackNotFoundException, IOException, URISyntaxException {
         String url = CheRestEndpoints.CREATE_WORKSPACE.generateUrl(cheServerUrlProvider.getUrl(keycloakToken));
         WorkspaceConfig wsConfig = stackClient.getStack(stackId, keycloakToken).getWorkspaceConfig();
 
