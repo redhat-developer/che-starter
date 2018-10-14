@@ -165,7 +165,7 @@ public class WorkspaceController {
     }
 
     /**
-     * Creates a new workspace from params
+     * Creates a new workspace from {@link WorkspaceCreateParams}
      */
     private Workspace createWorkspaceFromParams(String gitHubToken, String keycloakToken, WorkspaceCreateParams params) throws StackNotFoundException, IOException, GitHubOAthTokenException, URISyntaxException {
         Workspace workspace = workspaceClient.createWorkspace(keycloakToken, params.getStackId(), params.getRepo(), params.getBranch(), params.getDescription(), params.getSpaceId());
