@@ -56,7 +56,7 @@ public class GitHubTokenProvider {
 
     private String getResponseBody(String endpoint, String keycloakToken) {
         RestTemplate template = new KeycloakRestTemplate(keycloakToken);
-        ResponseEntity<String> response = template.exchange(endpoint.toString(), HttpMethod.GET, null, String.class);
+        ResponseEntity<String> response = template.exchange(endpoint, HttpMethod.GET, null, String.class);
         return response.getBody();
     }
 
