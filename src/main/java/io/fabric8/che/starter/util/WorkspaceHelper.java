@@ -74,8 +74,9 @@ public class WorkspaceHelper {
     }
 
     /**
-     * Che workspace id is used as OpenShift service / deployment config name and
-     * must match the regex [a-z]([-a-z0-9]*[a-z0-9]) e.g. "q5iuhkwjvw1w9emg"
+     * Che workspace id is used as OpenShift service / deployment config name
+     * and must match the regex [a-z]([-a-z0-9]*[a-z0-9]) e.g.
+     * "q5iuhkwjvw1w9emg"
      *
      * @return randomly generated workspace id
      */
@@ -95,7 +96,8 @@ public class WorkspaceHelper {
     public String generateName(final String projectName) {
         String randomPostfix = RandomStringUtils.random(RANDOM_POSTFIX_LENGTH, true, true).toLowerCase();
         String workspaceName = projectName + "-" + randomPostfix;
-        // hot fix for workspace validator - currently max length for workspace name is
+        // hot fix for workspace validator - currently max length for workspace
+        // name is
         // 20 chars
         return (workspaceName.length() <= 20) ? workspaceName : randomPostfix;
     }
