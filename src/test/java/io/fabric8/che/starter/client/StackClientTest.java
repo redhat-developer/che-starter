@@ -94,13 +94,13 @@ public class StackClientTest extends TestConfig {
     @Test
     public void getProjectTypeForVertxStack() {
         String projectType = client.getProjectTypeByStackId(VERTX_STACK_ID);
-        assertEquals(projectType, "maven");
+        assertEquals("maven", projectType);
     }
 
     @Test
     public void getProjectTypeForNonExistingStack() {
         String projectType = client.getProjectTypeByStackId(NON_EXISTING_STACK_ID);
-        assertEquals(projectType, StackProjectMapping.BLANK_PROJECT_TYPE);
+        assertEquals(StackProjectMapping.BLANK_PROJECT_TYPE, projectType);
     }
 
     @Test(expected = StackNotFoundException.class)
