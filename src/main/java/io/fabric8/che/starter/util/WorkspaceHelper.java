@@ -69,14 +69,13 @@ public class WorkspaceHelper {
     }
 
     public WorkspaceLink getWorkspaceIdeLink(final Workspace workspace) {
-        List<WorkspaceLink> links = workspace.getLinks();
-        return links.stream().filter(link -> WORKSPACE_IDE_URL.equals(link.getRel())).findFirst().get();
+        return workspace.getLinks().stream().filter(link -> WORKSPACE_IDE_URL.equals(link.getRel())).findFirst()
+                .orElse(null);
     }
 
     /**
-     * Che workspace id is used as OpenShift service / deployment config name
-     * and must match the regex [a-z]([-a-z0-9]*[a-z0-9]) e.g.
-     * "q5iuhkwjvw1w9emg"
+     * Che workspace id is used as OpenShift service / deployment config name and
+     * must match the regex [a-z]([-a-z0-9]*[a-z0-9]) e.g. "q5iuhkwjvw1w9emg"
      *
      * @return randomly generated workspace id
      */
@@ -85,16 +84,19 @@ public class WorkspaceHelper {
     }
 
     /**
-     * Generates workspace name based on projectName with random postfix e.g. 'che-starter-f8zbl2is'
+     * Generates workspace name based on projectName with random postfix e.g.
+     * 'che-starter-f8zbl2is'
+     * 
      * @param projectName
      * @return workspace name
      * @see https://github.com/openshiftio/openshift.io/issues/446
-     * @see https://github.com/eclipse/che/issues/6130 
+     * @see https://github.com/eclipse/che/issues/6130
      */
     public String generateName(final String projectName) {
         String randomPostfix = RandomStringUtils.random(RANDOM_POSTFIX_LENGTH, true, true).toLowerCase();
         String workspaceName = projectName + "-" + randomPostfix;
-        // hot fix for workspace validator - currently max length for workspace name is 20 chars
+        // hot fix for workspace validator - currently max length for workspace name is
+        // 20 chars
         return (workspaceName.length() <= 20) ? workspaceName : randomPostfix;
     }
 
