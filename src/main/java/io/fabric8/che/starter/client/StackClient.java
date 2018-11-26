@@ -45,24 +45,19 @@ public class StackClient {
     }
 
     /**
-     * Gets stack for specified stack ID. Throws StackNotFoundException if there
-     * is no such stack on the Che server.
+     * Gets stack for specified stack ID. Throws StackNotFoundException if there is no such stack
+     * on the Che server.
      * 
-     * @param stackId
-     *            stack ID
-     * @param keycloakToken
-     *            Keycloak token
+     * @param stackId stack ID
+     * @param keycloakToken Keycloak token
      * @return image name for stack
-     * @throws StackNotFoundException
-     *             if no image name exists for such stack ID or call to Che
-     *             server was not successful
+     * @throws StackNotFoundException if no image name exists for such stack ID or call to Che server was not successful
      */
     public Stack getStack(String stackId, String keycloakToken) throws StackNotFoundException {
         List<Stack> stacks = listStacks(keycloakToken);
         if (stacks != null && !stacks.isEmpty()) {
-            return stacks.stream().filter(s -> stackId.equals(s.getId())).findFirst()
-                    .orElseThrow(() -> new StackNotFoundException("Stack with id '" + stackId + "' was not found"));
-        }
+                return stacks.stream().filter(s -> stackId.equals(s.getId())).findFirst().orElseThrow(() -> new StackNotFoundException("Stack with id '" + stackId + "' was not found"));
+        } 
         throw new StackNotFoundException("No stacks were returned from Che server");
     }
 
