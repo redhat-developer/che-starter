@@ -13,7 +13,6 @@
 package io.fabric8.che.starter.client;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
