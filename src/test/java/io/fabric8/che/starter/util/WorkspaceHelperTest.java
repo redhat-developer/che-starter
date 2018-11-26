@@ -45,7 +45,7 @@ public class WorkspaceHelperTest extends TestConfig {
 
         List<WorkspaceLink> links = workspace.getLinks();
 
-        assertEquals(links.size(), 1);
+        assertEquals(1, links.size());
 
         WorkspaceLink workspaceLink = links.get(0);
 
@@ -61,7 +61,7 @@ public class WorkspaceHelperTest extends TestConfig {
         assertTrue(workspaceNameForShortNamedProject.matches("[a-zA-Z0-9][-_.a-zA-Z0-9]{1,18}[a-zA-Z0-9]"));
 
         String workspaceNameForLongNamedProject = workspaceHelper.generateName(TEST_PROJECT_LONG_NAME);
-        assertEquals(workspaceNameForLongNamedProject.length(), WorkspaceHelper.RANDOM_POSTFIX_LENGTH);
+        assertEquals(WorkspaceHelper.RANDOM_POSTFIX_LENGTH, workspaceNameForLongNamedProject.length());
         assertTrue(workspaceNameForLongNamedProject.matches("[a-zA-Z0-9][-_.a-zA-Z0-9]{1,18}[a-zA-Z0-9]"));
     }
 
