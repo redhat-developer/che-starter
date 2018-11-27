@@ -35,8 +35,8 @@ public class Project {
     private List<String> mixins;
 
     public Project() {
-        links = new ArrayList<ProjectLink>();
-        mixins = new ArrayList<String>();
+        links = new ArrayList<>();
+        mixins = new ArrayList<>();
     }
 
     public String getName() {
