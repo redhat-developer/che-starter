@@ -50,7 +50,7 @@ public class WorkspacePreferencesClient {
         RestTemplate template = new KeycloakRestTemplate(keycloakToken);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<WorkspacePreferences> entity = new HttpEntity<WorkspacePreferences>(preferences, headers);
+        HttpEntity<WorkspacePreferences> entity = new HttpEntity<>(preferences, headers);
         template.exchange(CheRestEndpoints.UPDATE_PREFERENCES.generateUrl(cheServerUrlProvider.getUrl(keycloakToken)), HttpMethod.PUT, entity, String.class);
     }
 
@@ -58,7 +58,7 @@ public class WorkspacePreferencesClient {
         RestTemplate template = new KeycloakRestTemplate(keycloakToken);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> entity = new HttpEntity<String>(headers);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
 
         ResponseEntity<WorkspacePreferences> response = template.exchange(
                 CheRestEndpoints.GET_PREFERENCES.generateUrl(cheServerUrlProvider.getUrl(keycloakToken)), HttpMethod.GET, entity,
