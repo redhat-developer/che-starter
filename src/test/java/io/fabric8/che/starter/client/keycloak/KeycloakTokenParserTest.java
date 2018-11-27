@@ -49,13 +49,13 @@ public class KeycloakTokenParserTest extends TestConfig {
     public void getIdentityId() throws JsonProcessingException, IOException {
         String identityId = parser.getIdentityId(AUTH_HEADER);
         LOG.info("Identity ID: {}", identityId);
-        assertEquals(identityId, SUB);
+        assertEquals(SUB, identityId);
     }
 
     @Test
     public void getSessionState() throws JsonProcessingException, IOException {
         String sessionState = parser.getSessionState(AUTH_HEADER);
         LOG.info("Session State: {}", sessionState);
-        assertEquals(sessionState, TEST_SESSION_STATE);
+        assertEquals(TEST_SESSION_STATE, sessionState);
     }
 }

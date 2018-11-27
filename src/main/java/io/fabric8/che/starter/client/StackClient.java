@@ -13,7 +13,6 @@
 package io.fabric8.che.starter.client;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -57,15 +56,9 @@ public class StackClient {
     public Stack getStack(String stackId, String keycloakToken) throws StackNotFoundException {
         List<Stack> stacks = listStacks(keycloakToken);
         if (stacks != null && !stacks.isEmpty()) {
-            try {
-                Stack stack = stacks.stream().filter(s -> stackId.equals(s.getId())).findFirst().get();
-                return stack;
-            } catch (NoSuchElementException e) {
-                throw new StackNotFoundException("Stack with id '" + stackId + "' was not found");
-            }
-        } else {
-            throw new StackNotFoundException("No stacks were returned from Che server");
-        }
+                return stacks.stream().filter(s -> stackId.equals(s.getId())).findFirst().orElseThrow(() -> new StackNotFoundException("Stack with id '" + stackId + "' was not found"));
+        } 
+        throw new StackNotFoundException("No stacks were returned from Che server");
     }
 
     public String getProjectTypeByStackId(final String stackId) {

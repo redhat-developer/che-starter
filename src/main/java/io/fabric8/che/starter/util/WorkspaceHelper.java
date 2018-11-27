@@ -70,7 +70,7 @@ public class WorkspaceHelper {
 
     public WorkspaceLink getWorkspaceIdeLink(final Workspace workspace) {
         List<WorkspaceLink> links = workspace.getLinks();
-        return links.stream().filter(link -> WORKSPACE_IDE_URL.equals(link.getRel())).findFirst().get();
+        return links.stream().filter(link -> WORKSPACE_IDE_URL.equals(link.getRel())).findFirst().orElse(null);
     }
 
     /**

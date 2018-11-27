@@ -40,8 +40,7 @@ public class GitHubTokenProvider {
     public String getGitHubToken(String keycloakToken) throws KeycloakException, JsonProcessingException, IOException {
         LOG.info("GitHub token url - {}", gitHubTokenUrl);
         // {"access_token":"token","scope":"admin:repo_hook,gist,read:org,repo,user","token_type":"bearer"}
-        String token = getAccessToken(gitHubTokenUrl, keycloakToken);
-        return token;
+        return getAccessToken(gitHubTokenUrl, keycloakToken);
     }
 
     private String getAccessToken(String endpoint, String keycloakToken) throws KeycloakException, JsonProcessingException, IOException {
@@ -57,7 +56,7 @@ public class GitHubTokenProvider {
 
     private String getResponseBody(String endpoint, String keycloakToken) {
         RestTemplate template = new KeycloakRestTemplate(keycloakToken);
-        ResponseEntity<String> response = template.exchange(endpoint.toString(), HttpMethod.GET, null, String.class);
+        ResponseEntity<String> response = template.exchange(endpoint, HttpMethod.GET, null, String.class);
         return response.getBody();
     }
 

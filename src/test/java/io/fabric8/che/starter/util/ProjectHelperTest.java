@@ -36,25 +36,25 @@ public class ProjectHelperTest extends TestConfig {
     @Test
     public void getProjectName() throws URISyntaxException, MalformedURLException {
         String projectName = projectHelper.getProjectNameFromGitRepository(REPOSITORY_URL);
-        assertEquals(projectName, PROJECT_NAME);
+        assertEquals(PROJECT_NAME, projectName);
     }
 
     @Test
     public void getProjectNameFromBareRepo() throws MalformedURLException, URISyntaxException {
         String projectName = projectHelper.getProjectNameFromGitRepository(BARE_REPOSITORY_URL);
-        assertEquals(projectName, PROJECT_NAME);
+        assertEquals(PROJECT_NAME, projectName);
     }
 
     @Test
     public void getProjectNameFromBareRepoWithSlash() throws MalformedURLException, URISyntaxException {
         String projectName = projectHelper.getProjectNameFromGitRepository(BARE_REPOSITORY_URL_WITH_SLASH);
-        assertEquals(projectName, PROJECT_NAME);
+        assertEquals(PROJECT_NAME, projectName);
     }
 
     @Test
     public void getProjectNameFromSshRepo() throws MalformedURLException, URISyntaxException {
         String projectName = projectHelper.getProjectNameFromGitRepository(BARE_REPOSITORY_SSH_URL);
-        assertEquals(projectName, PROJECT_NAME);
+        assertEquals(PROJECT_NAME, projectName);
     }
 
     @Test(expected = MalformedURLException.class)
