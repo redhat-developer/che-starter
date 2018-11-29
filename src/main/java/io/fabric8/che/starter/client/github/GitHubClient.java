@@ -67,7 +67,7 @@ public class GitHubClient {
         RestTemplate template = new KeycloakRestTemplate(keycloakToken);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<Token> entity = new HttpEntity<Token>(token, headers);
+        HttpEntity<Token> entity = new HttpEntity<>(token, headers);
 
         try {
             template.postForLocation(url, entity);
