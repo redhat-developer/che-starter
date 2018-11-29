@@ -74,7 +74,7 @@ public class WorkspaceController {
 
     @ApiOperation(value = "List workspaces per git repository. If repository parameter is not specified return all workspaces")
     @GetMapping("/workspace")
-    public List<Workspace> list(@RequestParam String masterUrl, @RequestParam String namespace,
+    public List<Workspace> list(@RequestParam(required = false) String masterUrl, @RequestParam(required = false) String namespace,
             @RequestParam(required = false) String repository,
             @ApiParam(value = "Keycloak token", required = true) @RequestHeader("Authorization") String keycloakToken,
             HttpServletRequest request)
@@ -87,7 +87,7 @@ public class WorkspaceController {
 
     @ApiOperation(value = "Create a new workspace")
     @PostMapping("/workspace")
-    public Workspace create(@RequestParam String masterUrl, @RequestParam String namespace,
+    public Workspace create(@RequestParam(required = false) String masterUrl, @RequestParam(required = false) String namespace,
             @RequestBody WorkspaceCreateParams params,
             @ApiParam(value = "Keycloak token", required = true) @RequestHeader("Authorization") String keycloakToken)
             throws IOException, URISyntaxException, StackNotFoundException,
@@ -99,8 +99,8 @@ public class WorkspaceController {
 
     @ApiOperation(value = "Prepare existing workspace for starting. Stop all other workspaces (only one workspace can be running at a time)")
     @PatchMapping("/workspace/{name}")
-    public Workspace startExisting(@PathVariable String name, @RequestParam String masterUrl,
-            @RequestParam String namespace,
+    public Workspace startExisting(@PathVariable String name, @RequestParam(required = false) String masterUrl,
+            @RequestParam(required = false) String namespace,
             @ApiParam(value = "Keycloak token", required = true) @RequestHeader("Authorization") String keycloakToken)
             throws IOException, URISyntaxException, StackNotFoundException,
             GitHubOAthTokenException, KeycloakException, WorkspaceNotFound {
@@ -115,8 +115,8 @@ public class WorkspaceController {
 
     @ApiOperation(value = "Delete an existing workspace by name")
     @DeleteMapping("/workspace/{name}")
-    public void deleteExistingWorkspace(@PathVariable String name, @RequestParam String masterUrl,
-            @RequestParam String namespace,
+    public void deleteExistingWorkspace(@PathVariable String name, @RequestParam(required = false) String masterUrl,
+            @RequestParam(required = false) String namespace,
             @ApiParam(value = "Keycloak token", required = true) @RequestHeader("Authorization") String keycloakToken)
             throws JsonProcessingException, IOException, KeycloakException, WorkspaceNotFound {
 

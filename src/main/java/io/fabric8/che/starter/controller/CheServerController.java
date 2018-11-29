@@ -42,7 +42,7 @@ public class CheServerController {
 
     @ApiOperation(value = "Get Che server info")
     @GetMapping("/server")
-    public CheServerInfo getCheServerInfo(@RequestParam String masterUrl, @RequestParam String namespace,
+    public CheServerInfo getCheServerInfo(@RequestParam(required = false) String masterUrl, @RequestParam(required = false) String namespace,
             @ApiParam(value = "Keycloak token", required = true) @RequestHeader("Authorization") String keycloakToken, HttpServletRequest request) throws Exception {
         KeycloakTokenValidator.validate(keycloakToken);
         boolean isClusterFull = clusterCapacityTracker.isClusterFull(keycloakToken);
