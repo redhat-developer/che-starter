@@ -39,7 +39,7 @@ public class StackController {
 
     @ApiOperation(value = "List the available stacks")
     @GetMapping("/stack")
-    public List<Stack> list(@RequestParam String masterUrl, @RequestParam String namespace,
+    public List<Stack> list(@RequestParam(required = false) String masterUrl, @RequestParam(required = false) String namespace,
             @ApiParam(value = "Keycloak token", required = true) @RequestHeader("Authorization") String keycloakToken)
             throws JsonProcessingException, IOException, KeycloakException {
         
