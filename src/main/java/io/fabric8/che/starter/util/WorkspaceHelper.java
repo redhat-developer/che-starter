@@ -94,7 +94,7 @@ public class WorkspaceHelper {
     public String generateName(final String projectName) {
         String randomPostfix = RandomStringUtils.random(RANDOM_POSTFIX_LENGTH, true, true).toLowerCase();
         String workspaceName = projectName + "-" + randomPostfix;
-        // hot fix for workspace validator - currently max length for workspace name is 20 chars
+        // hot fix for workspace validator - currently max length for workspace name is 100 chars
         return (workspaceName.length() <= 95) ? workspaceName : randomPostfix;
     }
 
