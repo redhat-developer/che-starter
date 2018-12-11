@@ -28,7 +28,7 @@ import io.fabric8.che.starter.model.workspace.WorkspaceLink;
 public class WorkspaceHelperTest extends TestConfig {
     private static final String REQUEST_URL = "http://localhost:10000/workspace";
     private static final String TEST_PROJECT_SHORT_NAME = "test-project";
-    private static final String TEST_PROJECT_LONG_NAME = "training-courses-management-system";
+    private static final String TEST_PROJECT_LONG_NAME = "project-name-which-contains-more-than-100-characters-to-trigger-the-use-of-hash-for-the-workspace-name";
 
     @Autowired
     WorkspaceHelper workspaceHelper;
