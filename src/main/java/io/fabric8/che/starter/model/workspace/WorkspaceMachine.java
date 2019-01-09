@@ -26,6 +26,7 @@ public class WorkspaceMachine {
     private List<String> installers;
     private WorkspaceMachineAttribute attributes;
     private Map<String, WorkspaceMachineServers> servers;
+    private Map<String, Map<String, String>> volumes;
 
     public List<String> getAgents() {
         return agents;
@@ -57,6 +58,14 @@ public class WorkspaceMachine {
 
     public void setServers(Map<String, WorkspaceMachineServers> servers) {
         this.servers = servers;
+    }
+
+    public Map<String, Map<String, String>> getVolumes() {
+        return volumes;
+    }
+
+    public void setVolumes(Map<String, Map<String, String>> volumes) {
+        this.volumes = volumes;
     }
 
 }
