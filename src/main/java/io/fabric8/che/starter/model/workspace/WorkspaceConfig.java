@@ -22,13 +22,13 @@ import java.util.Map;
 public class WorkspaceConfig {
 
     private List<WorkspaceCommand> commands;
-    // there could go list of projects
     private String defaultEnv;
     private String description;
     private Map<String, WorkspaceEnvironment> environments;
     private String name;
     private List<WorkspaceLink> links;
     private List<Project> projects;
+    private Map<String, String> attributes;
 
     public String getName() {
         return name;
@@ -84,6 +84,14 @@ public class WorkspaceConfig {
 
     public void setProjects(List<Project> projects) {
         this.projects = projects;
+    }
+
+    public Map<String, String> getAttributes() {
+        return attributes;
+    }
+
+    public void setAttributes(Map<String, String> attributes) {
+        this.attributes = attributes;
     }
 
 }

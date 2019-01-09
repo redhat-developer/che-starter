@@ -38,6 +38,9 @@ public class StackClientTest extends TestConfig {
     private static final String WILDFLY_SWARM_STACK_ID = "wildfly-swarm";
     private static final String NODE_JS_STACK_ID = "nodejs-centos";
     private static final String NON_EXISTING_STACK_ID = "non-existing-stack-id";
+    private static final String THEIA_STACK_ID = "simple-theia";
+    private static final String CHE7_STACK_ID = "che7";
+    private static final String CHE7_DEV_STACK_ID = "che7-preview-plugin-dev";
 
     @Autowired
     private StackClient client;
@@ -89,6 +92,24 @@ public class StackClientTest extends TestConfig {
     public void getNodeJsStack() throws StackNotFoundException {
         Stack nodeJs = client.getStack(NODE_JS_STACK_ID, osioUserToken);
         LOG.info("'nodejs4' stack is found: {}", nodeJs);
+    }
+
+    @Test
+    public void getTheiaStack() throws StackNotFoundException {
+        Stack theia = client.getStack(THEIA_STACK_ID, osioUserToken);
+        LOG.info("'{}' stack is found: {}", THEIA_STACK_ID, theia);
+    }
+
+    @Test
+    public void getChe7Stack() throws StackNotFoundException {
+        Stack che7 = client.getStack(CHE7_STACK_ID, osioUserToken);
+        LOG.info("'{}' stack is found: {}", CHE7_STACK_ID, che7);
+    }
+
+    @Test
+    public void getChe7DevStack() throws StackNotFoundException {
+        Stack che7dev = client.getStack(CHE7_DEV_STACK_ID, osioUserToken);
+        LOG.info("'{}' stack is found: {}", CHE7_DEV_STACK_ID, che7dev);
     }
 
     @Test
