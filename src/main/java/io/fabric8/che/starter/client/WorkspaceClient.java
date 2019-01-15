@@ -184,7 +184,6 @@ public class WorkspaceClient {
             workspace = WorkspaceLegacyFormatAdapter.getWorkspaceLegacyFormat(workspaceV6);
         }
         LOG.info("Workspace has been created: {}", workspace.getId());
-
         return workspace;
     }
 
